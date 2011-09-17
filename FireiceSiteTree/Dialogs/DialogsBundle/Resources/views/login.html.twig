@@ -1,0 +1,20 @@
+
+{% block content %}
+<h4>Вход в систему:</h4>
+{% if error %}
+    <div>{{ error.message }}</div>
+{% endif %}
+
+<div>{{ message }}</div>
+
+<form action="{{ path('_security_check') }}" method="post">
+    <label for="username">Email:</label>
+    <input type="text" id="username" name="_username" value="{{ last_username }}" />
+    <br>
+    <label for="password">Пароль:</label>
+    <input type="password" id="password" name="_password" />
+    <br>
+    <input type="submit" name="login" />
+</form>
+
+{% endblock %}

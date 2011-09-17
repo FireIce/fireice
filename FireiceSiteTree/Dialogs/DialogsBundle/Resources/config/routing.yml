@@ -1,0 +1,81 @@
+   
+# Юзеры
+get_users:
+    pattern: /backoffice/users/getusers
+    defaults: { _controller: DialogsBundle:Users:getUsers }    
+    
+get_userdata:
+    pattern: /backoffice/users/getuserdata
+    defaults: { _controller: DialogsBundle:Users:getUserData }    
+    
+edit_user:
+    pattern: /backoffice/users/edit
+    defaults: { _controller: DialogsBundle:Users:editUser }  
+    
+add_user:
+    pattern: /backoffice/users/add
+    defaults: { _controller: DialogsBundle:Users:addUser }    
+    
+delete_user:
+    pattern: /backoffice/users/delete
+    defaults: { _controller: DialogsBundle:Users:deleteUser }     
+    
+# Группы   
+get_groups:
+    pattern: /backoffice/groups/getgroups
+    defaults: { _controller: DialogsBundle:Groups:getGroups }  
+    
+get_groupdata:
+    pattern: /backoffice/groups/getgroupdata
+    defaults: { _controller: DialogsBundle:Groups:getGroupData }  
+    
+edit_group:
+    pattern: /backoffice/groups/edit
+    defaults: { _controller: DialogsBundle:Groups:editGroup }   
+    
+add_group:
+    pattern: /backoffice/groups/add
+    defaults: { _controller: DialogsBundle:Groups:addGroup }    
+    
+delete_group:
+    pattern: /backoffice/groups/delete
+    defaults: { _controller: DialogsBundle:Groups:deleteGroup }     
+    
+# Права    
+get_rights_modules:
+    pattern: /backoffice/rights/getmodules
+    defaults: { _controller: DialogsBundle:Rights:getModules }     
+    
+get_rights_users:
+    pattern: /backoffice/rights/getusers
+    defaults: { _controller: DialogsBundle:Rights:getUsers }     
+    
+get_rights_user:
+    pattern: /backoffice/rights/getuser
+    defaults: { _controller: DialogsBundle:Rights:getUser }     
+    
+edit_rights_user:
+    pattern: /backoffice/rights/edit
+    defaults: { _controller: DialogsBundle:Rights:editUser }  
+    
+# Сообщения
+get_messages:
+    pattern: /backoffice/messages/getmessages
+    defaults: { _controller: DialogsBundle:Messages:getMessages } 
+    
+get_message:
+    pattern: /backoffice/messages/getmessage
+    defaults: { _controller: DialogsBundle:Messages:getMessage }     
+    
+del_message:
+    pattern: /backoffice/messages/delmessage
+    defaults: { _controller: DialogsBundle:Messages:deleteMessage }     
+    
+    
+_security_login:
+    pattern: /backoffice/login
+    defaults: { _controller: DialogsBundle:Groups:login }
+_security_logout:
+    pattern: /backoffice/logout
+_security_check:
+    pattern: /backoffice/login_check

@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+    "http://www.w3.org/TR/html4/loose.dtd">
+<html> 
+<head>
+	<title></title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta http-equiv="Content-Language" content="ru">
+	<link href="{{ asset('bundles/fireicesitetree/css/menu.css') }}" type="text/css" rel="stylesheet"  media="screen" />    
+	
+    <script src="{{ asset('bundles/fireicesitetree/js/jquery.js') }}" type="text/javascript"></script>
+	<script src="{{ asset('bundles/fireicesitetree/js/jquery.tmpl.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('bundles/fireicesitetree/js/jquery.history.js') }}" type="text/javascript"></script>
+	
+    <script src="{{ asset('bundles/fireicesitetree/js/functions.js') }}" type="text/javascript"></script>
+	<script src="{{ asset('bundles/fireicesitetree/js/menu.js') }}" type="text/javascript"></script>  
+	<script src="{{ asset('bundles/fireicesitetree/js/dialogs.js') }}" type="text/javascript"></script>
+
+    <script src="{{ asset('bundles/fireicesitetree/js/plugins/plugin_uploadimage.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('bundles/fireicesitetree/js/plugins/plugin_ckeditor.js') }}" type="text/javascript"></script>
+
+    <script src="{{ asset('bundles/fireicesitetree/js/modules/module_item.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('bundles/fireicesitetree/js/modules/module_list.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('bundles/fireicesitetree/js/modules/module_comments.js') }}" type="text/javascript"></script>
+
+    <script src="{{ asset('bundles/fireicesitetree/ckeditor/ckeditor.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('bundles/fireicesitetree/ckfinder/ckfinder.js') }}" type="text/javascript"></script>
+	
+	<script type="text/javascript">	
+	
+	$(document).ready(function(){		
+        var progress_block = {
+            progress_block_html: '<table height="100%"><tr><td align="center" style="vertical-align: middle; font-size: 12px;">'+
+                                   '<img src="{{ asset('bundles/fireicesitetree/i/ajax-loader3.gif') }}" width="32" width="32">'+
+                                   '<br /><br />'+
+                                   'Подождите. Идёт загрузка...'+                               
+                                 '</td></tr></table>',
+			url: 'http://localhost/fireice4/web/app_dev.php/backoffice',
+			templates: 'http://localhost/fireice4/web/bundles/fireicesitetree/templates'
+        };
+
+        $.showMenu(progress_block);
+	});	
+		
+	</script>
+	
+</head>
+<body>
+
+
+<div align="right" style="margin-top: 5px; padding:5px; margin-right: 5px;">        
+	<a id="user_id" style="color: #6b6b6b; text-decoration: underline; font-weight: bold;"></a>&nbsp;|
+	<a id="messages_link_id" href="noscript" onclick="return false;" style="color: #6b6b6b; text-decoration: underline;">Сообщения<span {% if messages == 0 %}style="display: none;"{% endif %}>(<b>{{ messages }}</b>)</span></a>&nbsp;|
+    <a id="users_link_id" href="noscript" onclick="return false;" style="color: #6b6b6b; text-decoration: underline;">Пользователи</a>&nbsp;|
+    <a id="groups_link_id" href="noscript" onclick="return false;" style="color: #6b6b6b; text-decoration: underline;">Группы</a>&nbsp;&nbsp;&nbsp;
+    <a href="{{ url('_security_logout') }}" style="color: #6b6b6b; text-decoration: underline;">Выход</a>
+</div>
+
+<div id="menu_id" class="menu-wrapper" style="height: 100px;"></div>
+
+<div id="progress_id" align="center" style="display: none;"><br><br><br><img src="{{ asset('bundles/fireicesitetree/i/ajax-loader3.gif') }}" /></div>
+
+<div id="dialog_id" style="display: none; padding: 10px;"></div>
+
+</body>
+</html>

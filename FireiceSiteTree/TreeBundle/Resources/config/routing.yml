@@ -1,0 +1,101 @@
+nodes_show:
+    pattern:  /nodes_show
+    defaults: { _controller: TreeBundle:Tree:index }
+    
+node_create:
+    pattern: /backoffice/node_create
+    defaults: { _controller: TreeBundle:Tree:nodeCreate } 
+    
+hide_node:
+    pattern: /backoffice/hide_node/{id}
+    defaults: { _controller: TreeBundle:Tree:hideNode } 
+    requirements:    
+        id:  \d+    
+        
+show_node:
+    pattern: /backoffice/show_node/{id}
+    defaults: { _controller: TreeBundle:Tree:showNode } 
+    requirements:    
+        id:  \d+          
+        
+get_parents:
+    pattern: /backoffice/get_parents/{id}
+    defaults: { _controller: TreeBundle:Tree:getParents }        
+    requirements:    
+        id:  \d+          
+        
+get_shownodes:
+    pattern: /backoffice/get_shownodes
+    defaults: { _controller: TreeBundle:Tree:getShowNodes }  
+    
+get_newnodes:
+    pattern: /get_newnodes/{id}
+    defaults: { _controller: TreeBundle:Tree:getNewNodes }        
+    requirements:    
+        id:  \d+                
+    
+context_menu:
+    pattern: /backoffice/context_menu/{id}
+    defaults: { _controller: TreeBundle:Tree:contextMenu }        
+    requirements:    
+        id:  \d+  
+            
+get_modules: 
+    pattern:  /backoffice/get_modules/{id}
+    defaults: { _controller: TreeBundle:Tree:getModules }            
+    requirements:    
+        id:  \d+     
+
+# Какие модули привязаны к узлу (для формирования вкладок в окне диалога создания-правки узла)
+get_node_modules: 
+    pattern:  /backoffice/get_node_modules
+    defaults: { _controller: TreeBundle:Tree:getNodeModules }               
+    
+dialog_create_edit: 
+    pattern:  /backoffice/dialog_create_edit
+    defaults: { _controller: TreeBundle:Tree:dialogCreateEdit } 
+    
+update_orders: 
+    pattern:  /backoffice/update_orders
+    defaults: { _controller: TreeBundle:Tree:updateOrders }     
+    
+node_remove: 
+    pattern:  /backoffice/node_remove
+    defaults: { _controller: TreeBundle:Tree:remove }
+
+
+get_history:
+    pattern: /backoffice/get_history
+    defaults: { _controller: TreeBundle:Tree:getHistory } 
+
+backoffice:
+    pattern: /backoffice/
+    defaults: { _controller: TreeBundle:Tree:backOffice }
+    
+    
+# Отправка на подтверждение, подтверждение, возврат на доработку
+prove_editor:
+    pattern: /backoffice/prove_editor
+    defaults: { _controller: TreeBundle:Tree:proveEditor }
+prove_maineditor:
+    pattern: /backoffice/prove_maineditor
+    defaults: { _controller: TreeBundle:Tree:proveMainEditor }    
+    
+sendtoprove_editor:
+    pattern: /backoffice/sendtoprove_editor
+    defaults: { _controller: TreeBundle:Tree:sendToProveEditor }    
+sendtoprove_maineditor:
+    pattern: /backoffice/sendtoprove_maineditor
+    defaults: { _controller: TreeBundle:Tree:sendToProveMainEditor }      
+    
+return_writer:
+    pattern: /backoffice/return_writer
+    defaults: { _controller: TreeBundle:Tree:returnWriter }   
+return_editor:
+    pattern: /backoffice/return_editor
+    defaults: { _controller: TreeBundle:Tree:returnEditor }     
+    
+    
+get_new_messages:
+    pattern: /backoffice/messages/get_new_messages
+    defaults: { _controller: TreeBundle:Tree:getNewMessages }     

@@ -1,0 +1,41 @@
+{% extends "DialogsBundle::layout.html.twig" %}
+
+{% block content %}
+<div align="right"><a href="{{ url('_security_logout') }}">Выйти</a></div>
+<a href="">Добавить группу</a>
+<br><br />                                                       
+Список групп:
+<br><br />
+
+<table border="1" width="100%" cellspacing="0" cellpadding="4">
+    <tr style="background-color: #F0F2E6">
+        <td align="center" width="50">ID</td>
+        <td align="center">Name</td> 
+        <td align="center">Title</td>
+        <td align="center">Права группы</td>
+        <td align="center" width="250">Действия</td>    
+    </tr>  
+    {% for group in groups %}
+    <tr>
+        <td>{{ group.getId }}</td>
+        <td>{{ group.getName }}</td> 
+        <td>{{ group.getTitle }}</td>
+        <td>
+            {% for key, right in group.right %} 
+            Права для модуля {{ key }}:
+                {% for r in right %}
+                    {{ r }}{% if loop.last == false %}, {% endif %}
+                {% endfor %}
+                <br />
+            {% endfor %}
+        </td>
+        <td align="center">
+            <a href="{{ url('edit_group', { 'id': group.getId }) }}">Редактировать</a>
+            &nbsp;&nbsp;
+            <a href="{{ url('remove_group', { 'id': group.getId }) }}">Удалить</a>
+        </td>    
+    </tr> 
+    {% endfor %}                                                                                                              
+</table> 
+
+{% endblock %}
