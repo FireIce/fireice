@@ -104,7 +104,7 @@ class RightsModel
         
         foreach ($query->getResult() as $key=>$val)
         {            
-            $config = \Symfony\Component\Yaml\Yaml::parse(__DIR__.'//..//..//..//..//..//..//src//Fireice//Modules//'.$val['name'].'//Resources//config//config.yml');
+            $config = \Symfony\Component\Yaml\Yaml::parse(__DIR__.'//..//..//..//..//..//..//src//example//Modules//'.$val['name'].'//Resources//config//config.yml');
                        
             $modules[] = array(
                 'title' => $config['parameters']['title'],
@@ -173,7 +173,7 @@ class RightsModel
         
         $module = $query->getSingleResult();
         
-        $module_object = 'Fireice\\Modules\\'.$module['name'].'\\Controller\\BackendController';
+        $module_object = 'example\\Modules\\'.$module['name'].'\\Controller\\BackendController';
         $module_object = new $module_object(); 
                                         
         $groups_rights = array();
@@ -256,7 +256,7 @@ class RightsModel
         
         $module = $module[0];
 
-        $module_object = 'Fireice\\Modules\\'.$module['name'].'\\Controller\\BackendController';
+        $module_object = 'example\\Modules\\'.$module['name'].'\\Controller\\BackendController';
         $module_object = new $module_object();        
         
         $query = $this->em->createQuery("

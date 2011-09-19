@@ -70,7 +70,7 @@ class FrontendController extends Controller
                     $node_module = array_values($frontend_model->getNodeUsersModules($path[$i-1]));
                     $node_module = $node_module[0];
                     
-                    $module_act = '\\Fireice\\Modules\\'.$node_module.'\\Controller\\FrontendController';        
+                    $module_act = '\\example\\Modules\\'.$node_module.'\\Controller\\FrontendController';        
                     $module_act = new $module_act();
                     $module_act->setContainer( $this->container );  
                     
@@ -108,7 +108,7 @@ class FrontendController extends Controller
        
             foreach ($node_modules as $key=>$val)
             {
-                $module_act = '\\Fireice\\Modules\\'.$val.'\\Controller\\FrontendController';        
+                $module_act = '\\example\\Modules\\'.$val.'\\Controller\\FrontendController';        
                 $module_act = new $module_act();
                 $module_act->setContainer( $this->container );       
             

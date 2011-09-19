@@ -49,7 +49,7 @@ class GeneralModel
 	{        
         if (true === empty( $this->plugins ))
         {  
-            $module = '\\Fireice\\Modules\\'.$this->bundle_name.'\\Entity\\'.$this->entity_name;
+            $module = '\\example\\Modules\\'.$this->bundle_name.'\\Entity\\'.$this->entity_name;
             $module = new $module();
         
             foreach ($module->getConfig() as $val)
@@ -64,7 +64,7 @@ class GeneralModel
     
     protected function sort($array)
     {
-        $module = '\\Fireice\\Modules\\'.$this->bundle_name.'\\Entity\\'.$this->entity_name;
+        $module = '\\example\\Modules\\'.$this->bundle_name.'\\Entity\\'.$this->entity_name;
         $module = new $module();        
         
         if (method_exists($module,'getConfigSort'))

@@ -3,7 +3,7 @@
 namespace fireice\FireiceSiteTree\Modules\BasicBundle\Model;
 
 //use Doctrine\ORM\EntityManager;
-use Fireice\Modules\ModuleContactsBundle\Entity\history;  
+use example\Modules\ModuleContactsBundle\Entity\history;  
 
 class BackendModel extends GeneralModel
 {    
@@ -164,7 +164,7 @@ class BackendModel extends GeneralModel
     	            $query = $this->em->createQuery("UPDATE ".$this->bundle_name.':'.$this->entity_name." md SET md.final='N', md.eid = ".$hid." WHERE md.idd = ".$result['idd']." AND md.final = 'Y' AND md.eid IS NULL");		 
 		            $query->getResult();                  
                 
-                    $new_module_record = '\\Fireice\\Modules\\'.$this->bundle_name.'\\Entity\\'.$this->entity_name;
+                    $new_module_record = '\\example\\Modules\\'.$this->bundle_name.'\\Entity\\'.$this->entity_name;
                     $new_module_record = new $new_module_record();
                     $new_module_record->setIdd($result['idd']);
                     $new_module_record->setCid($hid);
@@ -180,7 +180,7 @@ class BackendModel extends GeneralModel
                 {
                     $plugin_id = $plugin->setDataInDb($request->get($plugin->getValue('name')));    
                 
-                    $new_module_record = '\\Fireice\\Modules\\'.$this->bundle_name.'\\Entity\\'.$this->entity_name;
+                    $new_module_record = '\\example\\Modules\\'.$this->bundle_name.'\\Entity\\'.$this->entity_name;
                     $new_module_record = new $new_module_record();
                     $new_module_record->setFinal('T');
                     $new_module_record->setPluginId($plugin_id);
@@ -269,7 +269,7 @@ class BackendModel extends GeneralModel
     	                $query = $this->em->createQuery("UPDATE ".$this->bundle_name.':'.$this->entity_name." md SET md.final='N', md.eid = ".$hid." WHERE md.idd = ".$result['idd']." AND md.final != 'N'");		 
 		                $query->getResult();                  
                 
-                        $new_module_record = '\\Fireice\\Modules\\'.$this->bundle_name.'\\Entity\\'.$this->entity_name;
+                        $new_module_record = '\\example\\Modules\\'.$this->bundle_name.'\\Entity\\'.$this->entity_name;
                         $new_module_record = new $new_module_record();
                         $new_module_record->setIdd($result['idd']);
                         $new_module_record->setCid($hid);
@@ -285,7 +285,7 @@ class BackendModel extends GeneralModel
                     {
                         $plugin_id = $plugin->setDataInDb($request->get($plugin->getValue('name')));    
                 
-                        $new_module_record = '\\Fireice\\Modules\\'.$this->bundle_name.'\\Entity\\'.$this->entity_name;
+                        $new_module_record = '\\example\\Modules\\'.$this->bundle_name.'\\Entity\\'.$this->entity_name;
                         $new_module_record = new $new_module_record();
                         $new_module_record->setFinal('T');
                         $new_module_record->setPluginId($plugin_id);
@@ -369,7 +369,7 @@ class BackendModel extends GeneralModel
                             $query = $this->em->createQuery("UPDATE ".$this->bundle_name.':'.$this->entity_name." md SET md.eid = ".$hid." WHERE md.idd = ".$result['idd']." AND (md.final = 'Y' OR md.final = 'W') AND md.eid IS NULL");
                         $query->getResult();
                 
-                        $new_module_record = '\\Fireice\\Modules\\'.$this->bundle_name.'\\Entity\\'.$this->entity_name;
+                        $new_module_record = '\\example\\Modules\\'.$this->bundle_name.'\\Entity\\'.$this->entity_name;
                         $new_module_record = new $new_module_record();
                         $new_module_record->setIdd($result['idd']);
                         $new_module_record->setCid($hid);
@@ -385,7 +385,7 @@ class BackendModel extends GeneralModel
                     {
                         $plugin_id = $plugin->setDataInDb($request->get($plugin->getValue('name')));    
                 
-                        $new_module_record = '\\Fireice\\Modules\\'.$this->bundle_name.'\\Entity\\'.$this->entity_name;
+                        $new_module_record = '\\example\\Modules\\'.$this->bundle_name.'\\Entity\\'.$this->entity_name;
                         $new_module_record = new $new_module_record();
                         $new_module_record->setFinal('T');
                         $new_module_record->setPluginId($plugin_id);

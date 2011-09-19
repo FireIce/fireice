@@ -207,7 +207,7 @@ class TreeController extends Controller
             
             if (count($modules) > 0)
             {
-                $module_act = '\\Fireice\\Modules\\'.$modules[$this->get('request')->get('type')]['directory'].'\\Controller\\BackendController';
+                $module_act = '\\example\\Modules\\'.$modules[$this->get('request')->get('type')]['directory'].'\\Controller\\BackendController';
                 $module_act = new $module_act();
                 $module_act->setContainer( $this->container );
             
@@ -222,7 +222,7 @@ class TreeController extends Controller
                 'status' => 'active'
             ));
             
-            $module_controller = '\\Fireice\Modules\\'.$module->getName().'\\Controller\\BackendController';
+            $module_controller = '\\example\\Modules\\'.$module->getName().'\\Controller\\BackendController';
             
             $module_act = new $module_controller();
             $module_act->setContainer($this->container);           
@@ -242,7 +242,7 @@ class TreeController extends Controller
                 'status' => 'active'
             ));
         
-            $module_act = '\\Fireice\\Modules\\'.$module->getName().'\\Controller\\BackendController';        
+            $module_act = '\\example\\Modules\\'.$module->getName().'\\Controller\\BackendController';        
             $module_act = new $module_act();
             $module_act->setContainer( $this->container );                         
         
@@ -256,7 +256,7 @@ class TreeController extends Controller
                 'status' => 'active'
             ));
             
-            $module_act = '\\Fireice\Modules\\'.$module->getName().'\\Controller\\BackendController';
+            $module_act = '\\example\\Modules\\'.$module->getName().'\\Controller\\BackendController';
             $module_act = new $module_act();
             $module_act->setContainer($this->container);           
        
@@ -280,7 +280,7 @@ class TreeController extends Controller
             'status' => 'active'
         ));
             
-        $module_act = '\\Fireice\Modules\\'.$module->getName().'\\Controller\\BackendController';
+        $module_act = '\\example\\Modules\\'.$module->getName().'\\Controller\\BackendController';
         $module_act = new $module_act();
         $module_act->setContainer($this->container);           
        
@@ -316,7 +316,7 @@ class TreeController extends Controller
                 
         $module = $em->getRepository('DialogsBundle:modules')->findOneBy(array('id' => $this->get('request')->get('module_type')));
             
-        $module_controller = '\\Fireice\Modules\\'.$module->getName().'\\Controller\\BackendController';
+        $module_controller = '\\example\\Modules\\'.$module->getName().'\\Controller\\BackendController';
   
         $module_act = new $module_controller();
         $module_act->setContainer($this->container);           

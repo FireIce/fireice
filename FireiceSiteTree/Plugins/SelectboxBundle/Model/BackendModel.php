@@ -34,7 +34,7 @@ class BackendModel extends \fireice\FireiceSiteTree\Plugins\BasicPluginBundle\Mo
         
         $tmp = explode(':', $module);
         
-        $entity = 'Fireice\\Modules\\'.$tmp[0].'\\Entity\\'.$tmp[1]; 
+        $entity = 'example\\Modules\\'.$tmp[0].'\\Entity\\'.$tmp[1]; 
         $entity = new $entity();
         
         $return = array();
@@ -121,7 +121,7 @@ class BackendModel extends \fireice\FireiceSiteTree\Plugins\BasicPluginBundle\Mo
         
         $tmp = explode(':', $module);
         
-        $entity = 'Fireice\\Modules\\'.$tmp[0].'\\Entity\\'.$tmp[1]; 
+        $entity = 'example\\Modules\\'.$tmp[0].'\\Entity\\'.$tmp[1]; 
         $entity = new $entity();
         
         $return = array();

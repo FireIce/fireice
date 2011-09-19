@@ -258,7 +258,7 @@ class Cache
         
         foreach ($node_types as $key=>$type)
         {
-            $module = '\\Fireice\\Modules\\'.$type['bundle'].'\\Entity\\'.$key;
+            $module = '\\example\\Modules\\'.$type['bundle'].'\\Entity\\'.$key;
             $module = new $module();
 
             $config = $module->getConfig();

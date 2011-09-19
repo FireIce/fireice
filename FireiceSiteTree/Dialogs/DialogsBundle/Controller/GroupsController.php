@@ -45,7 +45,7 @@ class GroupsController extends Controller
                 else
                 {
                 	// Если это обычный модуль
-                	$module_object = 'Fireice\\Modules\\Module'.ucfirst( $module['name'] ).'Bundle\\Controller\\BackendController';
+                	$module_object = 'example\\Modules\\Module'.ucfirst( $module['name'] ).'Bundle\\Controller\\BackendController';
                 }
                                 
                 $module_object = new $module_object();             	
@@ -188,7 +188,7 @@ class GroupsController extends Controller
                 else
                 {
                 	// Если это обычный модуль
-                	$module_object = 'Fireice\\Modules\\Module'.ucfirst( $module['name'] ).'Bundle\\Controller\\BackendController';
+                	$module_object = 'example\\Modules\\Module'.ucfirst( $module['name'] ).'Bundle\\Controller\\BackendController';
                 }
                                 
                 $module_object = new $module_object();         

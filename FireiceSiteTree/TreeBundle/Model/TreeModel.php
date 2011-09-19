@@ -8,12 +8,12 @@ use Doctrine\ORM\EntityManager;
 //use Symfony\Component\Finder\Finder;
 use Symfony\Component\Security\Acl\Permission\MaskBuilder;
 
-//use Fireice\Modules\TextBundle\Entity\sitetreeNodedataText;
+//use example\Modules\TextBundle\Entity\sitetreeNodedataText;
 
 use fireice\FireiceSiteTree\TreeBundle\Entity\modulesitetree;
 use fireice\FireiceSiteTree\TreeBundle\Entity\messages;
  
-use Fireice\Modules\ModuleContactsBundle\Entity\history; 
+use example\Modules\ModuleContactsBundle\Entity\history; 
 use fireice\FireiceSiteTree\Dialogs\DialogsBundle\Entity\module;
 
 Class TreeModel
@@ -127,7 +127,7 @@ Class TreeModel
         
         $module = $query->getSingleResult();         
         
-        $config = \Symfony\Component\Yaml\Yaml::parse(__DIR__.'//..//..//..//..//..//src//Fireice//Modules//'.$module->getName().'//Resources//config//config.yml');
+        $config = \Symfony\Component\Yaml\Yaml::parse(__DIR__.'//..//..//..//..//..//src//example//Modules//'.$module->getName().'//Resources//config//config.yml');
         
         $sub_modules = array();
         
@@ -633,7 +633,7 @@ Class TreeModel
         
         foreach ($query->getResult() as $val)
         {            
-            $config = \Symfony\Component\Yaml\Yaml::parse(__DIR__.'//..//..//..//..//..//src//Fireice//Modules//'.$val['name'].'//Resources//config//config.yml');
+            $config = \Symfony\Component\Yaml\Yaml::parse(__DIR__.'//..//..//..//..//..//src//example//Modules//'.$val['name'].'//Resources//config//config.yml');
                        
             $node_modules[] = array(
                 'name' => $config['parameters']['name']
@@ -660,7 +660,7 @@ Class TreeModel
             
             foreach ($user_modules as $user_module)
             {
-                $config = \Symfony\Component\Yaml\Yaml::parse(__DIR__.'/../../../../../src/Fireice/Modules/'.$user_module['name'].'//Resources//config//config.yml');    
+                $config = \Symfony\Component\Yaml\Yaml::parse(__DIR__.'/../../../../../src/example/Modules/'.$user_module['name'].'//Resources//config//config.yml');    
                 
                 if (!isset($name_title[ $config['parameters']['name'] ]))
                 {
@@ -749,7 +749,7 @@ Class TreeModel
 	public function scanModulesFolder()
     {    	
         $finder = new Finder();     
-        $finder->in(__DIR__.'/../../../../../src/Fireice/Modules')->depth('== 0');
+        $finder->in(__DIR__.'/../../../../../src/example/Modules')->depth('== 0');
         
         foreach ($finder as $dir)
         {
@@ -785,7 +785,7 @@ Class TreeModel
         
         $module = $query->getSingleResult();              
         
-        $module_obj = '\\Fireice\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
+        $module_obj = '\\example\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
         $module_obj = new $module_obj();
         
         foreach ($module_obj->getConfig() as $plugin)
@@ -833,7 +833,7 @@ Class TreeModel
     	        $query = $this->em->createQuery("UPDATE ".$module->getName().':'.$module->getTableName()." md SET md.final='N', md.eid = ".$hid." WHERE md.idd = ".$result['idd']." AND md.final = 'W' AND md.status = 'sendtoproveeditor'");		 
 		        $query->getResult();                  
                 
-                $new_module_record = '\\Fireice\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
+                $new_module_record = '\\example\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
                 $new_module_record = new $new_module_record();
                 $new_module_record->setIdd($result['idd']);
                 $new_module_record->setCid($hid);
@@ -875,7 +875,7 @@ Class TreeModel
         
         $module = $query->getSingleResult();              
         
-        $module_obj = '\\Fireice\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
+        $module_obj = '\\example\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
         $module_obj = new $module_obj();
         
         foreach ($module_obj->getConfig() as $plugin)
@@ -926,7 +926,7 @@ Class TreeModel
     	        $query = $this->em->createQuery("UPDATE ".$module->getName().':'.$module->getTableName()." md SET md.final='N' WHERE md.idd = ".$result['idd']." AND md.final = 'Y'");		 
 		        $query->getResult();                 
                 
-                $new_module_record = '\\Fireice\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
+                $new_module_record = '\\example\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
                 $new_module_record = new $new_module_record();
                 $new_module_record->setIdd($result['idd']);
                 $new_module_record->setCid($hid);
@@ -968,7 +968,7 @@ Class TreeModel
         
         $module = $query->getSingleResult();              
         
-        $module_obj = '\\Fireice\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
+        $module_obj = '\\example\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
         $module_obj = new $module_obj();
         
         foreach ($module_obj->getConfig() as $plugin)
@@ -1014,7 +1014,7 @@ Class TreeModel
     	        $query = $this->em->createQuery("UPDATE ".$module->getName().':'.$module->getTableName()." md SET md.final='N', md.eid = ".$hid." WHERE md.idd = ".$result['idd']." AND md.final = 'W'");		 
 		        $query->getResult();                  
                 
-                $new_module_record = '\\Fireice\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
+                $new_module_record = '\\example\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
                 $new_module_record = new $new_module_record();
                 $new_module_record->setIdd($result['idd']);
                 $new_module_record->setCid($hid);
@@ -1075,7 +1075,7 @@ Class TreeModel
         
         $module = $query->getSingleResult();              
         
-        $module_obj = '\\Fireice\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
+        $module_obj = '\\example\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
         $module_obj = new $module_obj();
         
         foreach ($module_obj->getConfig() as $plugin)
@@ -1121,7 +1121,7 @@ Class TreeModel
     	        $query = $this->em->createQuery("UPDATE ".$module->getName().':'.$module->getTableName()." md SET md.final='N', md.eid = ".$hid." WHERE md.idd = ".$result['idd']." AND md.final = 'W'");		 
 		        $query->getResult();                  
                 
-                $new_module_record = '\\Fireice\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
+                $new_module_record = '\\example\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
                 $new_module_record = new $new_module_record();
                 $new_module_record->setIdd($result['idd']);
                 $new_module_record->setCid($hid);
@@ -1182,7 +1182,7 @@ Class TreeModel
         
         $module = $query->getSingleResult();              
         
-        $module_obj = '\\Fireice\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
+        $module_obj = '\\example\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
         $module_obj = new $module_obj();
         
         foreach ($module_obj->getConfig() as $plugin)
@@ -1230,7 +1230,7 @@ Class TreeModel
     	        $query = $this->em->createQuery("UPDATE ".$module->getName().':'.$module->getTableName()." md SET md.final='N', md.eid = ".$hid." WHERE md.idd = ".$result['idd']." AND md.final = 'W' AND md.status = 'sendtoproveeditor'");		 
 		        $query->getResult();                  
                 
-                $new_module_record = '\\Fireice\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
+                $new_module_record = '\\example\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
                 $new_module_record = new $new_module_record();
                 $new_module_record->setIdd($result['idd']);
                 $new_module_record->setCid($hid);
@@ -1275,7 +1275,7 @@ Class TreeModel
         
         $module = $query->getSingleResult();              
         
-        $module_obj = '\\Fireice\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
+        $module_obj = '\\example\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
         $module_obj = new $module_obj();
         
         foreach ($module_obj->getConfig() as $plugin)
@@ -1323,7 +1323,7 @@ Class TreeModel
     	        $query = $this->em->createQuery("UPDATE ".$module->getName().':'.$module->getTableName()." md SET md.final='N', md.eid = ".$hid." WHERE md.idd = ".$result['idd']." AND md.final = 'W' AND md.status = 'sendtoprovemaineditor'");		 
 		        $query->getResult();                  
                 
-                $new_module_record = '\\Fireice\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
+                $new_module_record = '\\example\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
                 $new_module_record = new $new_module_record();
                 $new_module_record->setIdd($result['idd']);
                 $new_module_record->setCid($hid);
@@ -1418,7 +1418,7 @@ Class TreeModel
             
             if ($access)
             {
-                $config = \Symfony\Component\Yaml\Yaml::parse(__DIR__.'//..//..//..//..//..//src//Fireice//Modules//'.$val['name'].'//Resources//config//config.yml');
+                $config = \Symfony\Component\Yaml\Yaml::parse(__DIR__.'//..//..//..//..//..//src//example//Modules//'.$val['name'].'//Resources//config//config.yml');
                        
                 $modules[$val['id']] = array(
                     'title'            => $config['parameters']['title'],

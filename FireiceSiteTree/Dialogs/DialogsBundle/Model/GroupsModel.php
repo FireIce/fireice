@@ -60,9 +60,9 @@ class GroupsModel
         
         foreach ($modules as $module)
     	{
-            $config = \Symfony\Component\Yaml\Yaml::parse(__DIR__.'/../../../../../../src/Fireice/Modules/'.$module->getName().'/Resources/config/config.yml');
+            $config = \Symfony\Component\Yaml\Yaml::parse(__DIR__.'/../../../../../../src/example/Modules/'.$module->getName().'/Resources/config/config.yml');
             	
-            $module_controller = 'Fireice\\Modules\\Module'.ucfirst($config['parameters']['name']).'Bundle\\Controller\\BackendController';
+            $module_controller = 'example\\Modules\\Module'.ucfirst($config['parameters']['name']).'Bundle\\Controller\\BackendController';
 
             $module_controller = new $module_controller();  
                             	

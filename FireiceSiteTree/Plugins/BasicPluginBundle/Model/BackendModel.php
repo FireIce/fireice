@@ -115,7 +115,7 @@ class BackendModel
             
             $result = $query->getOneOrNullResult();
                         
-            $entity = 'Fireice\\Modules\\'.$result['name'].'\\Entity\\'.$result['table_name']; 
+            $entity = 'example\\Modules\\'.$result['name'].'\\Entity\\'.$result['table_name']; 
             $entity = new $entity();            
             
             $cnf = $entity->getConfig();
