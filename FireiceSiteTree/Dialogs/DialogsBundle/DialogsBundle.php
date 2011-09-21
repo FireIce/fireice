@@ -1,11 +1,12 @@
 <?php
 
-namespace fireice\FireiceSiteTree\Dialogs\DialogsBundle; 
+namespace fireice\FireiceSiteTree\Dialogs\DialogsBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class DialogsBundle extends Bundle
 {
+
     /**
      * {@inheritdoc}
      */
@@ -21,4 +22,5 @@ class DialogsBundle extends Bundle
     {
         return strtr(__DIR__, '\\', '/');
     }
-} 
+
+}

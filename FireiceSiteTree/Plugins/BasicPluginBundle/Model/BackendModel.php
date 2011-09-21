@@ -4,16 +4,18 @@ namespace fireice\FireiceSiteTree\Plugins\BasicPluginBundle\Model;
 
 class BackendModel
 {
-	protected $em;
-    
-    public function __construct($em, $controller)
-    {           
-        $this->em = $em;      
+    protected $em;
+    protected $container;
+
+    public function __construct($em, $controller, $container)
+    {
+        $this->em = $em;
         $this->controller = $controller;
-    }    
-    
+        $this->container = $container;
+    }
+
     public function getFrontendData($sitetree_id, $module, $module_id)
-    {    
+    {
         $query = $this->em->createQuery("
             SELECT 
                 md.plugin_type, 
@@ -34,12 +36,12 @@ class BackendModel
             AND md.final = 'Y' 
             AND md.plugin_id = plg.id
             AND md.plugin_type = '".$this->controller->getValue('type')."'");
-        
-        return $query->getScalarResult();                 
-    }    
-    
+
+        return $query->getScalarResult();
+    }
+
     public function getBackendData($sitetree_id, $module, $module_id, $module_type, $row_id=false)
-    {    
+    {
         $query = $this->em->createQuery("
             SELECT 
                 ".(($module_type === \fireice\FireiceSiteTree\Modules\BasicBundle\Model\BackendModel::TYPE_LIST) ? 'md.row_id,' : '')."
@@ -63,42 +65,37 @@ class BackendModel
             AND md.plugin_id = plg.id
             AND md.plugin_type = '".$this->controller->getValue('type')."'");
 
-        return $query->getScalarResult();                 
+        return $query->getScalarResult();
     }
-    
+
     public function setData($data)
-    {		    	
-        $plugin_entity = 'fireice\\FireiceSiteTree\\Plugins\\'.ucfirst($this->controller->getValue('type')).'Bundle\\Entity\\plugin'.$this->controller->getValue('type');			    
-		$plugin_entity = new $plugin_entity();
-				
-        $plugin_entity->setValue( $data );
+    {
+        $plugin_entity = 'fireice\\FireiceSiteTree\\Plugins\\'.ucfirst($this->controller->getValue('type')).'Bundle\\Entity\\plugin'.$this->controller->getValue('type');
+        $plugin_entity = new $plugin_entity();
+
+        $plugin_entity->setValue($data);
 
         $this->em->persist($plugin_entity);
-        $this->em->flush();	
-                 
-        return $plugin_entity->getId();                  
+        $this->em->flush();
+
+        return $plugin_entity->getId();
     }
-    
+
     // Сканирует конфиг и выдаёт пункты для плагинов: чекбокс, селектбокс и радиобаттон
-    protected function getChoices($entity, $plugin_name, array $options=array())
+    protected function getChoices($entity, $plugin_name, array $options=array ())
     {
         $metod = 'config'.ucfirst($plugin_name);
-        
+
         // Если нет метода задающего источник, то возвращаем false
-        if (!method_exists($entity, $metod))
-            return false;
-        
-        $config = $entity->$metod();         
-        
-        if ($config['type'] === 'array')
-        {
+        if (!method_exists($entity, $metod)) return false;
+
+        $config = $entity->$metod();
+
+        if ($config['type'] === 'array') {
             // Если пункты заданы массивом
-            $сhoices = $config['data'];    
-        }
-        elseif ($config['type'] === 'node')
-        {
+            $сhoices = $config['data'];
+        } elseif ($config['type'] === 'node') {
             // Если источник - другой узел
-            
             // Определяем что это за модуль
             $query = $this->em->createQuery("
                 SELECT 
@@ -111,16 +108,16 @@ class BackendModel
                 AND m_l.up_module = ".$config['data']['id_module']."
                 AND m_l.up_module = mds.idd
                 AND mds.final = 'Y'
-                AND mds.status = 'active'");             
-            
+                AND mds.status = 'active'");
+
             $result = $query->getOneOrNullResult();
-                        
-            $entity = 'example\\Modules\\'.$result['name'].'\\Entity\\'.$result['table_name']; 
-            $entity = new $entity();            
-            
+
+            $entity = $this->container->getParameter('project_name').'\\Modules\\'.$result['name'].'\\Entity\\'.$result['table_name'];
+            $entity = new $entity();
+
             $cnf = $entity->getConfig();
-            $plugin_for_title = $cnf[ $config['data']['plugin_id_for_title'] ];                        
-            
+            $plugin_for_title = $cnf[$config['data']['plugin_id_for_title']];
+
             $query = $this->em->createQuery("
                 SELECT 
                     md.row_id, 
@@ -139,21 +136,20 @@ class BackendModel
                 AND mp_l.up_plugin = md.idd
 
                 AND md.plugin_id = plg.id
-                AND md.plugin_name = '".$plugin_for_title['name']."'");     
-            
+                AND md.plugin_name = '".$plugin_for_title['name']."'");
+
             $result = $query->getScalarResult();
-            
+
             //print_r($result); exit;
-            
-            $сhoices = array();
-            
-            foreach ($result as $val)
-            {
-                $сhoices[ $val['row_id'] ] = $val['value'];    
+
+            $сhoices = array ();
+
+            foreach ($result as $val) {
+                $сhoices[$val['row_id']] = $val['value'];
             }
         }
-                        
+
         return $сhoices;
-    }       
-    
+    }
+
 }

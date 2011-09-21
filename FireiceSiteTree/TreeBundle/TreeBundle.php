@@ -1,11 +1,12 @@
 <?php
 
-namespace fireice\FireiceSiteTree\TreeBundle; 
+namespace fireice\FireiceSiteTree\TreeBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class TreeBundle extends Bundle
 {
+
     /**
      * {@inheritdoc}
      */
@@ -21,4 +22,5 @@ class TreeBundle extends Bundle
     {
         return strtr(__DIR__, '\\', '/');
     }
-} 
+
+}

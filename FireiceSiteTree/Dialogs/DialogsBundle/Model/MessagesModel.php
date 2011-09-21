@@ -1,9 +1,8 @@
-<?php 
+<?php
 
 namespace fireice\FireiceSiteTree\Dialogs\DialogsBundle\Model;
 
 use Doctrine\ORM\EntityManager;
-
 
 class MessagesModel
 {
@@ -11,9 +10,9 @@ class MessagesModel
 
     public function __construct(EntityManager $em)
     {
-        $this->em = $em;  
-    }                                                         
-    
+        $this->em = $em;
+    }
+
     public function getMessages($security)
     {
         $query = $this->em->createQuery("
@@ -28,16 +27,16 @@ class MessagesModel
                 DialogsBundle:users us
             WHERE msg.send_for = ".$security->getToken()->getUser()->getId()."
             AND msg.send_from = us.id
-            ORDER BY msg.id DESC");         
-        
+            ORDER BY msg.id DESC");
+
         $result = $query->getResult();
-        
+
         //print_r($result); exit;
 
-        return $result;      
+        return $result;
     }
-    
-    public function getMessage($id, $security) 
+
+    public function getMessage($id, $security)
     {
         $query = $this->em->createQuery("
             SELECT 
@@ -52,33 +51,30 @@ class MessagesModel
                 DialogsBundle:users us
             WHERE msg.send_for = ".$security->getToken()->getUser()->getId()."
             AND msg.send_from = us.id
-            AND msg.id = ".$id);         
-        
+            AND msg.id = ".$id);
+
         $result = $query->getOneOrNullResult();
-        
-        if ($result !== null)
-        {            
-            if ($result['is_read'] == 0)
-            {
-    	        $query = $this->em->createQuery("UPDATE TreeBundle:messages msg SET msg.is_read = 1 WHERE msg.id = ".$id);		 
-		        $query->getResult();                                               
-            }            
-            
+
+        if ($result !== null) {
+            if ($result['is_read'] == 0) {
+                $query = $this->em->createQuery("UPDATE TreeBundle:messages msg SET msg.is_read = 1 WHERE msg.id = ".$id);
+                $query->getResult();
+            }
+
             unset($result['is_read']);
-                
-            return $result;              
+
+            return $result;
         }
-        
+
         return 'error';
     }
-    
+
     public function deleteMessage($id, $security)
     {
-        $query = $this->em->createQuery("DELETE TreeBundle:messages msg WHERE msg.id = ".$id." AND msg.send_for = ".$security->getToken()->getUser()->getId());		 
-		$query->getResult();    
-        
+        $query = $this->em->createQuery("DELETE TreeBundle:messages msg WHERE msg.id = ".$id." AND msg.send_for = ".$security->getToken()->getUser()->getId());
+        $query->getResult();
+
         return 'ok';
     }
-    
+
 }
-                                                           

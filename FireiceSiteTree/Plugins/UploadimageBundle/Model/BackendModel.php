@@ -4,6 +4,7 @@ namespace fireice\FireiceSiteTree\Plugins\UploadimageBundle\Model;
 
 class BackendModel extends \fireice\FireiceSiteTree\Plugins\BasicPluginBundle\Model\BackendModel
 {
+
     public function getFrontendData($sitetree_id, $module, $module_id)
     {
         $query = $this->em->createQuery("
@@ -30,40 +31,36 @@ class BackendModel extends \fireice\FireiceSiteTree\Plugins\BasicPluginBundle\Mo
             AND md.plugin_type = '".$this->controller->getValue('type')."'");
 
         $result = $query->getScalarResult();
-        
-        $return = array();
-        $plugins = array();
-        
-        foreach ($result as $val)
-        {
-            if (!isset($plugins[$val['plugin_name']]))  
-                $plugins[$val['plugin_name']] = array();
-            
+
+        $return = array ();
+        $plugins = array ();
+
+        foreach ($result as $val) {
+            if (!isset($plugins[$val['plugin_name']])) $plugins[$val['plugin_name']] = array ();
+
             $plugins[$val['plugin_name']][$val['plugin_id_data']] = $val;
-        }         
-        
-        foreach ($plugins as $key=>$value)
-        {
-            $return[$key] = array(
-                'plugin_type'     => $value[0]['plugin_type'], 
-                'plugin_name'     => $value[0]['plugin_name'],
-                'plugin_value' => array()                 
+        }
+
+        foreach ($plugins as $key => $value) {
+            $return[$key] = array (
+                'plugin_type' => $value[0]['plugin_type'],
+                'plugin_name' => $value[0]['plugin_name'],
+                'plugin_value' => array ()
             );
-            
-            foreach ($value as $k=>$v)
-            {
-                $return[$key]['plugin_value'][$v['plugin_id_data']] = array(
+
+            foreach ($value as $k => $v) {
+                $return[$key]['plugin_value'][$v['plugin_id_data']] = array (
                     'alt' => $v['plugin_value_alt'],
-                    'src' => $v['plugin_value_src']                      
-                );                   
+                    'src' => $v['plugin_value_src']
+                );
             }
         }
-       
+
         //print_r($return); exit;
-                
-        return array_values($return);        
-    }      
-    
+
+        return array_values($return);
+    }
+
     public function getBackendData($sitetree_id, $module, $module_id, $module_type, $row_id=false)
     {
         $query = $this->em->createQuery("
@@ -92,78 +89,73 @@ class BackendModel extends \fireice\FireiceSiteTree\Plugins\BasicPluginBundle\Mo
             AND md.plugin_type = '".$this->controller->getValue('type')."'");
 
         $result = $query->getScalarResult();
-        
-        $return = array();
-        $plugins = array();
-        
-        foreach ($result as $val)
-        {
-            if (!isset($plugins[$val['plugin_name']]))  
-                $plugins[$val['plugin_name']] = array();
-            
+
+        $return = array ();
+        $plugins = array ();
+
+        foreach ($result as $val) {
+            if (!isset($plugins[$val['plugin_name']])) $plugins[$val['plugin_name']] = array ();
+
             $plugins[$val['plugin_name']][$val['plugin_id_data']] = $val;
-        }         
-        
-        foreach ($plugins as $key=>$value)
-        {
-            $return[$key] = array(
-                'plugin_type'     => $value[0]['plugin_type'], 
-                'plugin_name'     => $value[0]['plugin_name'], 
+        }
+
+        foreach ($plugins as $key => $value) {
+            $return[$key] = array (
+                'plugin_type' => $value[0]['plugin_type'],
+                'plugin_name' => $value[0]['plugin_name'],
                 'show_add_button' => 1,
-                'plugin_value' => array()                 
+                'plugin_value' => array ()
             );
-            
-            foreach ($value as $k=>$v)
-            {
-                $return[$key]['plugin_value'][$v['plugin_id_data']] = array(
+
+            foreach ($value as $k => $v) {
+                $return[$key]['plugin_value'][$v['plugin_id_data']] = array (
                     'alt' => $v['plugin_value_alt'],
-                    'src' => $v['plugin_value_src']                      
-                );                   
+                    'src' => $v['plugin_value_src']
+                );
             }
         }
-       
+
         //print_r($return); exit;
-                
-        return array_values($return);        
-    }   
-    
+
+        return array_values($return);
+    }
+
     public function setData($data)
-    {		    	        
+    {
         $plugin_entity_class = 'fireice\\FireiceSiteTree\\Plugins\\'.ucfirst($this->controller->getValue('type')).'Bundle\\Entity\\plugin'.$this->controller->getValue('type');
-                    
+
         $id_group = null;
-                    
-        foreach ($data as $k=>$v)
-        {
-            if ($id_group == null)
-            {
+
+        foreach ($data as $k => $v) {
+            if ($id_group == null) {
                 $plugin_entity = new $plugin_entity_class();
                 $plugin_entity->setIdGroup(0);
                 $plugin_entity->setIdData($k);
-                $plugin_entity->setValue($v); 
-                            
-			    $this->em->persist($plugin_entity);
-                $this->em->flush();	       
-                            
+                $plugin_entity->setValue($v);
+
+                $this->em->persist($plugin_entity);
+                $this->em->flush();
+
                 $id_group = $plugin_entity->getId();
-                            
+
                 $plugin_entity->setIdGroup($id_group);
-                            
-			    $this->em->persist($plugin_entity);
-                $this->em->flush();	  
-                            
+
+                $this->em->persist($plugin_entity);
+                $this->em->flush();
+
                 continue;
             }
-                        
+
             $plugin_entity = new $plugin_entity_class();
             $plugin_entity->setIdGroup($id_group);
             $plugin_entity->setIdData($k);
             $plugin_entity->setValue($v);
-                        
-			$this->em->persist($plugin_entity);
-            $this->em->flush();	                         
+
+            $this->em->persist($plugin_entity);
+            $this->em->flush();
         }
-                    
-        return $id_group;  
-    }     
+
+        return $id_group;
+    }
+
 }

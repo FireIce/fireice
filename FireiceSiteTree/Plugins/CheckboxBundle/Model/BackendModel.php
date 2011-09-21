@@ -3,7 +3,8 @@
 namespace fireice\FireiceSiteTree\Plugins\CheckboxBundle\Model;
 
 class BackendModel extends \fireice\FireiceSiteTree\Plugins\BasicPluginBundle\Model\BackendModel
-{    
+{
+
     public function getFrontendData($sitetree_id, $module, $module_id)
     {
         $query = $this->em->createQuery("
@@ -29,50 +30,45 @@ class BackendModel extends \fireice\FireiceSiteTree\Plugins\BasicPluginBundle\Mo
             AND md.plugin_id = plg.id_group
             AND md.plugin_type = '".$this->controller->getValue('type')."'");
 
-        $result = $query->getScalarResult(); 
-        
-        $tmp = explode(':', $module);
-        
-        $entity = 'example\\Modules\\'.$tmp[0].'\\Entity\\'.$tmp[1]; 
-        $entity = new $entity();
-        
-        $return = array();       
-        $plugins = array();
-        
-        foreach ($result as $val)
-        {
-            if (!isset($plugins[$val['plugin_name']]))  
-                $plugins[$val['plugin_name']] = array();
-            
-            $plugins[$val['plugin_name']][$val['plugin_id_data']] = $val;
-        }        
+        $result = $query->getScalarResult();
 
-        foreach ($entity->getConfig() as $val)
-        {
-            if ($val['type'] === 'checkbox')
-            {
+        $tmp = explode(':', $module);
+
+        $entity = $this->container->getParameter('project_name').'\\Modules\\'.$tmp[0].'\\Entity\\'.$tmp[1];
+        $entity = new $entity();
+
+        $return = array ();
+        $plugins = array ();
+
+        foreach ($result as $val) {
+            if (!isset($plugins[$val['plugin_name']])) $plugins[$val['plugin_name']] = array ();
+
+            $plugins[$val['plugin_name']][$val['plugin_id_data']] = $val;
+        }
+
+        foreach ($entity->getConfig() as $val) {
+            if ($val['type'] === 'checkbox') {
                 $choices = $this->getChoices($entity, $val['name']);
 
-                $return[$val['name']] = array(
-                    'plugin_type'  => $val['type'],
-                    'plugin_name'  => $val['name'],
-                    'status'       => 'active',
-                    'plugin_value' => array()
-                );                  
-                
-                foreach ($choices as $k=>$v)
-                {                                        
-                    $return[$val['name']]['plugin_value'][$k] = array(
+                $return[$val['name']] = array (
+                    'plugin_type' => $val['type'],
+                    'plugin_name' => $val['name'],
+                    'status' => 'active',
+                    'plugin_value' => array ()
+                );
+
+                foreach ($choices as $k => $v) {
+                    $return[$val['name']]['plugin_value'][$k] = array (
                         'label' => $v,
                         'value' => (isset($plugins[$val['name']][$k]) ? $plugins[$val['name']][$k]['plugin_value'] : '0')
-                    );    
-                }                                
-            }            
-        }  
+                    );
+                }
+            }
+        }
 
-        return array_values($return);  
-    }    
-    
+        return array_values($return);
+    }
+
     public function getBackendData($sitetree_id, $module, $module_id, $module_type, $row_id=false)
     {
         $query = $this->em->createQuery("
@@ -99,87 +95,81 @@ class BackendModel extends \fireice\FireiceSiteTree\Plugins\BasicPluginBundle\Mo
             AND md.plugin_id = plg.id_group
             AND md.plugin_type = '".$this->controller->getValue('type')."'");
 
-        $result = $query->getScalarResult(); 
+        $result = $query->getScalarResult();
 
         $tmp = explode(':', $module);
-        
-        $entity = 'example\\Modules\\'.$tmp[0].'\\Entity\\'.$tmp[1]; 
-        $entity = new $entity();
-        
-        $return = array();       
-        $plugins = array();
-        
-        foreach ($result as $val)
-        {
-            if (!isset($plugins[$val['plugin_name']]))  
-                $plugins[$val['plugin_name']] = array();
-            
-            $plugins[$val['plugin_name']][$val['plugin_id_data']] = $val;
-        }        
 
-        foreach ($entity->getConfig() as $val)
-        {
-            if ($val['type'] === 'checkbox')
-            {
+        $entity = $this->container->getParameter('project_name').'\\Modules\\'.$tmp[0].'\\Entity\\'.$tmp[1];
+        $entity = new $entity();
+
+        $return = array ();
+        $plugins = array ();
+
+        foreach ($result as $val) {
+            if (!isset($plugins[$val['plugin_name']])) $plugins[$val['plugin_name']] = array ();
+
+            $plugins[$val['plugin_name']][$val['plugin_id_data']] = $val;
+        }
+
+        foreach ($entity->getConfig() as $val) {
+            if ($val['type'] === 'checkbox') {
                 $choices = $this->getChoices($entity, $val['name']);
 
-                $return[$val['name']] = array(
-                    'plugin_type'  => $val['type'],
-                    'plugin_name'  => $val['name'],
-                    'status'       => 'active',
-                    'plugin_value' => array()
-                );                  
-                
-                foreach ($choices as $k=>$v)
-                {                                        
-                    $return[$val['name']]['plugin_value'][$k] = array(
+                $return[$val['name']] = array (
+                    'plugin_type' => $val['type'],
+                    'plugin_name' => $val['name'],
+                    'status' => 'active',
+                    'plugin_value' => array ()
+                );
+
+                foreach ($choices as $k => $v) {
+                    $return[$val['name']]['plugin_value'][$k] = array (
                         'label' => $v,
                         'value' => (isset($plugins[$val['name']][$k]) ? $plugins[$val['name']][$k]['plugin_value'] : '0')
-                    );    
-                }                                
-            }            
-        }       
+                    );
+                }
+            }
+        }
 
-        return array_values($return);  
-    }      
+        return array_values($return);
+    }
 
     public function setData($data)
-    {		    	        
+    {
         $plugin_entity_class = 'fireice\\FireiceSiteTree\\Plugins\\'.ucfirst($this->controller->getValue('type')).'Bundle\\Entity\\plugin'.$this->controller->getValue('type');
-                    
+
         $id_group = null;
-                    
-        foreach ($data as $k=>$v)
-        {
-            if ($id_group == null)
-            {
+
+        foreach ($data as $k => $v) {
+            if ($id_group == null) {
                 $plugin_entity = new $plugin_entity_class();
                 $plugin_entity->setIdGroup(0);
                 $plugin_entity->setIdData($k);
-                $plugin_entity->setValue($v); 
-                            
-			    $this->em->persist($plugin_entity);
-                $this->em->flush();	       
-                            
+                $plugin_entity->setValue($v);
+
+                $this->em->persist($plugin_entity);
+                $this->em->flush();
+
                 $id_group = $plugin_entity->getId();
-                            
+
                 $plugin_entity->setIdGroup($id_group);
-                            
-			    $this->em->persist($plugin_entity);
-                $this->em->flush();	  
-                            
+
+                $this->em->persist($plugin_entity);
+                $this->em->flush();
+
                 continue;
             }
-                        
+
             $plugin_entity = new $plugin_entity_class();
             $plugin_entity->setIdGroup($id_group);
             $plugin_entity->setIdData($k);
             $plugin_entity->setValue($v);
-                        
-			$this->em->persist($plugin_entity);
-            $this->em->flush();	                         
+
+            $this->em->persist($plugin_entity);
+            $this->em->flush();
         }
-                    
-        return $id_group;  
-    }    
+
+        return $id_group;
+    }
+
 }

@@ -3,6 +3,7 @@
 namespace fireice\FireiceSiteTree\Dialogs\DialogsBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+
 //use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -16,142 +17,141 @@ class modules
      * @ORM\Column(type="integer")      
      */
     protected $id;
-    
     /**
      * @ORM\Column(type="integer") 
      */
-    protected $idd;    
-    
+    protected $idd;
     /**
      * @ORM\Column(type="integer") 
      */
-    protected $cid;   
-    
+    protected $cid;
     /**
      * @ORM\Column(type="integer", nullable="TRUE") 
      */
-    protected $eid;     
-
-    /**   
+    protected $eid;
+    /**
      * @ORM\Column(type="string", length=1)   
      */
-    protected $final;   
-    
-    /**   
+    protected $final;
+    /**
      * @ORM\Column(type="string", length=45)   
      */
-    protected $type;    
-    
-    /**   
+    protected $type;
+    /**
      * @ORM\Column(type="string", length=45)   
      */
-    protected $table_name;     
-    
-    /**   
+    protected $table_name;
+    /**
      * @ORM\Column(type="string", length=45)   
      */
-    protected $name;    
-    
-    /**   
+    protected $name;
+    /**
      * @ORM\Column(type="string", length=45)   
      */
-    protected $status;     
-    
+    protected $status;
     /**
      * @ORM\Column(type="datetime")         
      */
-    protected $date_create;     
-
+    protected $date_create;
 
     public function setId($id)
     {
         $this->id = $id;
-    }  
+    }
+
     public function getId()
     {
         return $this->id;
-    }    
-    
+    }
+
     public function setIdd($idd)
     {
         $this->idd = $idd;
-    }  
+    }
+
     public function getIdd()
     {
         return $this->idd;
-    }   
-    
+    }
+
     public function setCid($cid)
     {
         $this->cid = $cid;
-    }  
+    }
+
     public function getCid()
     {
         return $this->cid;
-    }     
-    
+    }
+
     public function setEid($eid)
     {
         $this->eid = $eid;
-    }  
+    }
+
     public function getEid()
     {
         return $this->eid;
-    }      
-    
+    }
+
     public function setFinal($final)
     {
         $this->final = $final;
-    }    
+    }
+
     public function getFinal()
     {
-        return $this->final;    
-    }      
-        
+        return $this->final;
+    }
+
     public function setType($type)
     {
         $this->type = $type;
-    }    
+    }
+
     public function getType()
     {
-        return $this->type;    
-    } 
+        return $this->type;
+    }
 
     public function setTableName($table_name)
     {
         $this->table_name = $table_name;
-    }    
+    }
+
     public function getTableName()
     {
-        return $this->table_name;    
-    } 
-    
+        return $this->table_name;
+    }
+
     public function setName($name)
     {
         $this->name = $name;
-    }    
+    }
+
     public function getName()
     {
-        return $this->name;    
-    } 
-    
+        return $this->name;
+    }
+
     public function setStatus($status)
     {
         $this->status = $status;
-    }    
+    }
+
     public function getStatus()
     {
-        return $this->status;    
-    } 
-    
+        return $this->status;
+    }
+
     public function setDateCreate($date_create)
     {
         $this->date_create = $date_create;
-    }    
+    }
+
     public function getDateCreate()
     {
         return $this->date_create;
-    }    
-    
-    
+    }
+
 }

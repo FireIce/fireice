@@ -1,11 +1,12 @@
 <?php
 
-namespace fireice\Frontend\FrontendBasicBundle; 
+namespace fireice\Frontend\FrontendBasicBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class FrontendBasicBundle extends Bundle
 {
+
     /**
      * {@inheritdoc}
      */
@@ -21,4 +22,5 @@ class FrontendBasicBundle extends Bundle
     {
         return strtr(__DIR__, '\\', '/');
     }
-} 
+
+}

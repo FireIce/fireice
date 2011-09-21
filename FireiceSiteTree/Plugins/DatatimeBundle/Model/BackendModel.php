@@ -4,8 +4,9 @@ namespace fireice\FireiceSiteTree\Plugins\DatatimeBundle\Model;
 
 class BackendModel extends \fireice\FireiceSiteTree\Plugins\BasicPluginBundle\Model\BackendModel
 {
+
     public function getFrontendData($sitetree_id, $module, $module_id)
-    {    
+    {
         $query = $this->em->createQuery("
             SELECT 
                 md.plugin_type, 
@@ -27,24 +28,23 @@ class BackendModel extends \fireice\FireiceSiteTree\Plugins\BasicPluginBundle\Mo
             AND md.final = 'Y'
             AND md.plugin_id = plg.id
             AND md.plugin_type = '".$this->controller->getValue('type')."'");
-        
+
         $result = $query->getScalarResult();
-        
-        foreach ($result as &$val)
-        {
-            $val['plugin_value'] = array(
+
+        foreach ($result as &$val) {
+            $val['plugin_value'] = array (
                 'data' => $val['plugin_value_data'],
                 'time' => $val['plugin_value_time']
-            );    
+            );
         }
-        
+
         //print_r($result); exit;        
-                
-        return $result;                 
-    }    
-    
+
+        return $result;
+    }
+
     public function getBackendData($sitetree_id, $module, $module_id, $module_type, $row_id=false)
-    {    
+    {
         $query = $this->em->createQuery("
             SELECT 
                 ".(($module_type === \fireice\FireiceSiteTree\Modules\BasicBundle\Model\BackendModel::TYPE_LIST) ? 'md.row_id,' : '')."
@@ -67,19 +67,19 @@ class BackendModel extends \fireice\FireiceSiteTree\Plugins\BasicPluginBundle\Mo
             AND md.eid IS NULL
             AND md.plugin_id = plg.id
             AND md.plugin_type = '".$this->controller->getValue('type')."'");
-        
+
         $result = $query->getScalarResult();
-        
-        foreach ($result as &$val)
-        {
-            $val['plugin_value'] = array(
+
+        foreach ($result as &$val) {
+            $val['plugin_value'] = array (
                 'data' => $val['plugin_value_data'],
                 'time' => $val['plugin_value_time']
-            );    
+            );
         }
-        
+
         //print_r($result); exit;        
-                
-        return $result;                 
-    }      
+
+        return $result;
+    }
+
 }
