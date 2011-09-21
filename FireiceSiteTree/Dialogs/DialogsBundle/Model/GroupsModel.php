@@ -45,6 +45,7 @@ class GroupsModel
             'title' => 'Дерево сайта',
             'name' => 'sitetree',
             'rights' => $tree_controller->getRights(),
+            'module_object' => $tree_controller,
         );
 
         $query = $this->em->createQuery("
@@ -69,12 +70,16 @@ class GroupsModel
             $module_controller = $this->container->getParameter('project_name').'\\Modules\\Module'.ucfirst($config['parameters']['name']).'Bundle\\Controller\\BackendController';
 
             $module_controller = new $module_controller();
+            
+            $module_object = $this->container->getParameter('project_name').'\\Modules\\'.$module->getName().'\\Controller\\BackendController';
+            $module_object = new $module_object();
 
             $return_modules[] = array (
                 'id' => $module->getIdd(),
                 'title' => $config['parameters']['title'],
                 'name' => $config['parameters']['name'],
                 'rights' => $module_controller->getRights(),
+                'module_object' => $module_object,
             );
         }
 

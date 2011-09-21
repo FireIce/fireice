@@ -36,19 +36,9 @@ class GroupsController extends Controller
                 $object_module = new module();
                 $object_module->setId($module['id']);
 
-                if ($key == 0) {
-                    // Если это "зашитый" модуль дерева
-                    $module_object = 'fireice\FireiceSiteTree\\TreeBundle\\Controller\\TreeController';
-                } else {
-                    // Если это обычный модуль
-                    $module_object = $this->container->getParameter('project_name').'\\Modules\\Module'.ucfirst($module['name']).'Bundle\\Controller\\BackendController';
-                }
-
-                $module_object = new $module_object();
-
                 $groups_rights[$module['name']] = array ();
 
-                foreach ($module_object->getRights() as $right) {
+                foreach ($module['module_object']->getRights() as $right) {
                     if ($acl->checkGroupPermissions($object_module, $identy_group, $acl->getValueMask($right['name']))) {
                         $groups_rights[$module['name']][] = $right['name'];
                     }
@@ -57,8 +47,6 @@ class GroupsController extends Controller
 
             $group['gr_rights'] = $groups_rights;
         }
-
-        //print_r($groups); exit;
 
         $response = new Response(json_encode($groups));
         $response->headers->set('Content-Type', 'application/json');
@@ -176,15 +164,7 @@ class GroupsController extends Controller
                 $object = new module();
                 $object->setId($module['id']);
 
-                if ($key == 0) {
-                    // Если это "зашитый" модуль дерева
-                    $module_object = 'fireice\FireiceSiteTree\\TreeBundle\\Controller\\TreeController';
-                } else {
-                    // Если это обычный модуль
-                    $module_object = $this->container->getParameter('project_name').'\\Modules\\Module'.ucfirst($module['name']).'Bundle\\Controller\\BackendController';
-                }
-
-                $module_object = new $module_object();
+                $module_object = $module['module_object'];
 
                 $group = new \Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity('group_'.$god_group->getId());
                 $builder = new MaskBuilder();
