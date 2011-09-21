@@ -14,9 +14,9 @@ class Cache
     private $tmp;
     private $project_name;
 
-    public function __construct($em, $acl, $project_name)
+    public function __construct($em, $acl, $project_name, $cache_dir)
     {
-        $this->FilesystemCache = new FilesystemCache(__DIR__.'//..//..//..//..//..//app//cache//cms');
+        $this->FilesystemCache = new FilesystemCache($cache_dir);
 
         $this->em = $em;
         $this->acl = $acl;

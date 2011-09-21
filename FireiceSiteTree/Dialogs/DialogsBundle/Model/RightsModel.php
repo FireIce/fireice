@@ -104,12 +104,7 @@ class RightsModel
         $modules = array ();
 
         foreach ($query->getResult() as $key => $val) {
-            $config = \Symfony\Component\Yaml\Yaml::parse(
-                    $this->container->getParameter('kernel.root_dir')
-                    .'//..//src//'
-                    .$this->container->getParameter('project_name')
-                    .'//Modules//'.$val['name']
-                    .'//Resources//config//config.yml');
+            $config = \Symfony\Component\Yaml\Yaml::parse($this->container->getParameter('project_modules_directory').'//'.$val['name'].'//Resources//config//config.yml');
 
             $modules[] = array (
                 'title' => $config['parameters']['title'],

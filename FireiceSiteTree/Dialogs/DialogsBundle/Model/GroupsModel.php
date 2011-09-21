@@ -60,12 +60,7 @@ class GroupsModel
         $modules = $query->getResult();
 
         foreach ($modules as $module) {
-            $config = \Symfony\Component\Yaml\Yaml::parse(
-                    $this->container->getParameter('kernel.root_dir')
-                    .'//..//src//'
-                    .$this->container->getParameter('project_name')
-                    .'//Modules//'.$module->getName()
-                    .'//Resources//config//config.yml');
+            $config = \Symfony\Component\Yaml\Yaml::parse($this->container->getParameter('project_modules_directory').'//'.$module->getName().'//Resources//config//config.yml');
 
             $module_controller = $this->container->getParameter('project_name').'\\Modules\\Module'.ucfirst($config['parameters']['name']).'Bundle\\Controller\\BackendController';
 

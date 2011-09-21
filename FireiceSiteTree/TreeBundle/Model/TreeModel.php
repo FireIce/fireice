@@ -1415,12 +1415,7 @@ Class TreeModel
 
     private function getModuleConfig($name)
     {
-        return \Symfony\Component\Yaml\Yaml::parse(
-                $this->container->getParameter('kernel.root_dir')
-                .'//..//src//'
-                .$this->container->getParameter('project_name')
-                .'//Modules//'.$name
-                .'//Resources//config//config.yml');
+        return \Symfony\Component\Yaml\Yaml::parse($this->container->getParameter('project_modules_directory').'//'.$name.'//Resources//config//config.yml');
     }
 
 }
