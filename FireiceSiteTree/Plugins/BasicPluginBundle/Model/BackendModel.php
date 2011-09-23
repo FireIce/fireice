@@ -140,14 +140,16 @@ class BackendModel
 
             $result = $query->getScalarResult();
 
-            //print_r($result); exit;
-
             $сhoices = array ();
 
             foreach ($result as $val) {
                 $сhoices[$val['row_id']] = $val['value'];
             }
+        } elseif ($config['type'] === 'ajax') {
+            // Если источник типа ajax, то возвращаем false
+            return false;
         }
+
 
         return $сhoices;
     }

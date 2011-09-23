@@ -565,4 +565,104 @@ class BackendModel extends GeneralModel
         return true;
     }
 
+    public function ajaxLoadList($data, $id_new='')
+    {
+        //$plugin_name = 'title';
+
+        if ($data['id_node'] == 0) {
+            return array (0 => array (
+                    'value' => '---',
+                    'checked' => '0'
+                ));
+        }
+
+        $query = $this->em->createQuery("
+            SELECT 
+                md.name AS name
+            FROM 
+                TreeBundle:modulesitetree tr, 
+                DialogsBundle:moduleslink md_l, 
+                DialogsBundle:modules md
+            WHERE md.final = 'Y'
+            AND md.status = 'active'
+            AND md_l.up_tree = tr.idd
+            AND md_l.up_module = md.idd
+            AND tr.final = 'Y'
+            AND tr.idd='".$data['id_node']."'
+            AND md.type = 'user'");
+
+        $result = $query->getSingleResult();
+
+        $config = \Symfony\Component\Yaml\Yaml::parse($this->container->getParameter('project_modules_directory').'//'.$result['name'].'//Resources//config//config.yml');
+
+        if ($config['parameters']['type'] !== 'list') {
+            return array (0 => array (
+                    'value' => '---',
+                    'checked' => '0'
+                ));
+        }
+
+        $query = $this->em->createQuery("
+            SELECT 
+                md.idd as id_module,
+                md.name AS name,
+                md.table_name as entity
+            FROM 
+                TreeBundle:modulesitetree tr, 
+                DialogsBundle:moduleslink md_l, 
+                DialogsBundle:modules md
+            WHERE md.final = 'Y'
+            AND md.status = 'active'
+            AND md_l.up_tree = tr.idd
+            AND md_l.up_module = md.idd
+            AND (tr.status = 'active' OR tr.status = 'hidden')
+            AND tr.final = 'Y'
+            AND tr.idd='".$data['id_node']."'
+            AND md.type='user'
+            ORDER BY md.type");
+
+        $node_modules = $query->getOneOrNullResult();
+
+        $query = $this->em->createQuery("
+            SELECT 
+                md.row_id,
+                plg.value AS plugin_value
+            FROM 
+                ".$node_modules['name'].':'.$node_modules['entity']." md, 
+                FireicePluginsTextBundle:plugintext plg,
+                DialogsBundle:moduleslink m_l,
+                DialogsBundle:modulespluginslink mp_l
+            WHERE (md.final = 'Y' OR md.final = 'W')
+            AND md.eid IS NULL
+
+            AND m_l.up_tree = '".$data['id_node']."'
+            AND m_l.up_module = ".$node_modules['id_module']."
+            AND m_l.id = mp_l.up_link
+            AND mp_l.up_plugin = md.idd
+
+            AND md.plugin_id = plg.id
+            AND md.plugin_name = '".$data['title']."'");
+
+        $сhoices = array ();
+
+        foreach ($query->getResult() as $val) {
+            $сhoices[$val['row_id']] = $val['plugin_value'];
+        }
+
+        $return = array ();
+        $return[0] = array (
+            'value' => '---',
+            'checked' => '0'
+        );
+
+        foreach ($сhoices as $k => $v) {
+            $return[$k] = array (
+                'value' => $v,
+                'checked' => ($id_new == $k) ? '1' : '0'
+            );
+        }
+
+        return $return;
+    }
+
 }

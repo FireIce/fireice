@@ -545,7 +545,6 @@ Class TreeModel
 
             if (null !== $result) {
                 if ($result->getStatus() == 'active' && $acl->checkUserTreePermissions($tree_module, false, $acl->getValueMask('hidenodes'))) $return[] = array ('title' => 'Скрыть узел', 'action' => 'hidenode', 'id' => $id);
-
                 if ($result->getStatus() == 'hidden' && $acl->checkUserTreePermissions($tree_module, false, $acl->getValueMask('shownodes'))) $return[] = array ('title' => 'Открыть узел', 'action' => 'shownode', 'id' => $id);
             }
         }

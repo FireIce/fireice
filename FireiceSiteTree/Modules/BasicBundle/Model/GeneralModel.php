@@ -26,6 +26,11 @@ class GeneralModel
     {
         return $this->bundle_name;
     }
+    
+    public function getEntityName()
+    {
+        return $this->entity_name;
+    }    
 
     public function addPlugin($plugin)
     {

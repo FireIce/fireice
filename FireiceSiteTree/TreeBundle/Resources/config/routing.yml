@@ -99,3 +99,7 @@ return_editor:
 get_new_messages:
     pattern: /backoffice/messages/get_new_messages
     defaults: { _controller: TreeBundle:Tree:getNewMessages }     
+    
+ajax_load:
+    pattern: /backoffice/ajax_load
+    defaults: { _controller: TreeBundle:Tree:ajaxLoad }        

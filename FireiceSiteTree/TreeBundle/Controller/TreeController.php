@@ -476,6 +476,31 @@ class TreeController extends Controller
         return $response;
     }
 
+    public function ajaxLoadAction()
+    {
+        $em = $this->get('doctrine.orm.entity_manager');
+        $sess = $this->get('session');
+        $container = $this->container;
+        $tree_model = new TreeModel($em, $sess, $container);
+
+        $modules = $tree_model->getNodeModules($this->get('request')->get('id'), $this->get('acl'));
+
+        if (count($modules) > 0) {
+            $module_act = '\\'.$this->container->getParameter('project_name').'\\Modules\\'.$modules[$this->get('request')->get('id_module')]['directory'].'\\Controller\\BackendController';
+            $module_act = new $module_act();
+            $module_act->setContainer($this->container);
+
+            $answer = $module_act->ajaxLoad();
+        } else {
+            $answer = 'error';
+        }
+
+        $response = new Response(json_encode($answer));
+        $response->headers->set('Content-Type', 'application/json');
+
+        return $response;
+    }
+
     // ==================================================================================================
 
     public function getDefaultRights($group)

@@ -32,6 +32,20 @@ class BackendController extends Controller
         return $this->getModel()->getHistory($this->get('request'));
     }
 
+    public function ajaxLoad()
+    {
+        $entity = '\\'.$this->container->getParameter('project_name').'\\Modules\\'.$this->getModel()->getBundleName().'\\Entity\\'.$this->getModel()->getEntityName();
+        $entity = new $entity();
+
+        $config = 'config'.ucfirst($this->get('request')->get('plugin'));
+        $config = $entity->$config($this->get('request')->get('params'));
+
+        $method = 'ajaxLoad'.ucfirst($config['data']['type']);
+        $return = $this->getModel()->$method($config['data']);
+
+        return $return;
+    }
+
     public function getRights()
     {
         return array (
