@@ -565,7 +565,7 @@ class BackendModel extends GeneralModel
         return true;
     }
 
-    public function ajaxLoadList($data, $id_new='')
+    public function ajaxLoadList($data, $id_item='')
     {
         //$plugin_name = 'title';
 
@@ -658,7 +658,7 @@ class BackendModel extends GeneralModel
         foreach ($сhoices as $k => $v) {
             $return[$k] = array (
                 'value' => $v,
-                'checked' => ($id_new == $k) ? '1' : '0'
+                'checked' => ($id_item == $k) ? '1' : '0'
             );
         }
 
