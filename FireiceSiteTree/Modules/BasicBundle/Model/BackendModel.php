@@ -13,7 +13,7 @@ class BackendModel extends GeneralModel
 
         foreach ($this->getPlugins() as $plugin) {
             if (!isset($values[$plugin->getValue('type')])) {
-                $values[$plugin->getValue('type')] = $plugin->getBackendModuleData($sitetree_id, $this->bundle_name.':'.$this->entity_name, $module_id, self::TYPE_ITEM);
+                $values[$plugin->getValue('type')] = $plugin->getData($sitetree_id, $this->bundle_name.':'.$this->entity_name, $module_id, self::TYPE_ITEM);
             }
         }
 

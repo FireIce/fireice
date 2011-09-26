@@ -13,34 +13,8 @@ class BackendModel
         $this->controller = $controller;
         $this->container = $container;
     }
-
-    public function getFrontendData($sitetree_id, $module, $module_id)
-    {
-        $query = $this->em->createQuery("
-            SELECT 
-                md.plugin_type, 
-                md.plugin_name,
-                plg.value AS plugin_value
-            FROM 
-                ".$module." md, 
-                FireicePlugins".ucfirst($this->controller->getValue('type'))."Bundle:plugin".$this->controller->getValue('type')." plg,
-                DialogsBundle:moduleslink m_l,
-                DialogsBundle:modulespluginslink mp_l
-            WHERE md.status = 'active'
-            
-            AND m_l.up_tree = ".$sitetree_id."
-            AND m_l.up_module = ".$module_id."
-            AND m_l.id = mp_l.up_link
-            AND mp_l.up_plugin = md.idd
-
-            AND md.final = 'Y' 
-            AND md.plugin_id = plg.id
-            AND md.plugin_type = '".$this->controller->getValue('type')."'");
-
-        return $query->getScalarResult();
-    }
-
-    public function getBackendData($sitetree_id, $module, $module_id, $module_type, $row_id=false)
+    
+    public function getData($sitetree_id, $module, $module_id, $module_type, $rows=false)
     {
         $query = $this->em->createQuery("
             SELECT 
@@ -56,7 +30,7 @@ class BackendModel
                 DialogsBundle:modulespluginslink mp_l
             WHERE (md.final = 'Y' OR md.final = 'W')
             AND md.eid IS NULL
-            ".(($row_id !== false) ? 'AND md.row_id = '.$row_id : '')."
+            ".(($rows !== false) ? 'AND md.row_id IN ('.implode(',', $rows).')' : '')."
             AND m_l.up_tree = ".$sitetree_id."
             AND m_l.up_module = ".$module_id."
             AND m_l.id = mp_l.up_link

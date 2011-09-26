@@ -38,15 +38,10 @@ class BackendController extends Controller
     {
         return $this->getValue('name');
     }
-
-    public function getFrontendModuleData($sitetree_id, $module, $module_id)
+    
+    public function getData($sitetree_id, $module, $module_id, $module_type, $rows=false)
     {
-        return $this->getModel()->getFrontendData($sitetree_id, $module, $module_id);
-    }
-
-    public function getBackendModuleData($sitetree_id, $module, $module_id, $module_type, $row_id=false)
-    {
-        return $this->getModel()->getBackendData($sitetree_id, $module, $module_id, $module_type, $row_id);
+        return $this->getModel()->getData($sitetree_id, $module, $module_id, $module_type, $rows);
     }
 
     public function getNull()
