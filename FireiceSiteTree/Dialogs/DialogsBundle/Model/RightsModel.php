@@ -40,7 +40,7 @@ class RightsModel
             AND md.type = 'sitetree_node'
             AND md_l.up_tree = tr.idd
             AND md_l.up_module = md.idd
-            AND tr.status = 'active'
+            AND (tr.status = 'active' OR tr.status = 'hidden')
             AND tr.final = 'Y'
             AND tr.idd=".$id);
 
@@ -96,7 +96,7 @@ class RightsModel
             AND md.type = 'user'
             AND md_l.up_tree = tr.idd
             AND md_l.up_module = md.idd
-            AND tr.status = 'active'
+            AND (tr.status = 'active' OR tr.status = 'hidden')
             AND tr.final = 'Y'
             AND tr.idd=".$id."
             ORDER BY md.type");
