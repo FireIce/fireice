@@ -1,0 +1,23 @@
+<div align="left" style="font-size: 11px;">
+    Дата: ${data}<br>
+    Пользователь: ${user}<br>
+    Действие: ${action_code}<br><br>
+    {{each values}}
+     
+        ${$value.title}: 
+
+        {{if typeof $value.value == 'object'}}
+            <br> 
+            {{each(k, v) $value.value}}
+                &nbsp;&nbsp;&nbsp;${k}: ${v}<br>
+            {{/each}}
+
+        {{else}}
+            ${$value.value}
+        {{/if}}
+
+        <br>
+
+    {{/each}}        
+</div>
+<hr>

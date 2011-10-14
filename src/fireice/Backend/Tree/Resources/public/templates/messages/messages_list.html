@@ -1,0 +1,9 @@
+<tr {{if is_read == 0}} style="background-color: #eaeceb;" {{/if}}</td>
+    <td style="border: #000000 solid 1px;padding: 4px;">${date}</td>
+    <td style="border: #000000 solid 1px;padding: 4px;">${login}</td>
+    <td style="border: #000000 solid 1px;padding: 4px;">${subject}</td>
+    <td align="center" width="250" style="border: #000000 solid 1px;padding: 4px;">
+        <input id_mess="${id}" class="view_mess" type="button" value="Прочитать">
+        <input id_mess="${id}" class="del_mess" type="button" value="Удалить">
+    </td>
+</tr>

@@ -1,0 +1,19 @@
+<div style="background-color: #ffffff; ">
+
+    <br>
+    <div align="left">Раздел <b>${node_title}</b>. Создание потомка.</div>
+    <br>
+
+    <div align="center" class="select_module" style="padding: 25px; border: #000000 solid 1px;">
+        <br /><div align="center"><h4>Выберите модуль будущего узла<br></h4></div><br>
+        <select name="module_id" style="width: 300px;">
+            {{each option}}
+            <option value="${$index}">${$value}</option>
+            {{/each}}
+        </select>        
+        <br><br>
+        <div align="center"><input class="submit_button" type="button" value="Далее"></div>        
+    </div>     
+
+    <br><br>              
+</div>

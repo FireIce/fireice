@@ -1,0 +1,32 @@
+   
+<div align="left" style="background-color: #ffffff;">
+   
+    <div style="border: #000000 solid 1px; padding: 10px;"> 
+
+       <div align="left">Установка прав для узла "${node_title}"</div>
+
+        <br>
+		Модуль:
+		{{each modules}}
+        {{if $index == 0}}
+            <input module_id="${$value.id}" type="radio" value="1" checked="checked" />
+        {{else}}
+            <input module_id="${$value.id}" type="radio" value="1" />
+        {{/if}}
+        ${$value.title}   
+        {{/each}}
+		
+       <br><br>
+
+        <div style="border: #000000 solid 1px; padding: 20px;">
+            
+            <div class="contents inner"></div>
+            
+        </div>
+           
+        <br>
+        <div align="center"><input class="cancel_button" type="button" value="Закрыть"></div>  
+  
+    </div>  
+           
+</div>

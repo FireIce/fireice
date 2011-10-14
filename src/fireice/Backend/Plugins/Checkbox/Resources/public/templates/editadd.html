@@ -1,0 +1,11 @@
+<div>
+  <div style="float: left;">${ title }</div>
+  <div style="float: right; text-align: right;">
+  
+      {{each value }}
+      ${$value.label}<input type="checkbox" name="${ name }[${$index}]" value="1" {{if $value.value == '1'}}checked="checked"{{/if}} ><br>
+      {{/each}}
+  
+  </div>
+</div>
+<div style="clear: both; height: 15px;"><br></div>

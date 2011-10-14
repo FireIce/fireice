@@ -1,0 +1,40 @@
+                            
+                            <div align="center"><input class="add_button" type="button" value="Добавить"></div>
+                            <br>                            
+
+                            <table width="100%" border="1" cellspacing="0" cellpadding="4">
+                                <thead>
+                                    <tr style="background-color: #F0F2E6">
+                                        {{each head}}
+                                        <td align="center" style="border: #000000 solid 1px;padding: 4px;">${$value.title}</td>
+                                        {{/each}}
+                                        <td align="center" style="border: #000000 solid 1px;padding: 4px;">Действия</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{each data}}
+                                    <tr>
+                                        {{each(k, v) $value.data }}
+                                        <td align="center" style="border: #000000 solid 1px;padding: 4px; vertical-align: middle;">{{html v}}</td>
+                                        {{/each}}
+                                        <td width="250" align="center" style="border: #000000 solid 1px;padding: 4px; vertical-align: middle;">
+                                            <input row_id="${$value.id_row}" key="${$index}" type="button" class="edit_button" value="Редактировать">
+                                            <input row_id="${$value.id_row}" key="${$index}" type="button" class="delete_button" value="Удалить">    
+                                        </td>
+                                    </tr>
+                                    {{/each}}
+									{{if colspans}}
+									{{if data}}
+									<tr>
+									    <td colspan="${colspans.left}" style="border: #000000 solid 1px;padding: 4px;"> 
+                                        <td align="center" style="border: #000000 solid 1px;padding: 4px;"><input type="button" class="orders_button" value="Изменить"></td> 
+                                        <td colspan="${colspans.right}" style="border: #000000 solid 1px;padding: 4px;">  										 
+									</tr>
+									{{/if}}
+									{{/if}}
+                                </tbody>
+                            </table>
+                            
+                            <br>
+                            <div align="center"><input class="cancel_button" type="button" value="Закрыть"></div>                            
+

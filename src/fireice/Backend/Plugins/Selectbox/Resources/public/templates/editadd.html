@@ -1,0 +1,13 @@
+<div>
+  <div style="float: left;">${ title }</div>
+  <div style="float: right;">
+    <select name="${ name }">
+
+        {{each value }}
+        <option value="${$index}" {{if $value.checked == '1'}}selected{{/if}} >${$value.value}</option>
+        {{/each}}
+
+    </select>
+  </div>
+</div>
+<div style="clear: both; height: 5px;"></div>
