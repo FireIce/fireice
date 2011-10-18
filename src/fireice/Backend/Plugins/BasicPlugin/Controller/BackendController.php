@@ -31,7 +31,15 @@ class BackendController extends Controller
 
     public function getValues()
     {
-        return $this->values;
+        $tmp = $this->values;
+        unset($tmp['settings']);
+        
+        return $tmp;
+    }
+    
+    public function getSettings()
+    {
+        return (isset($this->values['settings'])) ? $this->values['settings'] : false;
     }
 
     public function getName()

@@ -104,16 +104,20 @@ class BackendModel extends \fireice\Backend\Plugins\BasicPlugin\Model\BackendMod
     }
 
     public function setData($data)
-    { 
+    {
         $plugin_entity_class = 'fireice\\Backend\\Plugins\\'.ucfirst($this->controller->getValue('type')).'\\Entity\\plugin'.$this->controller->getValue('type');
 
         $id_group = null;
+        $settings = $this->controller->getSettings();
 
         foreach ($data as $k => $v) {
             if ($id_group == null) {
                 $plugin_entity = new $plugin_entity_class();
                 $plugin_entity->setIdGroup(0);
                 $plugin_entity->setIdData($k);
+                if (false !== $settings && isset($settings['resize'])) {
+                    $v['src'] = $this->resize($v['src']);
+                }
                 $plugin_entity->setValue($v);
 
                 $this->em->persist($plugin_entity);
@@ -132,6 +136,9 @@ class BackendModel extends \fireice\Backend\Plugins\BasicPlugin\Model\BackendMod
             $plugin_entity = new $plugin_entity_class();
             $plugin_entity->setIdGroup($id_group);
             $plugin_entity->setIdData($k);
+            if (false !== $settings && isset($settings['resize'])) {
+                $v['src'] = $this->resize($v['src']);
+            }
             $plugin_entity->setValue($v);
 
             $this->em->persist($plugin_entity);
@@ -139,6 +146,157 @@ class BackendModel extends \fireice\Backend\Plugins\BasicPlugin\Model\BackendMod
         }
 
         return $id_group;
+    }
+
+    // ------------------------------------------------------------------
+
+    protected $image;
+    protected $type;
+    protected $filename;
+
+    protected function resize($image)
+    {
+        $settings = $this->controller->getSettings();
+        if (!isset($settings['resize']['x'])) $settings['resize']['x'] = '*';
+        if (!isset($settings['resize']['y'])) $settings['resize']['y'] = '*';
+
+        if (null === $this->setImage($image)) {
+            return null;
+        }
+
+        $a = $this->getResizeSize($settings['resize']['x'], $settings['resize']['y']);
+
+        if (true === $a['need']) {
+            $oImage = ImageCreateTrueColor($a['new']['x'], $a['new']['y']);
+
+            imagecopyresampled($oImage, $this->getImage(), 0, 0, 0, 0, $a['new']['x'], $a['new']['y'], $a['old']['x'], $a['old']['y']);
+
+            switch ($this->type) {
+                case 'image/png':
+                    $s = 'imagepng';
+                    break;
+                case 'image/gif':
+                    $s = 'imagegif';
+                    break;
+                default:
+                    $s = 'imagejpeg';
+                    break;
+            }
+
+            $dirname = (($settings['resize']['x'] !== '*') ? $settings['resize']['x'] : '').'x'.(($settings['resize']['y'] !== '*') ? $settings['resize']['y'] : '');
+
+            if (!is_dir($this->container->getParameter('upload_images_directory').'/'.$dirname)) {
+                mkdir($this->container->getParameter('upload_images_directory').'/'.$dirname);
+            }
+
+            $s($oImage, $this->container->getParameter('upload_images_directory').'/'.$dirname.'/'.$this->filename);
+
+            imagedestroy($oImage);
+
+            return $this->container->getParameter('images_url_part').'/'.$dirname.'/'.$this->filename;
+        }
+
+        return $image;
+    }
+
+    protected function setImage($file)
+    {
+        if (null !== $this->image) {
+            imagedestroy($this->image);
+            $this->image = null;
+            $this->type = null;
+            $this->filename = null;
+        }
+        
+        $type = getimagesize($this->container->getParameter('project_web_directory').$file);
+
+        switch ($type["mime"]) {
+            case 'image/jpeg':
+                $function = 'imagecreatefromjpeg';
+                break;
+            case 'image/png':
+                $function = 'imagecreatefrompng';
+                break;
+            case 'image/gif':
+                $function = 'imagecreatefromgif';
+                break;
+            default:
+                return null;
+        }
+
+        $this->type = $type["mime"];
+        $this->filename = basename($this->container->getParameter('project_web_directory').$file);
+        $this->image = $function($this->container->getParameter('project_web_directory').$file);
+
+        return true;
+    }
+
+    protected function getResizeSize($x, $y)
+    {
+        $a = array (
+            'old' => array (
+                'x' => $this->getImageSX(),
+                'y' => $this->getImageSY(),
+            ),
+            'new' => array (
+                'x' => $x,
+                'y' => $y,
+            ),
+        );
+
+        /**
+         * Выясняем коэффициент сжатия
+         *
+         */
+        $m = null;
+
+        /**
+         * По оси X
+         *
+         */
+        if ('*' !== $x && false === empty($x) && $a['old']['x'] > $x) {
+            $m = 100 * $x / $a['old']['x'];
+        }
+
+        /**
+         * По оси Y
+         *
+         */
+        if ('*' !== $y && false === empty($y) && $a['old']['y'] > $y) {
+            $mm = 100 * $y / $a['old']['y'];
+
+            if (null === $m || $mm < $m) {
+                $m = $mm;
+            }
+        }
+
+        /**
+         * Высчитываем новые размеры
+         *
+         */
+        if (null !== $m) {
+            $a['new']['x'] = ceil($a['old']['x'] / 100 * $m);
+            $a['new']['y'] = ceil($a['old']['y'] / 100 * $m);
+        }
+
+        $a['need'] = null !== $m;
+
+        return $a;
+    }
+
+    protected function getImage()
+    {
+        return $this->image;
+    }
+
+    protected function getImageSX()
+    {
+        return imageSX($this->getImage());
+    }
+
+    protected function getImageSY()
+    {
+        return imageSY($this->getImage());
     }
 
 }
