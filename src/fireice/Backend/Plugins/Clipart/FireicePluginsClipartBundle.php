@@ -1,10 +1,10 @@
 <?php
 
-namespace fireice\Backend\Plugins\Uploadimage;
+namespace fireice\Backend\Plugins\Clipart;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-class FireicePluginsUploadimageBundle extends Bundle
+class FireicePluginsClipartBundle extends Bundle
 {
     
 }

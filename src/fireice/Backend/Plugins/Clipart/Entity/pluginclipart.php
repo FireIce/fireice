@@ -1,15 +1,15 @@
 <?php
 
-namespace fireice\Backend\Plugins\Uploadimage\Entity;
+namespace fireice\Backend\Plugins\Clipart\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="plugin_uploadimage")
+ * @ORM\Table(name="plugin_clipart")
  */
-class pluginuploadimage
+class pluginclipart
 {
     /**
      * @ORM\Id
@@ -29,11 +29,51 @@ class pluginuploadimage
     /**
      * @ORM\Column(type="string", length=100)         
      */
-    protected $alt;
+    protected $original_src;
     /**
      * @ORM\Column(type="string", length=100)         
      */
-    protected $src;
+    protected $original_alt;
+    /**
+     * @ORM\Column(type="integer")        
+     */
+    protected $original_x;
+    /**
+     * @ORM\Column(type="integer")        
+     */
+    protected $original_y;
+    /**
+     * @ORM\Column(type="string", length=100)         
+     */
+    protected $big_src;
+    /**
+     * @ORM\Column(type="string", length=100)         
+     */
+    protected $big_alt;
+    /**
+     * @ORM\Column(type="integer")        
+     */
+    protected $big_x;
+    /**
+     * @ORM\Column(type="integer")        
+     */
+    protected $big_y;
+    /**
+     * @ORM\Column(type="string", length=100)         
+     */
+    protected $small_src;
+    /**
+     * @ORM\Column(type="string", length=100)         
+     */
+    protected $small_alt;
+    /**
+     * @ORM\Column(type="integer")        
+     */
+    protected $small_x;
+    /**
+     * @ORM\Column(type="integer")        
+     */
+    protected $small_y;
 
     public function setId($id)
     {
@@ -65,37 +105,159 @@ class pluginuploadimage
         return $this->id_data;
     }
 
-    public function setAlt($alt)
+    public function setOriginalSrc($original_src)
     {
-        $this->alt = $alt;
+        $this->original_src = $original_src;
     }
 
-    public function getAlt()
+    public function getOriginalSrc()
     {
-        return $this->alt;
+        return $this->original_src;
     }
 
-    public function setSrc($src)
+    public function setOriginalAlt($original_alt)
     {
-        $this->src = $src;
+        $this->original_alt = $original_alt;
     }
 
-    public function getSrc()
+    public function getOriginalAlt()
     {
-        return $this->src;
+        return $this->original_alt;
+    }
+
+    public function setOriginalX($original_x)
+    {
+        $this->original_x = $original_x;
+    }
+
+    public function getOriginalX()
+    {
+        return $this->original_x;
+    }
+
+    public function setOriginalY($original_y)
+    {
+        $this->original_y = $original_y;
+    }
+
+    public function getOriginalY()
+    {
+        return $this->original_y;
+    }
+
+    public function setBigSrc($big_src)
+    {
+        $this->big_src = $big_src;
+    }
+
+    public function getBigSrc()
+    {
+        return $this->big_src;
+    }
+
+    public function setBigAlt($big_alt)
+    {
+        $this->big_alt = $big_alt;
+    }
+
+    public function getBigAlt()
+    {
+        return $this->big_alt;
+    }
+
+    public function setBigX($big_x)
+    {
+        $this->big_x = $big_x;
+    }
+
+    public function getBigX()
+    {
+        return $this->big_x;
+    }
+
+    public function setBigY($big_y)
+    {
+        $this->big_y = $big_y;
+    }
+
+    public function getBigY()
+    {
+        return $this->big_y;
+    }
+
+    public function setSmallSrc($small_src)
+    {
+        $this->small_src = $small_src;
+    }
+
+    public function getSmallSrc()
+    {
+        return $this->small_src;
+    }
+
+    public function setSmallAlt($small_alt)
+    {
+        $this->small_alt = $small_alt;
+    }
+
+    public function getSmallAlt()
+    {
+        return $this->small_alt;
+    }
+
+    public function setSmallX($small_x)
+    {
+        $this->small_x = $small_x;
+    }
+
+    public function getSmallX()
+    {
+        return $this->small_x;
+    }
+
+    public function setSmallY($small_y)
+    {
+        $this->small_y = $small_y;
+    }
+
+    public function getSmallY()
+    {
+        return $this->small_y;
     }
 
     public function setValue($value)
     {
-        $this->alt = $value['alt'];
-        $this->src = $value['src'];
+        $this->original_src = $value['original_src'];
+        $this->original_alt = $value['original_alt'];
+        $this->original_x = $value['original_x'];
+        $this->original_y = $value['original_y'];
+
+        $this->big_src = $value['big_src'];
+        $this->big_alt = $value['big_alt'];
+        $this->big_x = $value['big_x'];
+        $this->big_y = $value['big_y'];
+
+        $this->small_src = $value['small_src'];
+        $this->small_alt = $value['small_alt'];
+        $this->small_x = $value['small_x'];
+        $this->small_y = $value['small_y'];
     }
 
     public function getValue()
     {
         return array (
-            'alt' => $this->alt,
-            'src' => $this->src
+            'original_src' => $this->original_src,
+            'original_alt' => $this->original_alt,
+            'original_x' => $this->original_x,
+            'original_y' => $this->original_y,
+            'big_src' => $this->big_src,
+            'big_alt' => $this->big_alt,
+            'big_x' => $this->big_x,
+            'big_y' => $this->big_y,
+            'small_src' => $this->small_src,
+            'small_alt' => $this->small_alt,
+            'small_x' => $this->small_x,
+            'small_y' => $this->small_y,
         );
     }
 

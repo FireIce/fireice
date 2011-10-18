@@ -1,0 +1,33 @@
+
+<div class="upload_${ name }">
+    <div>${ title }</div>
+    <div class="images" style="margin-top: 4px;">
+        {{each value}}
+		<div style="border: #000000 solid 1px; height: 90px; padding: 20px; margin-top:20px;"> 
+		    <div style="float: left">
+		        Оригинальная картинка<br><br>
+		        alt: <input style="width: 280px;" type="text" name="${ name }[${$index}][original_alt]" value="${$value.original_alt}"><br>
+                src: <input style="width: 280px;" class="clipart_orig_${$index}" type="text" name="${ name }[${$index}][original_src]" value="${$value.original_src}">
+		        <button class="upload_select" input_class="clipart_orig_${$index}" type="button">Выбрать</button><br><br>
+		    </div>
+		    <div style="float: left; margin-left: 30px;">
+		        Большая картинка<br><br>
+		        alt: <input style="width: 280px;" type="text" name="${ name }[${$index}][big_alt]" value="${$value.big_alt}"><br>
+                src: <input style="width: 280px;" class="clipart_big_${$index}" type="text" name="${ name }[${$index}][big_src]" value="${$value.big_src}">
+		        <button class="upload_select" input_class="clipart_big_${$index}" type="button">Выбрать</button><br><br>
+		    </div>
+	        <div style="float: left; margin-left: 30px;">
+		        Маленькая картинка<br><br>
+		        alt: <input style="width: 280px;" type="text" name="${ name }[${$index}][small_alt]" value="${$value.small_alt}"><br>
+                src: <input style="width: 280px;" class="clipart_small_${$index}" type="text" name="${ name }[${$index}][small_src]" value="${$value.small_src}">
+		        <button class="upload_select" input_class="clipart_small_${$index}" type="button">Выбрать</button><br><br>
+		    </div>
+		</div>
+		{{/each}}
+    </div>
+	{{if show_add_button == 1}}
+	<div style="clear: both;"><br></div>
+	<div><input class="add_image" type="button" value="Добавить"></div>
+	{{/if}}
+</div>
+<div style="clear: both; height: 5px;"></div>

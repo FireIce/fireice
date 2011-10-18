@@ -1,6 +1,6 @@
 <?php
 
-namespace fireice\Backend\Plugins\Uploadimage\Model;
+namespace fireice\Backend\Plugins\Clipart\Model;
 
 class BackendModel extends \fireice\Backend\Plugins\BasicPlugin\Model\BackendModel
 {
@@ -13,8 +13,12 @@ class BackendModel extends \fireice\Backend\Plugins\BasicPlugin\Model\BackendMod
                 md.plugin_type, 
                 md.plugin_name,
                 plg.id_data AS plugin_id_data,
-                plg.alt AS plugin_value_alt,
-                plg.src AS plugin_value_src,
+                plg.original_src AS plugin_value_original_src,
+                plg.original_alt AS plugin_value_original_alt,
+                plg.big_src AS plugin_value_big_src,
+                plg.big_alt AS plugin_value_big_alt,   
+                plg.small_src AS plugin_value_small_src,
+                plg.small_alt AS plugin_value_small_alt,                 
                 md.status
             FROM 
                 ".$module." md, 
@@ -64,8 +68,12 @@ class BackendModel extends \fireice\Backend\Plugins\BasicPlugin\Model\BackendMod
 
                     foreach ($v as $k2 => $v2) {
                         $return[$key][$k]['plugin_value'][$v2['plugin_id_data']] = array (
-                            'alt' => $v2['plugin_value_alt'],
-                            'src' => $v2['plugin_value_src']
+                            'original_src' => $v2['plugin_value_original_src'],
+                            'original_alt' => $v2['plugin_value_original_alt'],
+                            'big_src' => $v2['plugin_value_big_src'],
+                            'big_alt' => $v2['plugin_value_big_alt'],
+                            'small_src' => $v2['plugin_value_small_src'],
+                            'small_alt' => $v2['plugin_value_small_alt'],
                         );
                     }
                 }
@@ -83,8 +91,12 @@ class BackendModel extends \fireice\Backend\Plugins\BasicPlugin\Model\BackendMod
 
                 foreach ($value as $k => $v) {
                     $return[$key]['plugin_value'][$v['plugin_id_data']] = array (
-                        'alt' => $v['plugin_value_alt'],
-                        'src' => $v['plugin_value_src']
+                        'original_src' => $v2['plugin_value_original_src'],
+                        'original_alt' => $v2['plugin_value_original_alt'],
+                        'big_src' => $v2['plugin_value_big_src'],
+                        'big_alt' => $v2['plugin_value_big_alt'],
+                        'small_src' => $v2['plugin_value_small_src'],
+                        'small_alt' => $v2['plugin_value_small_alt'],
                     );
                 }
             }
@@ -104,12 +116,15 @@ class BackendModel extends \fireice\Backend\Plugins\BasicPlugin\Model\BackendMod
     }
 
     public function setData($data)
-    { 
+    {
         $plugin_entity_class = 'fireice\\Backend\\Plugins\\'.ucfirst($this->controller->getValue('type')).'\\Entity\\plugin'.$this->controller->getValue('type');
 
         $id_group = null;
 
         foreach ($data as $k => $v) {
+            
+            $this->addXYParameters($v);
+            
             if ($id_group == null) {
                 $plugin_entity = new $plugin_entity_class();
                 $plugin_entity->setIdGroup(0);
@@ -139,6 +154,16 @@ class BackendModel extends \fireice\Backend\Plugins\BasicPlugin\Model\BackendMod
         }
 
         return $id_group;
+    }
+    
+    protected function addXYParameters(&$value)
+    {
+        $value['original_x'] = 45;
+        $value['original_y'] = 45;
+        $value['big_x'] = 45;
+        $value['big_y'] = 45;
+        $value['small_x'] = 45;
+        $value['small_y'] = 45;        
     }
 
 }
