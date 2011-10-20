@@ -74,6 +74,10 @@ class pluginclipart
      * @ORM\Column(type="integer")        
      */
     protected $small_y;
+    /**
+     * @ORM\Column(type="string", length=10)         
+     */
+    protected $type_setting;
 
     public function setId($id)
     {
@@ -225,6 +229,16 @@ class pluginclipart
         return $this->small_y;
     }
 
+    public function setTypeSetting($type_setting)
+    {
+        $this->type_setting = $type_setting;
+    }
+
+    public function getTypeSetting()
+    {
+        return $this->type_setting;
+    }
+
     public function setValue($value)
     {
         $this->original_src = $value['original_src'];
@@ -241,6 +255,8 @@ class pluginclipart
         $this->small_alt = $value['small_alt'];
         $this->small_x = $value['small_x'];
         $this->small_y = $value['small_y'];
+
+        $this->type_setting = trim($value['type_setting']);
     }
 
     public function getValue()
@@ -258,6 +274,7 @@ class pluginclipart
             'small_alt' => $this->small_alt,
             'small_x' => $this->small_x,
             'small_y' => $this->small_y,
+            'type_setting' => $this->type_setting,
         );
     }
 

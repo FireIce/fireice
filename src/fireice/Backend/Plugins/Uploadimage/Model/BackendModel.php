@@ -109,6 +109,10 @@ class BackendModel extends \fireice\Backend\Plugins\BasicPlugin\Model\BackendMod
 
         $id_group = null;
         $settings = $this->controller->getSettings();
+        if (false !== $settings) {
+            if (!isset($settings['resize']['x'])) $settings['resize']['x'] = '*';
+            if (!isset($settings['resize']['y'])) $settings['resize']['y'] = '*';
+        }
 
         foreach ($data as $k => $v) {
             if ($id_group == null) {
@@ -116,7 +120,9 @@ class BackendModel extends \fireice\Backend\Plugins\BasicPlugin\Model\BackendMod
                 $plugin_entity->setIdGroup(0);
                 $plugin_entity->setIdData($k);
                 if (false !== $settings && isset($settings['resize'])) {
-                    $v['src'] = $this->resize($v['src']);
+
+                    $tmp = $this->resize($v['src'], array ('x' => $settings['resize']['x'], 'y' => $settings['resize']['y']));
+                    $v['src'] = $tmp['src'];
                 }
                 $plugin_entity->setValue($v);
 
@@ -137,7 +143,9 @@ class BackendModel extends \fireice\Backend\Plugins\BasicPlugin\Model\BackendMod
             $plugin_entity->setIdGroup($id_group);
             $plugin_entity->setIdData($k);
             if (false !== $settings && isset($settings['resize'])) {
-                $v['src'] = $this->resize($v['src']);
+
+                $tmp = $this->resize($v['src'], array ('x' => $settings['resize']['x'], 'y' => $settings['resize']['y']));
+                $v['src'] = $tmp['src'];
             }
             $plugin_entity->setValue($v);
 
@@ -154,17 +162,13 @@ class BackendModel extends \fireice\Backend\Plugins\BasicPlugin\Model\BackendMod
     protected $type;
     protected $filename;
 
-    protected function resize($image)
+    protected function resize($image, $size)
     {
-        $settings = $this->controller->getSettings();
-        if (!isset($settings['resize']['x'])) $settings['resize']['x'] = '*';
-        if (!isset($settings['resize']['y'])) $settings['resize']['y'] = '*';
-
         if (null === $this->setImage($image)) {
             return null;
         }
 
-        $a = $this->getResizeSize($settings['resize']['x'], $settings['resize']['y']);
+        $a = $this->getResizeSize($size['x'], $size['y']);
 
         if (true === $a['need']) {
             $oImage = ImageCreateTrueColor($a['new']['x'], $a['new']['y']);
@@ -183,20 +187,34 @@ class BackendModel extends \fireice\Backend\Plugins\BasicPlugin\Model\BackendMod
                     break;
             }
 
-            $dirname = (($settings['resize']['x'] !== '*') ? $settings['resize']['x'] : '').'x'.(($settings['resize']['y'] !== '*') ? $settings['resize']['y'] : '');
+            $dirname = (($size['x'] !== '*') ? $size['x'] : '').'x'.(($size['y'] !== '*') ? $size['y'] : '');
 
-            if (!is_dir($this->container->getParameter('upload_images_directory').'/'.$dirname)) {
-                mkdir($this->container->getParameter('upload_images_directory').'/'.$dirname);
+            if (!is_dir($this->getImagesDir().'/'.$dirname)) {
+                mkdir($this->getImagesDir().'/'.$dirname);
             }
 
-            $s($oImage, $this->container->getParameter('upload_images_directory').'/'.$dirname.'/'.$this->filename);
+            $s($oImage, $this->getImagesDir().'/'.$dirname.'/'.$this->filename);
 
             imagedestroy($oImage);
 
-            return $this->container->getParameter('images_url_part').'/'.$dirname.'/'.$this->filename;
+            return array (
+                'src' => $this->getImagesUrlPart().'/'.$dirname.'/'.$this->filename,
+                'size' => array (
+                    'x' => $a['new']['x'],
+                    'y' => $a['new']['y']
+                )
+            );
         }
 
-        return $image;
+        $info = getimagesize($this->getSrcRealPath($image));
+
+        return array (
+            'src' => $image,
+            'size' => array (
+                'x' => $info[0],
+                'y' => $info[1]
+            )
+        );
     }
 
     protected function setImage($file)
@@ -207,8 +225,8 @@ class BackendModel extends \fireice\Backend\Plugins\BasicPlugin\Model\BackendMod
             $this->type = null;
             $this->filename = null;
         }
-        
-        $type = getimagesize($this->container->getParameter('project_web_directory').$file);
+
+        $type = getimagesize($this->getSrcRealPath($file));
 
         switch ($type["mime"]) {
             case 'image/jpeg':
@@ -225,8 +243,8 @@ class BackendModel extends \fireice\Backend\Plugins\BasicPlugin\Model\BackendMod
         }
 
         $this->type = $type["mime"];
-        $this->filename = basename($this->container->getParameter('project_web_directory').$file);
-        $this->image = $function($this->container->getParameter('project_web_directory').$file);
+        $this->filename = basename($this->getSrcRealPath($file));
+        $this->image = $function($this->getSrcRealPath($file));
 
         return true;
     }
@@ -299,4 +317,20 @@ class BackendModel extends \fireice\Backend\Plugins\BasicPlugin\Model\BackendMod
         return imageSY($this->getImage());
     }
 
+    // Возвращает полный путь до файла, заданного через: /uploads/images/name.jpg
+    protected function getSrcRealPath($filename)
+    {
+        return $this->container->getParameter('project_web_directory').$filename;
+    }
+    
+    // Возвращает путь до директории images
+    protected function getImagesDir()
+    {
+        return rtrim($this->container->getParameter('upload_images_directory'), '/\\');
+    }
+    
+    protected function getImagesUrlPart()
+    {
+        return $this->container->getParameter('images_url_part');
+    }
 }

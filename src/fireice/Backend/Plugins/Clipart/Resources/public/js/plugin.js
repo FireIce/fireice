@@ -1,5 +1,4 @@
 
-
 function pluginClipart(data)
 {
     // Обработчик нажатия кнопки выбора картинки
@@ -29,13 +28,69 @@ function pluginClipart(data)
         temp = temp.replace(new RegExp('value=".*?"', 'g'), 'value=""');
 
         // Вставляем на страницу
-        $('<div style="border: #000000 solid 1px; height: 90px; padding: 20px; margin-top:20px;">' + temp + '</div>').appendTo('#dialog_id .inner .data .upload_' + data['name'] + ' .images');                    
+        $('<div style="border: #000000 solid 1px; padding: 20px; margin-top:20px;">' + temp + '</div>').appendTo('#dialog_id .inner .data .upload_' + data['name'] + ' .images');                    
+                    
+        if (data['resize'] == 1)
+        {
+            $('#dialog_id .inner .data .upload_' + data['name'] + ' .images').children('div:last').children('div:eq(1)').children('span').hide();   
+            $('#dialog_id .inner .data .upload_' + data['name'] + ' .images').children('div:last').children('div:eq(2)').children('span').hide();
+            $('#dialog_id .inner .data .upload_' + data['name'] + ' .images').children('div:last').children('a.type_setting').html('Ручная настройка');
+            $('#dialog_id .inner .data .upload_' + data['name'] + ' .images').children('div:last').children('a.type_setting').data('type', 'manually');
+			$('#dialog_id .inner .data .upload_' + data['name'] + ' .images').children('div:last').children('input[type=hidden]').val('auto');
+        }
+		else
+		{
+		    $('#dialog_id .inner .data .upload_' + data['name'] + ' .images').children('div:last').children('input[type=hidden]').val('manually');
+		}
                     
         // Вешаем обработчик нажатия кнопки
-        $('#dialog_id .inner .data .upload_' + data['name'] + ' .images').children('div:last').children('div').children('button').click(function(){
+        $('#dialog_id .inner .data .upload_' + data['name'] + ' .images').children('div:last').children('div').find('button').click(function(){
             createFinderClipart(this, data['name']);                         
-        });
+        });     
+        
+        // Вешаем обработчик нажатия ссылки
+        $('#dialog_id .inner .data .upload_' + data['name'] + ' .images').children('div:last').children('a').click(function(){		   
+            onClickLink(this);				
+            return false;                        
+        });	        
     }); 
+	
+    if (data['resize'] == 1)
+    {
+        $('#dialog_id .inner .data .upload_' + data['name'] + ' .images div a.type_setting').each(function(i){
+
+			if (data['value'][i]['type_setting'] == 'manually')
+			    next = 'auto';
+		    else
+			    next = 'manually';
+			
+			$(this).data('type', next);
+        });
+    }
+    
+	// Вешаем обработчик нажатия ссылки "Ручная настройка"
+    $('#dialog_id .inner .data .upload_' + data['name'] + ' .type_setting').click(function(){        
+		onClickLink(this);				
+        return false;		
+    }); 	
+}
+
+function onClickLink(th)
+{
+	if ($(th).data('type') == undefined || $(th).data('type') == 'manually') 
+	{		
+		$(th).parent('div').children('div').children('span').show();
+        $(th).html('Автоматическая настройка');
+		$(th).data('type', 'auto');
+        $(th).parent('div').children('input[type=hidden]').val('manually');
+	} 
+	else if ($(th).data('type') == 'auto')
+	{
+		$(th).parent('div').children('div').children('span').hide();
+        $(th).html('Ручная настройка');
+		$(th).data('type', 'manually');	
+        $(th).parent('div').children('input[type=hidden]').val('auto');
+	}	    
 }
 
 function createFinderClipart(th, plugin_name)

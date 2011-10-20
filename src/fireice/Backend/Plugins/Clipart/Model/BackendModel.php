@@ -2,7 +2,7 @@
 
 namespace fireice\Backend\Plugins\Clipart\Model;
 
-class BackendModel extends \fireice\Backend\Plugins\BasicPlugin\Model\BackendModel
+class BackendModel extends \fireice\Backend\Plugins\Uploadimage\Model\BackendModel
 {
 
     public function getData($sitetree_id, $module, $module_id, $module_type, $rows=false)
@@ -18,7 +18,8 @@ class BackendModel extends \fireice\Backend\Plugins\BasicPlugin\Model\BackendMod
                 plg.big_src AS plugin_value_big_src,
                 plg.big_alt AS plugin_value_big_alt,   
                 plg.small_src AS plugin_value_small_src,
-                plg.small_alt AS plugin_value_small_alt,                 
+                plg.small_alt AS plugin_value_small_alt, 
+                plg.type_setting as plugin_value_type_setting,
                 md.status
             FROM 
                 ".$module." md, 
@@ -74,6 +75,7 @@ class BackendModel extends \fireice\Backend\Plugins\BasicPlugin\Model\BackendMod
                             'big_alt' => $v2['plugin_value_big_alt'],
                             'small_src' => $v2['plugin_value_small_src'],
                             'small_alt' => $v2['plugin_value_small_alt'],
+                            'type_setting' => $v2['plugin_value_type_setting']
                         );
                     }
                 }
@@ -97,6 +99,7 @@ class BackendModel extends \fireice\Backend\Plugins\BasicPlugin\Model\BackendMod
                         'big_alt' => $v2['plugin_value_big_alt'],
                         'small_src' => $v2['plugin_value_small_src'],
                         'small_alt' => $v2['plugin_value_small_alt'],
+                        'type_setting' => $v2['plugin_value_type_setting']
                     );
                 }
             }
@@ -122,9 +125,9 @@ class BackendModel extends \fireice\Backend\Plugins\BasicPlugin\Model\BackendMod
         $id_group = null;
 
         foreach ($data as $k => $v) {
-            
-            $this->addXYParameters($v);
-            
+
+            $this->updateParameters($v);
+
             if ($id_group == null) {
                 $plugin_entity = new $plugin_entity_class();
                 $plugin_entity->setIdGroup(0);
@@ -155,15 +158,50 @@ class BackendModel extends \fireice\Backend\Plugins\BasicPlugin\Model\BackendMod
 
         return $id_group;
     }
-    
-    protected function addXYParameters(&$value)
+
+    protected function updateParameters(&$value)
     {
-        $value['original_x'] = 45;
-        $value['original_y'] = 45;
-        $value['big_x'] = 45;
-        $value['big_y'] = 45;
-        $value['small_x'] = 45;
-        $value['small_y'] = 45;        
+        $value['type_setting'] = trim($value['type_setting']);
+
+        $settings = $this->controller->getSettings();
+
+        if ($value['type_setting'] == 'manually' || $settings === false) {
+
+            // Ручная настройка. Нужно только определить и подставить разрешения (x*y) выбранных картинок
+            $info = getimagesize($this->getSrcRealPath($value['original_src']));
+            $value['original_x'] = $info[0];
+            $value['original_y'] = $info[1];
+
+            $info = getimagesize($this->getSrcRealPath($value['big_src']));
+            $value['big_x'] = $info[0];
+            $value['big_y'] = $info[1];
+
+            $info = getimagesize($this->getSrcRealPath($value['small_src']));
+            $value['small_x'] = $info[0];
+            $value['small_y'] = $info[1];
+        } elseif ($value['type_setting'] == 'auto' && $settings !== false) {
+
+            // Автоматическая настройка. Нужно определить и подставить разрешение оригинальной картинки.
+            // Большую и маленькую получить ресайзом оригинальной (и проставить разрешение для большой и маленькой).
+            $info = getimagesize($this->getSrcRealPath($value['original_src']));
+            $value['original_x'] = $info[0];
+            $value['original_y'] = $info[1];
+
+            if (!isset($settings['resize']['big']['x'])) $settings['resize']['big']['x'] = '*';
+            if (!isset($settings['resize']['big']['y'])) $settings['resize']['big']['y'] = '*';
+            if (!isset($settings['resize']['small']['x'])) $settings['resize']['small']['x'] = '*';
+            if (!isset($settings['resize']['small']['y'])) $settings['resize']['small']['y'] = '*';
+
+            $tmp = $this->resize($value['original_src'], array ('x' => $settings['resize']['big']['x'], 'y' => $settings['resize']['big']['y']));
+            $value['big_src'] = $tmp['src'];
+            $value['big_x'] = $tmp['size']['x'];
+            $value['big_y'] = $tmp['size']['y'];
+
+            $tmp = $this->resize($value['original_src'], array ('x' => $settings['resize']['small']['x'], 'y' => $settings['resize']['small']['y']));
+            $value['small_src'] = $tmp['src'];
+            $value['small_x'] = $tmp['size']['x'];
+            $value['small_y'] = $tmp['size']['y'];
+        }
     }
 
 }

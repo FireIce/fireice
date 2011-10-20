@@ -3,25 +3,36 @@
     <div>${ title }</div>
     <div class="images" style="margin-top: 4px;">
         {{each value}}
-		<div style="border: #000000 solid 1px; height: 90px; padding: 20px; margin-top:20px;"> 
+		<div style="border: #000000 solid 1px; padding: 20px; margin-top:20px;"> 
 		    <div style="float: left">
 		        Оригинальная картинка<br><br>
 		        alt: <input style="width: 280px;" type="text" name="${ name }[${$index}][original_alt]" value="${$value.original_alt}"><br>
                 src: <input style="width: 280px;" class="clipart_orig_${$index}" type="text" name="${ name }[${$index}][original_src]" value="${$value.original_src}">
 		        <button class="upload_select" input_class="clipart_orig_${$index}" type="button">Выбрать</button><br><br>
 		    </div>
-		    <div style="float: left; margin-left: 30px;">
+		    <div style="float: left; margin-left: 40px;">
 		        Большая картинка<br><br>
 		        alt: <input style="width: 280px;" type="text" name="${ name }[${$index}][big_alt]" value="${$value.big_alt}"><br>
-                src: <input style="width: 280px;" class="clipart_big_${$index}" type="text" name="${ name }[${$index}][big_src]" value="${$value.big_src}">
-		        <button class="upload_select" input_class="clipart_big_${$index}" type="button">Выбрать</button><br><br>
+                <span style="{{if resize == 1 && $value.type_setting != 'manually'}} display: none; {{/if}}">
+				    src: <input style="width: 280px;" class="clipart_big_${$index}" type="text" name="${ name }[${$index}][big_src]" value="${$value.big_src}">
+		            <button class="upload_select" input_class="clipart_big_${$index}" type="button">Выбрать</button>
+			    </span><br><br>
 		    </div>
-	        <div style="float: left; margin-left: 30px;">
+	        <div style="float: left; margin-left: 40px;">
 		        Маленькая картинка<br><br>
 		        alt: <input style="width: 280px;" type="text" name="${ name }[${$index}][small_alt]" value="${$value.small_alt}"><br>
-                src: <input style="width: 280px;" class="clipart_small_${$index}" type="text" name="${ name }[${$index}][small_src]" value="${$value.small_src}">
-		        <button class="upload_select" input_class="clipart_small_${$index}" type="button">Выбрать</button><br><br>
+                <span style="{{if resize == 1 && $value.type_setting != 'manually'}} display: none; {{/if}}">
+				    src: <input style="width: 280px;" class="clipart_small_${$index}" type="text" name="${ name }[${$index}][small_src]" value="${$value.small_src}">
+		            <button class="upload_select" input_class="clipart_small_${$index}" type="button">Выбрать</button>
+			    </span><br><br>
 		    </div>
+			<div style="clear:both;"></div>
+			{{if resize == 1}}
+            <input type="hidden" name="${ name }[${$index}][type_setting]" value="{{if $value.type_setting != 'manually'}} auto {{else}} manually {{/if}}">            
+			<a href="noscript" style="text-decoration: underline" class="type_setting">{{if $value.type_setting != 'manually'}} Ручная настройка {{else}} Автоматическая настройка {{/if}}</a>
+			{{else}}
+			<input type="hidden" name="${ name }[${$index}][type_setting]" value="manually">
+			{{/if}}
 		</div>
 		{{/each}}
     </div>
