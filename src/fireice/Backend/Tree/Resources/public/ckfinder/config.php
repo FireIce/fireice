@@ -36,7 +36,7 @@ function CheckAuthentication()
         
         //$_SESSION['CKFinder_UserRole'] = 'gr_'.$object->getUser()->getGroups();
         
-        if ($object->getUser()->getGroups() == 214 || $object->getUser()->getGroups() == 215)        
+        if ($object->getUser()->getGroups() == 5 || $object->getUser()->getGroups() == 6)        
             return true;
     }
     

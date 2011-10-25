@@ -50,6 +50,7 @@ class FrontendModel
         $node = $this->sitetree['nodes'][$node_id];
 
         return array (
+            'id' => $node_id,
             'parent' => $node['up_parent'],
             'name' => isset($node['plugins']['fireice_node_name']['value']) ? $node['plugins']['fireice_node_name']['value'] : $node_id,
             'title' => isset($node['plugins']['fireice_node_title']['value']) ? $node['plugins']['fireice_node_title']['value'] : '[Узел без названия]',
@@ -133,6 +134,33 @@ class FrontendModel
     public function getUser()
     {
         return $this->current_user;
+    }
+
+    public function getMenuHierarchy($navigation)
+    {
+        if (count($navigation) > 0) {
+
+            $first = $navigation[0];
+            $next = (isset($navigation[1])) ? $navigation[1] : false;
+
+            $childs = $this->getChilds($first['id']);
+
+            $return = array ();
+            foreach ($childs as $val2) {
+                $tmp = $this->getNodeInfo($val2);
+
+                if (false !== $next && $next['id'] == $tmp['id']) {
+
+                    $tmp['childs'] = $this->getMenuHierarchy(array_slice($navigation, 1));
+                } else {
+                    $tmp['childs'] = array ();
+                }
+
+                $return[] = $tmp;
+            }
+
+            return $return;
+        }
     }
 
 }

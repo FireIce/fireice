@@ -30,7 +30,7 @@ class FrontendController extends Controller
         return $this->getModel()->getFrontendData($this->id_node, $this->id_module, $params);
     }
 
-    public function frontend($params)
+    public function frontend($params, $data=array())
     {
         $model = $this->getModel();
 

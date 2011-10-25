@@ -125,11 +125,6 @@ function editCreateRowSubmit(row_id, act)
         field = $(this).attr('name');   
         data += field + '=' + $(this).val() + '&';
     });     
-    
-    $('#dialog_id .inner .data textarea').each(function(){        
-        field = $(this).attr('name');     
-        data += field + '=' + $(this).val() + '&';
-    });     
 
     $('#dialog_id .inner select').each(function(){        
         field = $(this).attr('name');
