@@ -1419,7 +1419,7 @@ Class TreeModel
 
     private function getModuleConfig($name)
     {
-        return Yaml::parse($this->container->getParameter('project_modules_directory').'//'.$name.'//Resources//config//config.yml');
+        return Yaml::parse($this->container->getParameter('project_modules_directory').'/'.$name.'/Resources/config/config.yml');
     }
 
 }
