@@ -1,8 +1,7 @@
 <tr>
-    <td style="border: #000000 solid 1px;padding: 4px;">${gr_name}</td>
-    <td style="border: #000000 solid 1px;padding: 4px;">${gr_title}</td>
-    <td style="border: #000000 solid 1px;padding: 4px;">
-    
+    <td>${gr_name}</td>
+    <td>${gr_title}</td>
+    <td>
         {{each gr_rights }}
 
             ${$index}: 
@@ -10,11 +9,9 @@
                 ${val}{{if key < $value.length - 1}}, {{else}};{{/if}}                    
             {{/each}}
             <br>
-
         {{/each}}
-    
     </td>
-    <td align="center" width="250" style="border: #000000 solid 1px;padding: 4px;">
+    <td align="center" width="250">
         <input id_group="${gr_id}" class="edit_group" type="button" value="Редактировать">
         <input id_group="${gr_id}" class="del_group" type="button" value="Удалить">
     </td>

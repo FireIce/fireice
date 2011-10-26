@@ -6,45 +6,56 @@
 
 /*	Blueprint CSS Framework 0.8 */
 html, body, div, span, object, iframe, h1, h2,	h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, code, del, dfn, em, img, q, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td {margin:0;padding:0;border:0;font-weight:inherit;font-style:inherit;font-size:100%;font-family:inherit;vertical-align:baseline;}
-.inline {display: inline !important;}
-.hide {display: none !important;}
-.hand {cursor: pointer;}
-.nowrap {white-space:nowrap;}
+.inline {display: inline !important;} .hide {display: none !important;} .block {display:block;}
+.nw {white-space:nowrap;}
 .clear {clear:both;}
 .auto {margin:auto;}
-.block {display:block;}
+body, html {height:100%;}
 
 /* Fonts */
 body, div, span, h1, h2, h3, h4, h5, h6, p, blockquote,
 pre, abbr, acronym, address, code, del, dfn,
 em, q, dl, dt, dd, ol, li, fieldset, label, legend,
 caption, tr, th, td {
-	font-size: 16px;
-	font-family:  Calibri, Tahoma, Arial, Verdana, Helvetica, Geneva, sans-serif;
+	font:14px Trebuchet MS, Arial, Helvetica, sans-serif;
 	color:#3d3d3d;
 	text-shadow:0 1px 0 #fff;
 }
+h1, h2, h3, h4 {
+	font-family:  Trebuchet MS, Arial, Verdana, Helvetica, sans-serif;
+	margin:0 0 0.5em 0;
+	font-weight:bold;
+}
+h1 {font-size:24px;}
+h2 {font-size:18px; color:#447b87;}
+h3 {font-size:16px;}
+h4 {font-size:14px;}
 
 /* Links */
 a { 
 	text-decoration: none; 
 	outline:none; 
-	color:#3d3d3d;
+	color:#44b9cd;
 }
 a:hover {text-decoration: none;}
 a.script { 
 	text-decoration: none;
-	border-bottom: 1px dashed #3d3d3d; 
+	border-bottom: 1px dashed #44b9cd; 
 	border-width: 0px 0px 1px 0px; 
-	color:#3d3d3d;
+	color:#44b9cd;
 }
  li.select a {
 	text-shadow:0 1px 0 #ccc;
  }
  a.hidden {
-	color: #999999;
-    font-style:italic;
+	color: #999999 !important;
+	font-style:italic !important;
  }
+em {
+	line-height:30px;
+	font-style:italic;
+}
+ul li {list-style:none;}
 /* Footnotes */
 sup, sub {
 	vertical-align: middle;
@@ -78,7 +89,7 @@ hr {
 	height: 1px;
 	margin:10px 0;
 }
-/* Position */                                   
+/* Position */
 .c { text-align: center !important; }
 .r { text-align: right !important; }
 .l { text-align: left !important; }
@@ -94,32 +105,29 @@ hr {
 .w100p { width: 100% !important; }
 
 /* SITE */
-body,
-html {height:100%;}
-body {background-color: #fff;}
+
+body {
+	background-color: #fff;
+	padding:0 5px;
+}
 .menu-wrapper {
-	background: #d2d3d3 url('../images/gr.png') repeat-x 0 0;
-	/*padding:8px;*/
+	background: #d7d8d8 url('../images/gr.png') repeat-x 0 0;
 	margin:10px;
 	border-radius:7px;
 	-moz-border-radius:7px;
 	-webkit-border-radius:7px;
-
 	box-shadow: 1px 2px 2px 0px #8c8c8c;
 	-moz-box-shadow: 1px 2px 2px 0px #8c8c8c;
 	-webkit-box-shadow: 1px 2px 2px 0px #8c8c8c;
-
 	position:relative;
 }
-em {
-	line-height:30px;
-	font-style:italic;
-}
 .hidetip {opacity:0.3;}
-ul li {list-style:none;}
+
 .menu-wrapper a {
 	display:block;
 	padding:4px 8px;
+	color:#3d3d3d;
+	font: 16px Calibri, Trebuchet MS, Arial, Verdana, Helvetica, sans-serif;
 }
 .menu-wrapper li:hover {
 	background: url('../images/ahover.png') repeat-x 0 center;
@@ -147,17 +155,18 @@ ul li {list-style:none;}
 .menu-wrapper li.select:hover {
 	background: url('../images/select-hover.png') repeat-x 0 center;
 }
-.level0 {
+#level_0 {
 	border-right:1px dotted #ccc;
 	padding-right:8px;
-	width: 200px;
+	background-color:transparent;
+	border-radius:0;-moz-border-radius:0;-webkit-border-radius:0;
+	box-shadow: none;-moz-box-shadow: none;-webkit-box-shadow: none;
 }
-.level1{padding-left:20px !important;}
 .child {
 	position:absolute;
 	top:0;
 	width:217px;
-	padding:8px;
+	padding:8px 7px 8px 8px;
 	background-color: #f1f2f1;
 	border-radius:5px;
 	-moz-border-radius:5px;
@@ -166,15 +175,6 @@ ul li {list-style:none;}
 	-moz-box-shadow: 1px 1px 2px 1px #bcbcbc;
 	-webkit-box-shadow: 1px 1px 2px 1px #bcbcbc;
 }
-
-.level2 {left:216px;}
-.level3 {left:453px;}
-.level4 {left:690px;}
-.level5 {left:927px;}
-.level6 {left:1164px;}
-.level7 {left:1401px;}
-.level8 {left:1638px;}
-
 .note {
 	width:6px;height:11px;
 	position:absolute;
@@ -196,25 +196,159 @@ ul li {list-style:none;}
 .context a {
 	display:block;
 	padding:4px 8px;
-	font-size:14px;
+	color:#3d3d3d;
+	font: 14px Calibri, Trebuchet MS, Arial, Verdana, Helvetica, sans-serif;
 	text-shadow:0 1px 0 #f0f0f0;
 }
 .context a:hover {
 	background: url('../images/context-hover.gif') repeat-x 0 center;
 	border-radius:5px;
 	-moz-border-radius:5px;
-	-webkit-border-radius:5px;	
+	-webkit-border-radius:5px;
 	box-shadow: inset 1px 1px 1px 0px #659298;
 	-moz-box-shadow: inset 1px 1px 1px 0px #659298;
 	-webkit-box-shadow:inset 1px 1px 1px 0px #659298;
 }
-
 .back {
-/*
-	margin-left:-110px;
-	height:100%;      
-	*/
 	box-shadow: -30px 1px 40px 0px #9e9e9e, 1px 1px 2px 1px #bcbcbc;
 	-moz-box-shadow: -30px 1px 40px 0px #9e9e9e, 1px 1px 2px 1px #bcbcbc;
 	-webkit-box-shadow: 30px 1px 40px 0px #9e9e9e, 1px 1px 2px 1px #bcbcbc;
 }
+
+/*Tabs*/
+.tab.current {
+	background-color:#FFF;
+	border:3px solid #d3d3d3;
+	border-width:3px;
+	border-bottom:3px solid #fff;
+	color:#4e4e4e;
+	padding: 3px 20px 6px 20px;
+}
+.tab {
+	border-radius:5px 5px 0 0;
+	-moz-border-radius:5px 5px 0 0;
+	-webkit-border-radius:5px 5px 0 0;
+	background-color:#f6f6f6;
+	border:1px solid #e4e4e4;
+	border-width:1px;
+	padding: 5px 20px 6px 20px;
+	float:left;
+	margin-left:3px;
+	color:#7ea9b2;
+	font: 18px Calibri, Trebuchet MS, Arial, Verdana, Helvetica, sans-serif;
+	cursor:pointer;
+}
+.container,
+.select_module {
+	margin-top:-3px;
+	background-color:#FFF;
+	border:1px solid #d3d3d3;
+	border-radius:5px;
+	-moz-border-radius:5px;
+	-webkit-border-radius:5px;
+	padding:15px 10px;
+}
+.select_module {padding:25px;}
+input[type=button],
+input[type=submit],
+button {
+	background: url('../images/icons.png') repeat-x 0 -54px;
+	padding: 7px 20px 10px 20px;
+	margin:5px 10px 5px 2px;
+	border:1px solid #fff;
+	border-radius:7px;
+	-moz-border-radius:7px;
+	-webkit-border-radius:7px;
+	cursor:pointer;
+	color:#3f3f3f;
+	font: 18px Calibri, Trebuchet MS, Arial, Verdana, Helvetica, sans-serif;
+	text-shadow:0 1px 0 #fff;
+	box-shadow: 1px 1px 3px 0px #afb0b0;
+	-moz-box-shadow: 1px 1px 3px 0px #afb0b0;
+	-webkit-box-shadow:1px 1px 3px 0px #afb0b0;
+}
+input[type=button].submit_button,
+input[type=button].add_button,
+input[type=button].edit_button,
+input[type=button].orders_button,
+button.upload_select,
+input[type=button].add_image,
+input[type=button].edit_user,
+input[type=button].edit_group {background: url('../images/icons.png') repeat-x 0 0;}
+
+input[type=button].edit_button,
+input[type=button].delete_button,
+input[type=button].edit_user,
+input[type=button].del_user,
+input[type=button].edit_group,
+input[type=button].del_group {
+	padding: 3px 10px 5px 10px;
+	font-size:16px;
+	margin-right:0;
+}
+input[type=button].delete_button,
+input[type=button].del_user,
+input[type=button].del_group {color:#b03025;}
+
+.contents_table th,
+.contents_table td {
+	padding:4px;
+	font-size:13px;
+	border:1px solid #d3d3d3;
+	vertical-align:middle;
+}
+.contents_table th {
+	text-align:center;
+	background:#e2e4e3 url('../images/icons.png') repeat-x 0 -54px;
+	border:1px solid #f6f6f6;
+	font-style:italic;
+	padding:6px;
+}
+.edit_add .caption {
+	float:left;
+	width:10%;
+	font-weight:bold;
+	padding:17px 20px 0 0;
+	text-align:right;
+	color:#848484;
+	min-width:150px;
+}
+.caption.check_cap {width:20%;}
+.edit_add textarea, 
+.edit_add select {
+	width:85%;
+	float:left;
+	margin:5px 0;
+	padding:5px;
+	font: 18px Calibri, Trebuchet MS, Arial, Verdana, Helvetica, sans-serif;
+	color:#4e4e4e;
+}
+.edit_add input[type=text],
+.images input[type=text] {
+	width:85%;
+	float:left;
+	margin:5px 0;
+	padding:5px;
+	font: 24px Calibri, Trebuchet MS, Arial, Verdana, Helvetica, sans-serif;
+	color:#4e4e4e;
+}
+.images .caption {
+	font-weight:bold;
+	font-family:Arial;
+	padding:17px 20px 0 0;
+	color:#848484;
+	width:10%;
+}
+.images input[type=text] {width:90%;}
+.images {
+	border-left:5px solid #efcc41;
+	padding: 4px 15px;
+	background-color:#f9f2d6;
+	margin-bottom:20px;
+}
+.check {
+	float:left;
+	margin: 0 0 20px 0;
+	padding-top:18px;
+}
+.check input[type=checkbox] {position:relative; top:1px}

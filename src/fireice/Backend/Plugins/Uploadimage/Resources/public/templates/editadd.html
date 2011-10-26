@@ -1,17 +1,20 @@
-
 <div class="upload_${ name }">
-    <div>${ title }</div>
-    <div class="images" style="margin-top: 4px;">
+    <h2>${ title }</h2>
+    <div class="images">
         {{each value}}
-		<div>
-		    alt: <input style="width: 300px;" type="text" name="${ name }[${$index}][alt]" value="${$value.alt}"><br>
-            src: <input style="width: 300px;" class="uploadimage_${$index}" type="text" name="${ name }[${$index}][src]" value="${$value.src}">
-		    <button class="upload_select" input_class="uploadimage_${$index}" type="button">Выбрать</button><br><br>
-		</div>
-		{{/each}}
+       <table>
+       	<tr>
+       		<td class="caption">Подпись (alt):</td>
+       		<td><input type="text" name="${ name }[${$index}][alt]" value="${$value.alt}"></td>
+       		<td class="caption">Изображение:</td>
+			<td><input class="uploadimage_${$index}" type="text" name="${ name }[${$index}][src]" value="${$value.src}"></td>
+			<td class="c"><button class="upload_select" input_class="uploadimage_${$index}" type="button">Выбрать</button></td>
+       	</tr>
+       </table>
+     </div>
+        {{/each}}
     </div>
-	{{if show_add_button == 1}}
-	<div><input class="add_image" type="button" value="Добавить"></div>
-	{{/if}}
+    {{if show_add_button == 1}}
+    <div><input class="add_image" type="button" value="Добавить"></div>
+    {{/if}}
 </div>
-<div style="clear: both; height: 5px;"></div>

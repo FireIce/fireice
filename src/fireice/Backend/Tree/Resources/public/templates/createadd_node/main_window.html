@@ -1,33 +1,25 @@
-   
 <div align="left" style="background-color: #ffffff;">
-   
+
     <br>
     <div align="left">Раздел <b>${node_title}</b>. ${dialog_caption}</div>
     <br>
 
-    <style>
-        div .tab { float: left; border: #bbbbbb solid 1px; padding: 5px 25px 5px 25px; } 
-        div .current  { border: #000000 solid 1px; } 
-    </style>
-    
     <div class="form"> 
-        
+
         {{each modules}}
         <div id_module="${$value.id}" module_type="${$value.module_type}" class="tab {{if $index == 0}}current{{/if}} ">${$value.title}</div>
-        {{/each}}        
+        {{/each}}
 
-        <div style="clear: both;"></div>
-        
-        <div style="border: #000000 solid 1px; padding: 20px;">
+        <div class="clear"></div>
 
-            
+        <div class="container">
+
             <div class="contents inner"></div>
-            
 
         </div>
-        
+
         <br>
-                              
+
     </div>  
-           
+
 </div>

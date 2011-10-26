@@ -1,11 +1,7 @@
-<div>
-  <div style="float: left;">${ title }</div>
-  <div style="float: right;">
-              
-        {{each value }}
-        ${$value.value}<input type="radio" name="${ name }" value="${$index}" {{if $value.checked == '1'}}checked="checked"{{/if}} ><br>
-        {{/each}}		
-
-  </div>
+<div class="edit_add">
+  <div class="caption">${ title }</div>
+   {{each value }}
+      ${$value.value}<input type="radio" name="${ name }" value="${$index}" {{if $value.checked == '1'}}checked="checked"{{/if}} ><br>
+    {{/each}}
 </div>
-<div style="clear: both; height: 5px;"></div>
+<div class="clear"></div>
