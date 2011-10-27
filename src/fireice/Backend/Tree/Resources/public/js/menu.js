@@ -31,10 +31,10 @@ var defaults = {
     
     // Хтмл прогресс заставки
     progress_block_html: '<table height="100%"><tr><td align="center" style="vertical-align: middle; font-size: 12px;">'+
-                           '<img src="i/ajax-loader3.gif" width="32" width="32">'+
-                           '<br /><br />'+
-                           'Подождите. Идёт загрузка...'+                               
-                         '</td></tr></table>'
+'<img src="i/ajax-loader3.gif" width="32" width="32">'+
+'<br /><br />'+
+'Подождите. Идёт загрузка...'+                               
+'</td></tr></table>'
 };
 
 
@@ -67,7 +67,9 @@ function selectItem(q_level)
     if ($(selected_item).filter('.parent').length > 0)
     {
         $(selected_item).filter('.parent').parent().addClass('select');	                                                             
-    } else { $(selected_item).parent().css('border', options.select_border); }
+    } else {
+        $(selected_item).parent().css('border', options.select_border);
+    }
 }
 
 // Удаление ненужных блоков
@@ -109,9 +111,18 @@ function ajaxQuery(id)
 {   
     zaglushka = true; 
     zaglushka_ed = true;
-    
-    var url = options.url + 'get_parents/' + id;
-    $.get(url, '', addItemsInBlock);
+      
+    $.ajax({
+        url: options.url + 'get_parents/' + id,
+        data: '',
+        async: true,
+        dataType : "json",   
+        cache: false,                             
+        success: function (answer, textStatus) { 
+
+            addItemsInBlock(answer);
+        }
+    });     
 }    
 
 // Вставка в блок полученных аяксом пунктов меню
@@ -127,7 +138,7 @@ function addItemsInBlock(answer)
         for (i=0; i<answer.length; i++)
         {               
             // Обработчики onclick
-        	on_click = 'hideBlocks(' + level + ', ' + ((answer[i].c > 0) ? 'true':'false') + '); selected_item = this; selectItem(' + level + ');';
+            on_click = 'hideBlocks(' + level + ', ' + ((answer[i].c > 0) ? 'true':'false') + '); selected_item = this; selectItem(' + level + ');';
 
             if (answer[i].c > 0)
             {
@@ -136,9 +147,11 @@ function addItemsInBlock(answer)
             
             on_context_menu = 'context_event = event; e = event || window.event; e.preventDefault ? e.preventDefault() : (e.returnValue=false); showContextMenu(' +answer[i].i + ', ' + "'" + 'link_' + level + '_' + i + "'" + ');';
         	
-        	on_dbl_click = 'ckeditorInstancesDestroy(); updateUrl(' + "'node_edit'" + ', ' + answer[i].i + '); return false;';
+            on_dbl_click = 'ckeditorInstancesDestroy(); updateUrl(' + "'node_edit'" + ', ' + answer[i].i + '); return false;';
             
-            if (answer[i].i == 1) { answer[i].t = '<b>' + answer[i].t + '</b>'; }
+            if (answer[i].i == 1) {
+                answer[i].t = '<b>' + answer[i].t + '</b>';
+            }
             items += '<li><a item_id="' + answer[i].i + '" id="link_' + level + '_' + i + '" href="noscript" onDblClick="' + on_dbl_click + '" onclick="' + on_click + '; return false;" oncontextmenu="' + on_context_menu + '" class="' + (answer[i].c>0?'parent ':'') + (answer[i].h=='1'?'hidden':'') + '">' + answer[i].t + '</a></li>';    
         }	 
         
@@ -172,7 +185,9 @@ function addItemsInBlock(answer)
         zaglushka = false;  
         zaglushka_ed = false;     
         
-    } else { window.location.reload(); }
+    } else {
+        window.location.reload();
+    }
 }                                         
 
 // Добавление и показ блока (вначале в нём прогресс-заставка)
@@ -190,7 +205,9 @@ function showEmptyBlock(id)
         left = parseInt(left.slice(0, -2));  
         left += (options.block_width + options.block_padding*2);  
         
-    } else { left = 0; }
+    } else {
+        left = 0;
+    }
     
     $(options.main_div).append('<div id="level_' + level + '" class="child" style="left: ' + left + 'px">' + note + '<div class="block_items" style="height: 100%;">' + options.progress_block_html + '</div></div>'); 
     
@@ -208,7 +225,9 @@ function showEmptyBlock(id)
             $(options.main_div + ' #level_' + level).css( 'min-height', selected_item_top + $('#level_' + level).children('.note').height() + 'px' );
         }      
         
-    } else { $(options.main_div).height( $('#level_0').height() + options.block_padding*2 ); }     
+    } else {
+        $(options.main_div).height( $('#level_0').height() + options.block_padding*2 );
+    }     
     
     toMoveLeft();                                                   
     ajaxQuery(id);
@@ -228,9 +247,13 @@ function toMoveLeft()
         for (i=2, j=1; i<=level-1; i++, j++)
         {             
             left = i * (options.block_width + options.block_padding*2);  	// Сколько должно было быть 
-            $(options.main_div + ' #level_' + i).animate({left: (left - to_mov*j) + 'px'}, 
-                                              options.animate_speed, 
-                                              function (){ $(this).addClass('back') });   
+            $(options.main_div + ' #level_' + i).animate({
+                left: (left - to_mov*j) + 'px'
+                }, 
+            options.animate_speed, 
+            function (){
+                $(this).addClass('back')
+            });   
         }   
         $(options.main_div + ' #level_' + level).css('left', (left - to_mov*(j-1) + (options.block_width + options.block_padding*2)) + 'px');
     }
@@ -251,20 +274,30 @@ function toMoveRight()
         for (i=2, j=1; i<=level-2; i++, j++)
         {            
             left = i * (options.block_width + options.block_padding*2);  	// Сколько должно было быть  
-            $(options.main_div + ' #level_' + i).animate({left: (left - to_mov*j) + 'px'}, options.animate_speed);   
+            $(options.main_div + ' #level_' + i).animate({
+                left: (left - to_mov*j) + 'px'
+                }, options.animate_speed);   
         } 
-        $(options.main_div + ' #level_' + i).animate({left: (left - to_mov*(j-1) + (options.block_width + options.block_padding*2)) + 'px'}, 
-                                          options.animate_speed, 
-                                          function (){ $(this).removeClass('back') });
+        $(options.main_div + ' #level_' + i).animate({
+            left: (left - to_mov*(j-1) + (options.block_width + options.block_padding*2)) + 'px'
+            }, 
+        options.animate_speed, 
+        function (){
+            $(this).removeClass('back')
+        });
     }
     else
     {
         for (i=2; i<=level; i++)
         {             
             left = i * (options.block_width + options.block_padding*2);  	              
-            $(options.main_div + ' #level_' + i).animate({left: left + 'px'}, 
-                                              options.animate_speed, 
-                                              function (){ $(this).removeClass('back'); });            
+            $(options.main_div + ' #level_' + i).animate({
+                left: left + 'px'
+                }, 
+            options.animate_speed, 
+            function (){
+                $(this).removeClass('back');
+            });            
         }
         $(options.main_div + ' #level_' + (level-1)).css('left', ((level-1)* (options.block_width + options.block_padding*2)) + 'px').removeClass('back');   	    
     }	
@@ -274,8 +307,18 @@ function toMoveRight()
 function getShowNodes()
 {   
     $(options.main_div).html( options.progress_block_html );
-    var url = options.url + 'get_shownodes';  
-    $.get(url, '', getShowNodes_callback);	
+    	
+    $.ajax({
+        url: options.url + 'get_shownodes',
+        data: '',
+        async: true,
+        dataType : "json",   
+        cache: false,                             
+        success: function (answer, textStatus) { 
+
+            getShowNodes_callback(answer);
+        }
+    });     
 }     
 function getShowNodes_callback(answer)
 {   
@@ -313,7 +356,7 @@ function getShowNodes_callback(answer)
                     }  
 
                     // Ставим обработчики событий
-                	on_click = 'hideBlocks(' + i + ', ' + ((answer[i][j].c > 0) ? 'true':'false') + '); selected_item = this; selectItem(' + i + ');';
+                    on_click = 'hideBlocks(' + i + ', ' + ((answer[i][j].c > 0) ? 'true':'false') + '); selected_item = this; selectItem(' + i + ');';
 
                     if (answer[i][j].c > 0)
                     {
@@ -324,7 +367,9 @@ function getShowNodes_callback(answer)
 
                     on_dbl_click = 'ckeditorInstancesDestroy(); updateUrl(' + "'node_edit'" + ', ' + answer[i][j].i + '); return false;';
                     
-                    if (answer[i][j].i == 1) { answer[i][j].t = '<b>' + answer[i][j].t + '</b>'; }
+                    if (answer[i][j].i == 1) {
+                        answer[i][j].t = '<b>' + answer[i][j].t + '</b>';
+                    }
                     
                     items += '<li' + (is_select?' class="select"':'') + '><a onDblClick="' + on_dbl_click + '" oncontextmenu="' + on_context_menu + '" onclick="' + on_click + '; return false;" item_id="' + answer[i][j].i + '" id="link_' + i + '_' + j + '" href="noscript" class="' + (answer[i][j].c>0?'parent ':'') + (answer[i][j].h=='1'?'hidden':'') + '">' + answer[i][j].t + '</a></li>';
                 }	
@@ -337,7 +382,9 @@ function getShowNodes_callback(answer)
                     left = parseInt(left.slice(0, -2));  
                     left += (options.block_width + options.block_padding*2);  
                 
-                } else { left = 0; }
+                } else {
+                    left = 0;
+                }
 
                 $(options.main_div).append('<div id="level_' + i + '" class="child" style="left: ' + left + 'px">' + note + '<div class="block_items" style="height: 100%;"><ul>' + items + '</ul></div></div>');             
             }        
@@ -375,8 +422,12 @@ function getShowNodes_callback(answer)
             level++;
             zaglushka_ed = false;      
         
-        } else { showEmptyBlock(1); }     
-    } else { window.location.reload(); }
+        } else {
+            showEmptyBlock(1);
+        }     
+    } else {
+        window.location.reload();
+    }
 }  
 
 ///////////////////////////////////////////////////////////////////////
@@ -386,8 +437,17 @@ function getShowNodes_callback(answer)
 // Аякс запрос на контекстное меню             
 function showContextMenu(id, origID)                                                          
 {	
-    var url = options.url + 'context_menu/' + id; 
-    $.get(url, '', showContextMenu_callback);
+    $.ajax({
+        url: options.url + 'context_menu/' + id,
+        data: '',
+        async: true,
+        dataType : "json",   
+        cache: false,                             
+        success: function (answer, textStatus) { 
+
+            showContextMenu_callback(answer);
+        }
+    });    
     
     $('#context_menu').remove();    
     $('body').append('<div id="context_menu" class="context" style="display: none;"></div>');
@@ -426,7 +486,7 @@ function showContextMenu_callback(answer)
             on_click = "showNode(" + answer[i].id + ");";
         }         
     	
-    	items += '<a id="context_' + i + '" href="noscript" onclick="' + on_click + '; return false;">' + answer[i].title + '</a>';	    
+        items += '<a id="context_' + i + '" href="noscript" onclick="' + on_click + '; return false;">' + answer[i].title + '</a>';	    
     }  
 
     $('#context_menu').html( items ); 
@@ -438,15 +498,24 @@ function showContextMenu_callback(answer)
 
 function showSelectModule(id_act, act)
 {	
-	$('#dialog_id').hide().html('');
+    $('#dialog_id').hide().html('');
 	
-	action = act;                   
+    action = act;                   
     id_action = id_act;	
 	
     $('#progress_id').show();
 
-    var url = options.url + 'get_modules/' + id_action;    
-    $.get(url, '', showSelectModule_callback); 
+    $.ajax({
+        url: options.url + 'get_modules/' + id_action,
+        data: '',
+        async: true,
+        dataType : "json",   
+        cache: false,                             
+        success: function (answer, textStatus) { 
+
+            showSelectModule_callback(answer);
+        }
+    });     
 }
 function showSelectModule_callback(answer)
 {      
@@ -459,7 +528,9 @@ function showSelectModule_callback(answer)
     $('#progress_id').hide();	
     $('#dialog_id').slideDown(100);		   
     
-    $('#dialog_id .submit_button').click(function(){ selectModuleSubmit(); });       
+    $('#dialog_id .submit_button').click(function(){
+        selectModuleSubmit();
+    });       
 }
 function selectModuleSubmit()
 {
@@ -475,8 +546,18 @@ function selectModuleSubmit()
     $('#dialog_id').hide().html('');
     $('#progress_id').show();
  
-    var url = options.url + 'node_create';  
-    $.post(url, 'id=' + id_action + '&' + data, showCreate); 
+    $.ajax({
+        url: options.url + 'node_create',
+        data: 'id=' + id_action + '&' + data,
+        type: 'post',
+        async: true,
+        dataType : "json",   
+        cache: false,                             
+        success: function (answer, textStatus) { 
+
+            showCreate(answer);
+        }
+    });     
 }
 
 function showCreate(id_node) 
@@ -486,9 +567,9 @@ function showCreate(id_node)
 
 function showEdit(id_act, act)
 {   
-	$('#dialog_id').hide().html('');
+    $('#dialog_id').hide().html('');
 	
-	action = act;                   
+    action = act;                   
     id_action = id_act;	
 	
     $('#progress_id').show();  
@@ -567,7 +648,7 @@ function showTab(id_mod, is_show_row)
         $.ajax({
             url: options.url + 'dialog_create_edit',
             data: 'act=show&id=' + id_action + '&id_module=' + id_module,
-            async: false,
+            async: true,
             dataType : "json",   
             cache: false,                             
             success: function (answer, textStatus) { 
@@ -590,8 +671,18 @@ function deleteNode(id_node)
 {
     if (confirm('Вы уверены?'))
     {        
-        var url = options.url + 'node_remove'; 
-        $.post(url, 'id=' + id_node, deleteNode_callback);       
+        $.ajax({
+            url: options.url + 'node_remove',
+            data: 'id=' + id_node,
+            type: 'post',
+            async: true,
+            dataType : "json",   
+            cache: false,                             
+            success: function (answer, textStatus) { 
+                
+                deleteNode_callback(answer);
+            }
+        });         
     }   
 }
 function deleteNode_callback(answer)
@@ -602,13 +693,25 @@ function deleteNode_callback(answer)
     	                
         getShowNodes();  
         
-    } else { showMessage('Ошибка!', '#ff0000'); }         
+    } else {
+        showMessage('Ошибка!', '#ff0000');
+    }         
 }
 
 function hideNode(id)
-{
-    var url = options.url + 'hide_node/' + id; 
-    $.post(url, '', hideNode_callback);      
+{   
+    $.ajax({
+        url: options.url + 'hide_node/' + id,
+        data: '',
+        type: 'post',
+        async: true,
+        dataType : "json",   
+        cache: false,                             
+        success: function (answer, textStatus) { 
+                
+            hideNode_callback(answer);
+        }
+    });     
 }
 function hideNode_callback(answer)
 {
@@ -618,13 +721,25 @@ function hideNode_callback(answer)
     	                
         getShowNodes();  
         
-    } else { showMessage('Ошибка!', '#ff0000'); }   
+    } else {
+        showMessage('Ошибка!', '#ff0000');
+    }   
 }
 
 function showNode(id)
 {
-    var url = options.url + 'show_node/' + id; 
-    $.post(url, '', showNode_callback);
+    $.ajax({
+        url: options.url + 'show_node/' + id,
+        data: '',
+        type: 'post',
+        async: true,
+        dataType : "json",   
+        cache: false,                             
+        success: function (answer, textStatus) { 
+                
+            showNode_callback(answer);
+        }
+    });     
 }
 function showNode_callback(answer)
 {
@@ -634,7 +749,9 @@ function showNode_callback(answer)
     	                
         getShowNodes();  
         
-    } else { showMessage('Ошибка!', '#ff0000'); } 
+    } else {
+        showMessage('Ошибка!', '#ff0000');
+    } 
 }
 
 
@@ -656,20 +773,34 @@ $.showMenu = function(params) {
             showOpenDialog(url);
         else
         {            
-	        action = undefined;                   
+            action = undefined;                   
             id_action = undefined;	   
 
-            $('#dialog_id').slideUp(100, function(){ $(this).html('') }); 
+            $('#dialog_id').slideUp(100, function(){
+                $(this).html('')
+            }); 
             setTitle('');
+            
+            ckeditorInstancesDestroy();
         }
     
-    }, { unescape: "/" });
+    }, {
+        unescape: "/"
+    });
     
     // В ИЕ ресайз срабатывает даже когда просто появляются линейки прокрутки (но ширина окна не меняется) - поэтому начинает глючить
     var IE = /*@cc_on ! @*/ false;
     if (IE)
-        { $(options.main_div).resize(function(){ toMoveRight(); }); }
+    {
+        $(options.main_div).resize(function(){
+            toMoveRight();
+        });
+    }
     else
-        { $(window).resize(function(){ toMoveRight(); }); }
+    {
+        $(window).resize(function(){
+            toMoveRight();
+        });
+    }
 }
                             

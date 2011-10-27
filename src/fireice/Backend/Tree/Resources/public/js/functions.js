@@ -2,36 +2,36 @@
 //                          Полезные функции                         //
 ///////////////////////////////////////////////////////////////////////
 
-//var is_back_button = true;
-
 var plugin_templates = [];
 
 // Ставит куку
 function setCookie(name, value, days)
 {
-  if (days) 
-  {
-    var date = new Date();
-    date.setTime(date.getTime() + parseInt(days * 24 * 60 * 60 * 1000));
-    var expires = '; expires=' + date.toGMTString();
+    if (days) 
+    {
+        var date = new Date();
+        date.setTime(date.getTime() + parseInt(days * 24 * 60 * 60 * 1000));
+        var expires = '; expires=' + date.toGMTString();
     
-  } else { var expires = ''; }  
+    } else {
+        var expires = '';
+    }  
   
-  document.cookie = name + '=' + value + expires + '; path=/';
+    document.cookie = name + '=' + value + expires + '; path=/';
 }
 
 // Читает куку
 function getCookie(name)
 {
-	name = name + '=';
-	list = document.cookie.split(';');
-	for (i = 0; i < list.length; i++)
-	{
-		c = list[i];
-		while (c.charAt(0) == ' ') c = c.substring (1, c.length);
-		if (c.indexOf(name) == 0) return c.substring(name.length, c.length);
-	}
-	return false;
+    name = name + '=';
+    list = document.cookie.split(';');
+    for (i = 0; i < list.length; i++)
+    {
+        c = list[i];
+        while (c.charAt(0) == ' ') c = c.substring (1, c.length);
+        if (c.indexOf(name) == 0) return c.substring(name.length, c.length);
+    }
+    return false;
 }
 
 // Добавления события (для контекстного меню (в jquery нет oncontextmenu))
@@ -69,9 +69,12 @@ function defPosition(event)
     } 
     else 
     {
-        // Do nothing
+    // Do nothing
     }
-    return {x:x, y:y};
+    return {
+        x:x, 
+        y:y
+    };
 } 
 
 // Вывод сообщения
@@ -130,7 +133,9 @@ function loadPlugins(data)
                 }
             });  
             
-        } else { temp = plugin_templates[data[plugin]['type']]; }
+        } else {
+            temp = plugin_templates[data[plugin]['type']];
+        }
         
         templates[plugin] = temp;
     }
@@ -183,7 +188,9 @@ function loadPluginsToc(data)
                     }
                 });     
                 
-            } else { temp = plugin_templates[data[key]['data'][plugin]['type'] + '_toc']; }
+            } else {
+                temp = plugin_templates[data[key]['data'][plugin]['type'] + '_toc'];
+            }
             
             temp = '<script type="text/x-jquery-tmpl">' + temp + '</script>';
 
@@ -227,40 +234,48 @@ function showOpenDialog(hash)
         if (params['id'] != id_action)
             showEdit(params['id'], 'create');
         
-        var is_show_row = (params['edit_row'] != undefined || params['add_row'] != undefined) ? true : false;
-        if (params['module'] != undefined)
-            showTab(params['module'], is_show_row);
+        if (params['history'] != 'true')
+        {        
+            var is_show_row = (params['edit_row'] != undefined || params['add_row'] != undefined) ? true : false;
+            if (params['module'] != undefined)
+                showTab(params['module'], is_show_row);
+            else
+                showTab(first_tab, is_show_row);      
+        
+            if (params['edit_row'] != undefined)
+                editCreateRow(params['edit_row'], 'edit');
+        
+            if (params['add_row'] == 'true')
+                editCreateRow(-1, 'add');    
+        }
         else
-            showTab(first_tab, is_show_row);        
-        
-        if (params['history'] == 'true')
-            getHistory();        
-        
-        if (params['edit_row'] != undefined)
-            editCreateRow(params['edit_row'], 'edit');
-        
-        if (params['add_row'] == 'true')
-            editCreateRow(-1, 'add');             
+        {
+            getHistory(params['module']);    
+        }          
     }
     else if (params['action'] == 'node_edit')
     {   
         if (params['id'] != id_action || params['action'] != 'node_' + action)
             showEdit(params['id'], 'edit');  
         
-        var is_show_row = (params['edit_row'] != undefined || params['add_row'] != undefined) ? true : false;
-        if (params['module'] != undefined)
-            showTab(params['module'], is_show_row);
-         else
-            showTab(first_tab, is_show_row);
+        if (params['history'] != 'true')
+        {
+            var is_show_row = (params['edit_row'] != undefined || params['add_row'] != undefined) ? true : false;
+            if (params['module'] != undefined)
+                showTab(params['module'], is_show_row);
+            else
+                showTab(first_tab, is_show_row);       
         
-        if (params['history'] == 'true')
-            getHistory();
+            if (params['edit_row'] != undefined)
+                editCreateRow(params['edit_row'], 'edit');
         
-        if (params['edit_row'] != undefined)
-            editCreateRow(params['edit_row'], 'edit');
-        
-        if (params['add_row'] == 'true')
-            editCreateRow(-1, 'add');        
+            if (params['add_row'] == 'true')
+                editCreateRow(-1, 'add');     
+        }
+        else
+        {
+            getHistory(params['module']);    
+        }      
     }
     else if (params['action'] == 'users_list')
     {
@@ -337,7 +352,7 @@ function setTitle(text)
     title = title.replace(new RegExp('^(\\S+?\\s: backoffice)(.*?)$', 'g'), '$1');
 
     if (text != '')
-        $('title').html(title + ' : ' + text);
+        $('document title').html(title + ' : ' + text);
     else
-        $('title').html(title);
+        $('document title').html(title);
 }

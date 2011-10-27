@@ -83,8 +83,7 @@ function showItemInner(data)
 function editSubmit()
 {   
     var data, field;
-    var url = options.url + 'dialog_create_edit?act=edit&action=' + action + '&id=' + id_action + '&id_module=' + id_module;
-
+    
     data = '';  
     
     $('#dialog_id .inner input[type=text]').each(function(){        
@@ -123,7 +122,18 @@ function editSubmit()
    
     data = data.slice(0, -1); 
 
-    $.post(url, data, editSubmit_callback);
+    $.ajax({
+        url: options.url + 'dialog_create_edit?act=edit&action=' + action + '&id=' + id_action + '&id_module=' + id_module,
+        data: data,
+        type: 'post',
+        async: true,
+        dataType : "json",   
+        cache: false,                             
+        success: function (answer, textStatus) { 
+                
+            editSubmit_callback(answer);
+        }
+    });        
 }    
 function editSubmit_callback(data)
 {   
@@ -136,9 +146,22 @@ function editSubmit_callback(data)
     } else { showMessage('Ошибка!', '#ff0000'); getEditData_callback(data); }	
 }
 
-function getHistory()
+function getHistory(id_mod)
 {           
+    id_module = id_mod;
+    
     ckeditorInstancesDestroy();
+  
+    $('#dialog_id .tab').removeClass('current');
+    $('#dialog_id .form .tab').each(function(){
+        if ($(this).attr('id_module') == id_mod)
+        {
+            $(this).addClass('current');
+        }
+    });      
+    
+    var template = getTemplate(options.assets + '/tree/templates/createadd_node/item_inner.html');      
+    $('#dialog_id .inner').html(template);
     
     $('#dialog_id .data').hide();
     $('#dialog_id .history').html(options.progress_block_html).show();
@@ -157,9 +180,19 @@ function getHistory()
         $.history.load('action/' + act_tmp + '/id/' + id_action + '/module/' + id_module);                              
     
     });   
-   
-    var url = options.url + 'get_history?id=' + id_action + '&id_module=' + id_module;   
-    $.get(url, '', getHistory_callback);       
+    
+    $.ajax({
+        url: options.url + 'get_history?id=' + id_action + '&id_module=' + id_module,
+        data: '',
+        type: 'get',
+        async: true,
+        dataType : "json",   
+        cache: false,                             
+        success: function (answer, textStatus) { 
+                
+            getHistory_callback(answer);
+        }
+    });      
 }
 function getHistory_callback(answer)
 { 

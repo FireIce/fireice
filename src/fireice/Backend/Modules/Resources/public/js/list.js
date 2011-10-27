@@ -64,24 +64,25 @@ function showListInner(data)
         updateOrders();
     });      
 }
+
 function editCreateRow(row_id, act)
 {
-    var data;
-    
     $('#dialog_id .inner').html(options.progress_block_html);
     
     $.ajax({
         url: options.url + 'dialog_create_edit',
         data: 'act=get_row&id=' + id_action + '&id_module=' + id_module + '&row_id=' + row_id,
-        async: false,
+        async: true,
         dataType : "json",   
         cache: false,                             
         success: function (answer, textStatus) { 
-                
-            data = answer;
+
+            editCreateRow_callback(answer, row_id, act);
         }
-    });
-    
+    });       
+}
+function editCreateRow_callback(data, row_id, act)
+{
     var plugin_templates = loadPlugins(data);
     var template = getTemplate(options.assets + '/tree/templates/createadd_node/item_inner.html');    
     
@@ -99,20 +100,21 @@ function editCreateRow(row_id, act)
         }        
     }     
 
-    $('#dialog_id .inner .submit_button').click(function(){ editCreateRowSubmit(row_id, act) });
+    $('#dialog_id .inner .submit_button').click(function(){
+        editCreateRowSubmit(row_id, act)
+    });
     
     $('#dialog_id .inner .cancel_button').click(function(){
         var act_tmp = 'node_' + action;
         if (act_tmp == 'node_create')
             act_tmp = 'node_create_2';
         $.history.load('action/' + act_tmp + '/id/' + id_action + '/module/' + id_module);
-    });     
+    });      
 }
 
 function editCreateRowSubmit(row_id, act)
 {   
-    var data, field;
-    var url = options.url + 'dialog_create_edit?act=edit&action=' + act + '&id=' + id_action + '&id_module=' + id_module + '&id_row=' + row_id;
+    var data, field;    
 
     data = '';     
     
@@ -146,8 +148,19 @@ function editCreateRowSubmit(row_id, act)
     });     
       
     data = data.slice(0, -1);
-    
-    $.post(url, data, editCreateRowSubmit_callback);    
+     
+    $.ajax({
+        url: options.url + 'dialog_create_edit?act=edit&action=' + act + '&id=' + id_action + '&id_module=' + id_module + '&id_row=' + row_id,
+        data: data,
+        type: 'post',
+        async: true,
+        dataType : "json",   
+        cache: false,                             
+        success: function (answer, textStatus) { 
+                
+            editCreateRowSubmit_callback(answer);
+        }
+    });       
 }
 function editCreateRowSubmit_callback(answer)
 {
@@ -161,15 +174,27 @@ function editCreateRowSubmit_callback(answer)
 
         $.history.load('action/' + act_tmp + '/id/' + id_action + '/module/' + id_module);
         
-    } else { showMessage('Ошибка!', '#ff0000'); }    
+    } else {
+        showMessage('Ошибка!', '#ff0000');
+    }    
 }
 
 function deleteRow(id_row)
 {
     if (confirm('Вы уверены?'))
-    {        
-        var url = options.url + 'dialog_create_edit?act=delete_row&id=' + id_action + '&id_module=' + id_module + '&id_row=' + id_row; 
-        $.post(url, '', deleteRow_callback);      
+    {           
+        $.ajax({
+            url: options.url + 'dialog_create_edit?act=delete_row&id=' + id_action + '&id_module=' + id_module + '&id_row=' + id_row,
+            data: '',
+            type: 'post',
+            async: true,
+            dataType : "json",   
+            cache: false,                             
+            success: function (answer, textStatus) { 
+                
+                deleteRow_callback(answer);
+            }
+        });         
     }         
 }
 function deleteRow_callback(answer)
@@ -180,7 +205,9 @@ function deleteRow_callback(answer)
         
         showTab(id_module);
         
-    } else { showMessage('Ошибка!', '#ff0000'); }     
+    } else {
+        showMessage('Ошибка!', '#ff0000');
+    }     
 }
 
 function updateOrders()
@@ -195,8 +222,18 @@ function updateOrders()
     
     data = data.slice(0, -1);
     
-    var url = options.url + 'update_orders?id=' + id_action + '&id_module=' + id_module;
-    $.post(url, data, updateOrders_callback);
+    $.ajax({
+        url: options.url + 'update_orders?id=' + id_action + '&id_module=' + id_module,
+        data: data,
+        type: 'post',
+        async: true,
+        dataType : "json",   
+        cache: false,                             
+        success: function (answer, textStatus) { 
+                
+            updateOrders_callback(answer);
+        }
+    });      
 }
 function updateOrders_callback(answer)
 {
@@ -206,5 +243,7 @@ function updateOrders_callback(answer)
         
         showTab(id_module);
         
-    } else { showMessage('Ошибка!', '#ff0000'); } 
+    } else {
+        showMessage('Ошибка!', '#ff0000');
+    } 
 }

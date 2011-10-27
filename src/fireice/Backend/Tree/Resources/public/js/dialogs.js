@@ -8,7 +8,7 @@ var id_group_edit;
  
 function getUsers()
 {   
-	setTitle('Список пользователей');
+    setTitle('Список пользователей');
     
     action = undefined;                   
     id_action = undefined;	    
@@ -16,8 +16,18 @@ function getUsers()
     $('#progress_id').show();
     $('#dialog_id').slideUp(100).html('');    
       
-    var url = options.url + 'users/getusers';
-    $.get(url, '', getUsersData_callback);
+    $.ajax({
+        url: options.url + 'users/getusers',
+        data: '',
+        type: 'get',
+        async: true,
+        dataType : "json",   
+        cache: false,                             
+        success: function (answer, textStatus) { 
+                
+            getUsersData_callback(answer);
+        }
+    });     
 }
 function getUsersData_callback(answer)
 {         
@@ -36,8 +46,12 @@ function getUsersData_callback(answer)
     $('#dialog_id .del_user').click(function(){
         deleteUser( $(this).attr('id_user') );        
     });    
-    $('#dialog_id .add_button').click(function(){ $.history.load('action/user_add'); });
-    $('#dialog_id .cancel_button').click(function(){ $.history.load(''); });    
+    $('#dialog_id .add_button').click(function(){
+        $.history.load('action/user_add');
+    });
+    $('#dialog_id .cancel_button').click(function(){
+        $.history.load('');
+    });    
     
     $('#dialog_id').slideDown(100);
 }
@@ -58,9 +72,19 @@ function editUser(id_user)
     arr.action_title = 'Редактирование пользователя';
     
     $( answer ).tmpl( arr ).appendTo( '#dialog_id' );
-   
-    var url = options.url + 'users/getuserdata';
-    $.get(url, 'id=' + id_user_edit, getUserData_callback);     
+     
+    $.ajax({
+        url: options.url + 'users/getuserdata',
+        data: 'id=' + id_user_edit,
+        type: 'get',
+        async: true,
+        dataType : "json",   
+        cache: false,                             
+        success: function (answer, textStatus) { 
+                
+            getUserData_callback(answer);
+        }
+    });    
 }
 function getUserData_callback(answer)
 {   
@@ -76,10 +100,14 @@ function getUserData_callback(answer)
 	        
     $('#progress_id').hide();
 		
-	$('#dialog_id').slideDown(100);
+    $('#dialog_id').slideDown(100);
     
-    $('#dialog_id .submit_button').click(function(){ editUserSubmit(); });
-    $('#dialog_id .cancel_button').click(function(){ $.history.load('action/users_list'); });    
+    $('#dialog_id .submit_button').click(function(){
+        editUserSubmit();
+    });
+    $('#dialog_id .cancel_button').click(function(){
+        $.history.load('action/users_list');
+    });    
 }
 function editUserSubmit()
 {    
@@ -97,8 +125,18 @@ function editUserSubmit()
     
     data += 'id=' + id_user_edit;
     
-    var url = options.url + 'users/edit';
-    $.post(url, data, editUserSubmit_callback);      
+    $.ajax({
+        url: options.url + 'users/edit',
+        data: data,
+        type: 'post',
+        async: true,
+        dataType : "json",   
+        cache: false,                             
+        success: function (answer, textStatus) { 
+                
+            editUserSubmit_callback(answer);
+        }
+    });    
 }
 function editUserSubmit_callback(answer)
 {
@@ -108,7 +146,9 @@ function editUserSubmit_callback(answer)
     	                
         $.history.load('action/users_list'); 
         
-    } else { showMessage('Ошибка!', '#ff0000'); }    
+    } else {
+        showMessage('Ошибка!', '#ff0000');
+    }    
 }
 
 
@@ -127,8 +167,18 @@ function addUser()
 
     $( answer ).tmpl( arr ).appendTo( '#dialog_id' );
    
-    var url = options.url + 'users/getuserdata';
-    $.get(url, 'id=-1', getCreateUserData_callback); 
+    $.ajax({
+        url: options.url + 'users/getuserdata',
+        data: 'id=-1',
+        type: 'get',
+        async: true,
+        dataType : "json",   
+        cache: false,                             
+        success: function (answer, textStatus) { 
+                
+            getCreateUserData_callback(answer);
+        }
+    });     
 }
 function getCreateUserData_callback(answer)
 { 
@@ -142,10 +192,14 @@ function getCreateUserData_callback(answer)
     
     $('#progress_id').hide();
 		
-	$('#dialog_id').slideDown(100);	    
+    $('#dialog_id').slideDown(100);	    
     
-    $('#dialog_id .submit_button').click(function(){ addUserSubmit(); });
-    $('#dialog_id .cancel_button').click(function(){ $.history.load('action/users_list'); });         
+    $('#dialog_id .submit_button').click(function(){
+        addUserSubmit();
+    });
+    $('#dialog_id .cancel_button').click(function(){
+        $.history.load('action/users_list');
+    });         
 }
 function addUserSubmit()
 {
@@ -162,9 +216,19 @@ function addUserSubmit()
     });      
     
     data = data.slice(0, -1);
-    
-    var url = options.url + 'users/add';
-    $.post(url, data, addUserSubmit_callback);        
+      
+    $.ajax({
+        url: options.url + 'users/add',
+        data: data,
+        type: 'post',
+        async: true,
+        dataType : "json",   
+        cache: false,                             
+        success: function (answer, textStatus) { 
+                
+            addUserSubmit_callback(answer);
+        }
+    });    
 }
 function addUserSubmit_callback(answer)
 {
@@ -174,15 +238,27 @@ function addUserSubmit_callback(answer)
     	                
         $.history.load('action/users_list'); 
         
-    } else { showMessage('Ошибка!', '#ff0000'); }     
+    } else {
+        showMessage('Ошибка!', '#ff0000');
+    }     
 }
 
 function deleteUser($id_user)
 {
     if (confirm('Вы уверены?'))
     {        
-        var url = options.url + 'users/delete';
-        $.post(url, 'id=' + $id_user, deleteUser_callback);        
+        $.ajax({
+            url: options.url + 'users/delete',
+            data: 'id=' + $id_user,
+            type: 'post',
+            async: true,
+            dataType : "json",   
+            cache: false,                             
+            success: function (answer, textStatus) { 
+                
+                deleteUser_callback(answer);
+            }
+        });         
     }
 }
 function deleteUser_callback(answer)
@@ -193,7 +269,9 @@ function deleteUser_callback(answer)
     	                
         getUsers(); 
         
-    } else { showMessage('Ошибка!', '#ff0000'); }     
+    } else {
+        showMessage('Ошибка!', '#ff0000');
+    }     
 }
 
 
@@ -205,14 +283,24 @@ function getGroups()
 {
     setTitle('Список групп');
     
-	action = undefined;                   
+    action = undefined;                   
     id_action = undefined;    
     
     $('#progress_id').show();
     $('#dialog_id').slideUp(100).html('');    
       
-    var url = options.url + 'groups/getgroups';
-    $.get(url, '', getGroupsData_callback);    
+    $.ajax({
+        url: options.url + 'groups/getgroups',
+        data: '',
+        type: 'get',
+        async: true,
+        dataType : "json",   
+        cache: false,                             
+        success: function (answer, textStatus) { 
+                
+            getGroupsData_callback(answer);
+        }
+    });     
 }
 function getGroupsData_callback(answer)
 {   
@@ -231,8 +319,12 @@ function getGroupsData_callback(answer)
     $('#dialog_id .del_group').click(function(){
         deleteGroup( $(this).attr('id_group') );        
     });    
-    $('#dialog_id .add_button').click(function(){ $.history.load('action/group_add'); });
-    $('#dialog_id .cancel_button').click(function(){ $.history.load(''); });    
+    $('#dialog_id .add_button').click(function(){
+        $.history.load('action/group_add');
+    });
+    $('#dialog_id .cancel_button').click(function(){
+        $.history.load('');
+    });    
     
     $('#dialog_id').slideDown(100);    
 }
@@ -251,8 +343,18 @@ function editGroup(id_group)
     
     $( template ).tmpl( arr ).appendTo( '#dialog_id' );
    
-    var url = options.url + 'groups/getgroupdata';
-    $.get(url, 'id=' + id_group, getGroupData_callback);  
+    $.ajax({
+        url: options.url + 'groups/getgroupdata',
+        data: 'id=' + id_group,
+        type: 'get',
+        async: true,
+        dataType : "json",   
+        cache: false,                             
+        success: function (answer, textStatus) { 
+                
+            getGroupData_callback(answer);
+        }
+    });    
 }
 function getGroupData_callback(answer)
 {        
@@ -268,10 +370,14 @@ function getGroupData_callback(answer)
 	        
     $('#progress_id').hide();
 		
-	$('#dialog_id').slideDown(100);
+    $('#dialog_id').slideDown(100);
     
-    $('#dialog_id .submit_button').click(function(){ editGroupSubmit(); });
-    $('#dialog_id .cancel_button').click(function(){ $.history.load('action/groups_list'); });     
+    $('#dialog_id .submit_button').click(function(){
+        editGroupSubmit();
+    });
+    $('#dialog_id .cancel_button').click(function(){
+        $.history.load('action/groups_list');
+    });     
 }
 function editGroupSubmit()
 {
@@ -293,9 +399,19 @@ function editGroupSubmit()
     });      
     
     data += 'id=' + id_group_edit;    
-    
-    var url = options.url + 'groups/edit';
-    $.post(url, data, editGroupSubmit_callback);              
+     
+    $.ajax({
+        url: options.url + 'groups/edit',
+        data: data,
+        type: 'post',
+        async: true,
+        dataType : "json",   
+        cache: false,                             
+        success: function (answer, textStatus) { 
+                
+            editGroupSubmit_callback(answer);
+        }
+    });    
 }
 function editGroupSubmit_callback(answer)
 {
@@ -305,7 +421,9 @@ function editGroupSubmit_callback(answer)
     	                
         $.history.load('action/groups_list'); 
         
-    } else { showMessage('Ошибка!', '#ff0000'); }             
+    } else {
+        showMessage('Ошибка!', '#ff0000');
+    }             
 }
 
 function addGroup()
@@ -323,8 +441,18 @@ function addGroup()
     
     $( template ).tmpl( arr ).appendTo( '#dialog_id' );
    
-    var url = options.url + 'groups/getgroupdata';
-    $.get(url, 'id=-1', getCreateGroupData_callback);         
+    $.ajax({
+        url: options.url + 'groups/getgroupdata',
+        data: 'id=-1',
+        type: 'get',
+        async: true,
+        dataType : "json",   
+        cache: false,                             
+        success: function (answer, textStatus) { 
+                
+            getCreateGroupData_callback(answer);
+        }
+    });    
 }
 function getCreateGroupData_callback(answer)
 {
@@ -338,10 +466,14 @@ function getCreateGroupData_callback(answer)
 	        
     $('#progress_id').hide();
 		
-	$('#dialog_id').slideDown(100);
+    $('#dialog_id').slideDown(100);
     
-    $('#dialog_id .submit_button').click(function(){ addGroupSubmit(); });
-    $('#dialog_id .cancel_button').click(function(){ $.history.load('action/groups_list'); });     
+    $('#dialog_id .submit_button').click(function(){
+        addGroupSubmit();
+    });
+    $('#dialog_id .cancel_button').click(function(){
+        $.history.load('action/groups_list');
+    });     
 }
 
 function addGroupSubmit()
@@ -365,8 +497,18 @@ function addGroupSubmit()
     
     data = data.slice(0, -1);    
     
-    var url = options.url + 'groups/add';
-    $.post(url, data, addGroupSubmit_callback);      
+    $.ajax({
+        url: options.url + 'groups/add',
+        data: data,
+        type: 'post',
+        async: true,
+        dataType : "json",   
+        cache: false,                             
+        success: function (answer, textStatus) { 
+                
+            addGroupSubmit_callback(answer);
+        }
+    });    
 }
 function addGroupSubmit_callback(answer)
 {
@@ -376,16 +518,28 @@ function addGroupSubmit_callback(answer)
     	                
         $.history.load('action/groups_list'); 
         
-    } else { showMessage('Ошибка!', '#ff0000'); }     
+    } else {
+        showMessage('Ошибка!', '#ff0000');
+    }     
 }
 
 
 function deleteGroup(id_group)
 {
     if (confirm('Вы уверены?'))
-    {        
-        var url = options.url + 'groups/delete';
-        $.post(url, 'id=' + id_group, deleteGroup_callback);        
+    {         
+        $.ajax({
+            url: options.url + 'groups/delete',
+            data: 'id=' + id_group,
+            type: 'post',
+            async: true,
+            dataType : "json",   
+            cache: false,                             
+            success: function (answer, textStatus) { 
+                
+                deleteGroup_callback(answer);
+            }
+        });        
     }
 }
 function deleteGroup_callback(answer)
@@ -396,7 +550,9 @@ function deleteGroup_callback(answer)
     	                
         getGroups();
         
-    } else { showMessage('Ошибка!', '#ff0000'); }     
+    } else {
+        showMessage('Ошибка!', '#ff0000');
+    }     
 }
 
 
@@ -447,8 +603,12 @@ function getRightsData_callback(answer)
     $( template ).tmpl( answer ).appendTo( '#dialog_id' );   
 
     $('#dialog_id .inner').html(options.progress_block_html);
-    $('#dialog_id .cancel_button').click(function(){ $.history.load(''); });
-    $('#dialog_id input[type=radio]').click(function(){ $.history.load('action/rights_list/id/' + id_action + '/module/' + $(this).attr('module_id')); });
+    $('#dialog_id .cancel_button').click(function(){
+        $.history.load('');
+    });
+    $('#dialog_id input[type=radio]').click(function(){
+        $.history.load('action/rights_list/id/' + id_action + '/module/' + $(this).attr('module_id'));
+    });
     
     $('#progress_id').hide();	
     $('#dialog_id').show();	 
@@ -460,8 +620,18 @@ function showModuleRights(id_mod)
 {   
     id_module = id_mod;
     
-    var url = options.url + 'rights/getusers';
-    $.get(url, 'id_node=' + id_action + '&id_module=' + id_module, showModuleRights_callback);      
+    $.ajax({
+        url: options.url + 'rights/getusers',
+        data: 'id_node=' + id_action + '&id_module=' + id_module,
+        type: 'get',
+        async: true,
+        dataType : "json",   
+        cache: false,                             
+        success: function (answer, textStatus) { 
+                
+            showModuleRights_callback(answer);
+        }
+    });    
 }
 function showModuleRights_callback(answer)
 {   
@@ -486,8 +656,18 @@ function editRights(id_act, id_mod, id_user)
     $('#progress_id').show();
     $('#dialog_id').slideUp(100).html('');              
    
-    var url = options.url + 'rights/getuser';
-    $.get(url, 'id_node=' + id_action + '&id_module=' + id_module + '&id_user=' + id_user, editRights_callback);    
+    $.ajax({
+        url: options.url + 'rights/getuser',
+        data: 'id_node=' + id_action + '&id_module=' + id_module + '&id_user=' + id_user,
+        type: 'get',
+        async: true,
+        dataType : "json",   
+        cache: false,                             
+        success: function (answer, textStatus) { 
+                
+            editRights_callback(answer);
+        }
+    });    
 }
 function editRights_callback(answer)
 {   
@@ -518,10 +698,14 @@ function editRights_callback(answer)
 	        
     $('#progress_id').hide();
 		
-	$('#dialog_id').slideDown(100);
+    $('#dialog_id').slideDown(100);
 
-    $('#dialog_id .submit_button').click(function(){ editRightsSubmit(); });
-    $('#dialog_id .cancel_button').click(function(){ $.history.load('action/rights_list/id/' + id_action); });              
+    $('#dialog_id .submit_button').click(function(){
+        editRightsSubmit();
+    });
+    $('#dialog_id .cancel_button').click(function(){
+        $.history.load('action/rights_list/id/' + id_action);
+    });              
 }
 
 function editRightsSubmit()
@@ -534,9 +718,19 @@ function editRightsSubmit()
     });      
     
     data += 'id_node=' + id_action + '&id_module=' + id_module + '&id_user=' + id_user_edit;   
-    
-    var url = options.url + 'rights/edit';
-    $.post(url, data, editRightsSubmit_callback);         
+       
+    $.ajax({
+        url: options.url + 'rights/edit',
+        data: data,
+        type: 'post',
+        async: true,
+        dataType : "json",   
+        cache: false,                             
+        success: function (answer, textStatus) { 
+                
+            editRightsSubmit_callback(answer);
+        }
+    });     
 }
 
 function editRightsSubmit_callback(answer)
@@ -547,7 +741,9 @@ function editRightsSubmit_callback(answer)
     	                
         $.history.load('action/rights_list/id/' + id_action); 
         
-    } else { showMessage('Ошибка!', '#ff0000'); }      
+    } else {
+        showMessage('Ошибка!', '#ff0000');
+    }      
 }
 
 
@@ -557,9 +753,19 @@ function editRightsSubmit_callback(answer)
 
 
 function getNewMessages()
-{      
-    var url = options.url + 'messages/get_new_messages';
-    $.get(url, '', getNewMessages_callback);    
+{        
+    $.ajax({
+        url: options.url + 'messages/get_new_messages',
+        data: '',
+        type: 'get',
+        async: true,
+        dataType : "json",   
+        cache: false,                             
+        success: function (answer, textStatus) { 
+                
+            getNewMessages_callback(answer);
+        }
+    });    
 }
 function getNewMessages_callback(answer)
 {
@@ -568,12 +774,14 @@ function getNewMessages_callback(answer)
         $('#messages_link_id b').html(answer);
         $('#messages_link_id span').show();     
         
-    } else { $('#messages_link_id span').hide();  }
+    } else {
+        $('#messages_link_id span').hide();
+    }
 }
 
 function getMessages()
 {
-	setTitle('Список сообщений');
+    setTitle('Список сообщений');
     
     action = undefined;                   
     id_action = undefined;    
@@ -581,8 +789,18 @@ function getMessages()
     $('#progress_id').show();
     $('#dialog_id').slideUp(100).html('');    
       
-    var url = options.url + 'messages/getmessages';
-    $.get(url, '', getMessages_callback);    
+    $.ajax({
+        url: options.url + 'messages/getmessages',
+        data: '',
+        type: 'get',
+        async: true,
+        dataType : "json",   
+        cache: false,                             
+        success: function (answer, textStatus) { 
+                
+            getMessages_callback(answer);
+        }
+    });     
 }
 function getMessages_callback(answer)
 {   
@@ -601,7 +819,9 @@ function getMessages_callback(answer)
     $('#dialog_id .del_mess').click(function(){       
         deleteMessage($(this).attr('id_mess'));      
     });    
-    $('#dialog_id .cancel_button').click(function(){ $.history.load(''); });    
+    $('#dialog_id .cancel_button').click(function(){
+        $.history.load('');
+    });    
     
     $('#dialog_id').slideDown(100);    
 }
@@ -610,9 +830,19 @@ function getMessage(id)
 {
     $('#progress_id').show();
     $('#dialog_id').slideUp(100).html('');      
-   
-    var url = options.url + 'messages/getmessage';
-    $.post(url, 'id=' + id, getMessage_callback);     
+    
+    $.ajax({
+        url: options.url + 'messages/getmessage',
+        data: 'id=' + id,
+        type: 'post',
+        async: true,
+        dataType : "json",   
+        cache: false,                             
+        success: function (answer, textStatus) { 
+                
+            getMessage_callback(answer);
+        }
+    });     
 }
 function getMessage_callback(answer)
 {
@@ -633,17 +863,29 @@ function getMessage_callback(answer)
     
     $('#progress_id').hide();
 		
-	$('#dialog_id').slideDown(100);
+    $('#dialog_id').slideDown(100);
 
-    $('#dialog_id .cancel_button').click(function(){ $.history.load('action/messages_list'); });     
+    $('#dialog_id .cancel_button').click(function(){
+        $.history.load('action/messages_list');
+    });     
 }
 
 function deleteMessage(id)
 {
     if (confirm('Вы уверены?'))
-    {        
-        var url = options.url + 'messages/delmessage';
-        $.post(url, 'id=' + id, deleteMessage_callback);        
+    {          
+        $.ajax({
+            url: options.url + 'messages/delmessage',
+            data: 'id=' + id,
+            type: 'post',
+            async: true,
+            dataType : "json",   
+            cache: false,                             
+            success: function (answer, textStatus) { 
+                
+                deleteMessage_callback(answer);
+            }
+        });        
     }
 }
 function deleteMessage_callback(answer)
@@ -655,7 +897,9 @@ function deleteMessage_callback(answer)
         getMessages();
         getNewMessages();
         
-    } else { showMessage('Ошибка!', '#ff0000'); }  
+    } else {
+        showMessage('Ошибка!', '#ff0000');
+    }  
 }
 
 
