@@ -19,7 +19,7 @@ class plugintextarea
      */
     protected $id;
     /**
-     * @ORM\Column(type="string", length=45)         
+     * @ORM\Column(type="string", length=10000)         
      */
     protected $value;
 

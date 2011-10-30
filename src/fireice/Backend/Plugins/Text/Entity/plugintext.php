@@ -19,7 +19,7 @@ class plugintext
      */
     protected $id;
     /**
-     * @ORM\Column(type="string", length=45)        
+     * @ORM\Column(type="string", length=1000)        
      */
     protected $value;
 

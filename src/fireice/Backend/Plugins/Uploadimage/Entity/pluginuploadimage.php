@@ -27,11 +27,11 @@ class pluginuploadimage
      */
     protected $id_data;
     /**
-     * @ORM\Column(type="string", length=100)         
+     * @ORM\Column(type="string", length=300)         
      */
     protected $alt;
     /**
-     * @ORM\Column(type="string", length=100)         
+     * @ORM\Column(type="string", length=300)         
      */
     protected $src;
 

@@ -489,7 +489,7 @@ class BackendModel extends GeneralModel
 
                 $history_values[] = array (
                     'title' => $plugin->getValue('title'),
-                    'value' => $value->getValue(),
+                    'value' => isset($value) ? $value->getValue() : '---',
                 );
             }
 

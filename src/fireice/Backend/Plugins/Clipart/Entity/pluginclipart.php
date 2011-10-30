@@ -27,11 +27,11 @@ class pluginclipart
      */
     protected $id_data;
     /**
-     * @ORM\Column(type="string", length=100)         
+     * @ORM\Column(type="string", length=300)         
      */
     protected $original_src;
     /**
-     * @ORM\Column(type="string", length=100)         
+     * @ORM\Column(type="string", length=300)         
      */
     protected $original_alt;
     /**
@@ -43,11 +43,11 @@ class pluginclipart
      */
     protected $original_y;
     /**
-     * @ORM\Column(type="string", length=100)         
+     * @ORM\Column(type="string", length=300)         
      */
     protected $big_src;
     /**
-     * @ORM\Column(type="string", length=100)         
+     * @ORM\Column(type="string", length=300)         
      */
     protected $big_alt;
     /**
@@ -59,11 +59,11 @@ class pluginclipart
      */
     protected $big_y;
     /**
-     * @ORM\Column(type="string", length=100)         
+     * @ORM\Column(type="string", length=300)         
      */
     protected $small_src;
     /**
-     * @ORM\Column(type="string", length=100)         
+     * @ORM\Column(type="string", length=300)         
      */
     protected $small_alt;
     /**
