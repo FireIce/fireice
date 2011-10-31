@@ -20,7 +20,7 @@ class FrontendModel
 
         $this->sitetree = $cache->getSiteTreeStructure();
         $this->access = $cache->getSiteTreeAccess();
-
+        
         if ($this->sitetree === false || $this->access === false) {
             $this->server_is_busy = true;
         } else {
@@ -163,4 +163,8 @@ class FrontendModel
         }
     }
 
+    public function getNodeStatus($id)
+    {
+        return $this->sitetree['nodes'][$id]['status'];
+    }
 }

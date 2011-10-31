@@ -453,6 +453,7 @@ class TreeController extends Controller
             $tree_model->hideNode($id, $this->get('security.context'));
 
             $this->get('cache')->updateSiteTreeAccessAll();
+            $this->get('cache')->updateSiteTreeStructure();
 
             $response = new Response(json_encode('ok'));
         } else $response = new Response(json_encode('error'));
@@ -472,6 +473,7 @@ class TreeController extends Controller
         $tree_model->showNode($id, $this->get('security.context'));
 
         $this->get('cache')->updateSiteTreeAccessAll();
+        $this->get('cache')->updateSiteTreeStructure();
 
         $response = new Response(json_encode('ok'));
         $response->headers->set('Content-Type', 'application/json');

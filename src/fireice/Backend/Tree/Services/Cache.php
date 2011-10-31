@@ -187,7 +187,8 @@ class Cache
                 md.table_name AS table,
                 md.name AS bundle,
                 md.idd AS module_id,
-                md.type
+                md.type,
+                tr.status
             FROM 
                 TreeBundle:modulesitetree tr, 
                 DialogsBundle:moduleslink md_l, 
@@ -206,7 +207,8 @@ class Cache
             if (!isset($nodes[$val['node_id']])) $nodes[$val['node_id']] = array (
                     'up_parent' => $val['up_parent'],
                     'sitetree_module' => array (),
-                    'user_modules' => array ()
+                    'user_modules' => array (),
+                    'status' => $val['status']
                 );
 
             if ($val['type'] == 'sitetree_node') {
