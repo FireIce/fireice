@@ -109,13 +109,14 @@ class FrontendController extends Controller
 
         $current_page = $navigation[count($navigation) - 1];
 
-        return $this->render('FrontendBundle:Frontend:index.html.twig', array (
+        $content = $this->renderView('FrontendBundle:Frontend:index.html.twig', array (
                 'modules' => $modules_html,
                 'menu' => $menu,
                 'navigation' => $navigation,
                 'current_page' => $current_page,
                 'user' => $frontend_model->getUser()
             ));
+        return new Response($this->transformationHtml($content));
     }
 
     public function get404Page()
@@ -124,6 +125,11 @@ class FrontendController extends Controller
         $response->headers->set('Content-Type', 'text/html');
 
         return $response;
+    }
+    
+    protected function transformationHtml($html)
+    {
+        return preg_replace('|^(\s*?)(\S)|m', "$2", $html);
     }
 
 }
