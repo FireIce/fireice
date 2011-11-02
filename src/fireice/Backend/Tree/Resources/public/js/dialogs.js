@@ -24,8 +24,14 @@ function getUsers()
         dataType : "json",   
         cache: false,                             
         success: function (answer, textStatus) { 
-                
-            getUsersData_callback(answer);
+            
+            if (answer === 'error') {
+                errorAndToMain('Ошибка!', '#ff0000');
+            } else if (answer === 'no_rights') {
+                errorAndToMain('Нет прав!', '#ff0000');
+            } else {
+                getUsersData_callback(answer);
+            }
         }
     });     
 }
@@ -82,7 +88,13 @@ function editUser(id_user)
         cache: false,                             
         success: function (answer, textStatus) { 
                 
-            getUserData_callback(answer);
+            if (answer === 'error') {
+                errorAndToMain('Ошибка!', '#ff0000');
+            } else if (answer === 'no_rights') {
+                errorAndToMain('Нет прав!', '#ff0000');
+            } else {                
+                getUserData_callback(answer);
+            }
         }
     });    
 }
@@ -176,7 +188,13 @@ function addUser()
         cache: false,                             
         success: function (answer, textStatus) { 
                 
-            getCreateUserData_callback(answer);
+            if (answer === 'error') {
+                errorAndToMain('Ошибка!', '#ff0000');
+            } else if (answer === 'no_rights') {
+                errorAndToMain('Нет прав!', '#ff0000');
+            } else {                    
+                getCreateUserData_callback(answer);
+            }
         }
     });     
 }
@@ -263,12 +281,11 @@ function deleteUser($id_user)
 }
 function deleteUser_callback(answer)
 {    
-    if (answer == 'ok')
-    {   
-        showMessage('Пользователь удалён!', '#38bc50'); 
-    	                
+    if (answer == 'ok') {   
+        showMessage('Пользователь удалён!', '#38bc50');     	                
         getUsers(); 
-        
+    } else if (answer == 'no_rights') {
+        showMessage('Нет прав!', '#ff0000');     
     } else {
         showMessage('Ошибка!', '#ff0000');
     }     

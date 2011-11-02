@@ -93,6 +93,14 @@ function showMessage(message, color)
     })    
 }
 
+// Вывод сообщения об ошибке и на главную
+function errorAndToMain(message)
+{
+    $('#progress_id').hide();
+    $.history.load('');
+    showMessage(message, '#ff0000');    
+}
+
 function getTemplate(url)
 {   
     var template;

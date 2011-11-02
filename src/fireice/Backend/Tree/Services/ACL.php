@@ -23,13 +23,20 @@ class ACL
     const MASK_EDITNODESRIGHTS = 65536;       // Право менять права для разных пользователей-узлов
     const MASK_SHOWNODES = 131072;      // Право открывать узлы
     const MASK_HIDENODES = 262144;      // Право скрывать узлы
-    const MASK_SEEHIDENODES = 524288;      // Право смотреть скрытые узлы во фронтенде
+    const MASK_SEEHIDENODES = 524288;      // Право смотреть скрытые узлы во фронтенде    
+    const MASK_VIEWUSERS = 1048576;       // Смотреть список юзеров
+    const MASK_EDITUSER = 2097152;       // Редактировать (добавлять) юзеров
+    const MASK_DELETEUSER = 4194304;       // Удалять юзеров
+    const MASK_VIEWGROUPS = 8388608;      // Смотреть список групп
+    const MASK_EDITGROUP = 16777216;      // Редактировать (добавлять) группы
+    const MASK_DELETEGROUP = 33554432;      // Удалять группы    
     protected $em;
     protected $aclProvider;
     protected $securityContext;
     protected $acl;
     protected $acl_no_rights_array = null;
     public $current_user;
+    private $tree_object = null;
 
     public function __construct(EntityManager $em, $aclProvider, $securityContext)
     {
@@ -187,14 +194,19 @@ class ACL
     }
 
     // Проверка юзера
-    public function checkUserTreePermissions($object, $user, $mask)
+    public function checkUserTreePermissions($user, $mask)
     {
+        if ($this->tree_object === null) {
+            $this->tree_object = new module();
+            $this->tree_object->setId(-1);
+        }
+
         if (false === $user) $user = $this->current_user;
 
         if ($user->getGroups() !== null) {
             $group = new RoleSecurityIdentity('group_'.$user->getGroups());
 
-            if ($this->checkGroupPermissions($object, $group, $mask)) {
+            if ($this->checkGroupPermissions($this->tree_object, $group, $mask)) {
                 return true;
             }
         }

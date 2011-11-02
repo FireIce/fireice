@@ -20,7 +20,7 @@ class FrontendModel
 
         $this->sitetree = $cache->getSiteTreeStructure();
         $this->access = $cache->getSiteTreeAccess();
-        
+//print_r($this->sitetree); exit;        
         if ($this->sitetree === false || $this->access === false) {
             $this->server_is_busy = true;
         } else {

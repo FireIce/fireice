@@ -4,6 +4,7 @@ namespace fireice\Backend\Dialogs\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Acl\Permission\MaskBuilder;
 use fireice\Backend\Dialogs\Model\UsersModel;
 
 class UsersController extends Controller
@@ -14,13 +15,14 @@ class UsersController extends Controller
         $em = $this->get('doctrine.orm.entity_manager');
         $acl = $this->get('acl');
 
-        $users_model = new UsersModel($em, $acl);
+        if ($acl->checkUserTreePermissions(false, $acl->getValueMask('viewusers'))) {
+            $users_model = new UsersModel($em, $acl);
+            $answer = $users_model->getUsers();
+        } else {
+            $answer = 'no_rights';
+        }
 
-        $users = $users_model->getUsers();
-
-        //print_r($users); exit;
-
-        $response = new Response(json_encode($users));
+        $response = new Response(json_encode($answer));
         $response->headers->set('Content-Type', 'application/json');
 
         return $response;
@@ -31,13 +33,14 @@ class UsersController extends Controller
         $em = $this->get('doctrine.orm.entity_manager');
         $acl = $this->get('acl');
 
-        $users_model = new UsersModel($em, $acl);
+        if ($acl->checkUserTreePermissions(false, $acl->getValueMask('edituser'))) {
+            $users_model = new UsersModel($em, $acl);
+            $answer = $users_model->getUserData($this->get('request')->get('id'));
+        } else {
+            $answer = 'no_rights';
+        }
 
-        $user_data = $users_model->getUserData($this->get('request')->get('id'));
-
-        //print_r($user_data); exit;
-
-        $response = new Response(json_encode($user_data));
+        $response = new Response(json_encode($answer));
         $response->headers->set('Content-Type', 'application/json');
 
         return $response;
@@ -63,13 +66,18 @@ class UsersController extends Controller
         $em = $this->get('doctrine.orm.entity_manager');
         $acl = $this->get('acl');
 
-        $users_model = new UsersModel($em, $acl);
+        if ($acl->checkUserTreePermissions(false, $acl->getValueMask('edituser'))) {
+            $users_model = new UsersModel($em, $acl);
 
-        $user = $users_model->addUser($this->get('request'));
+            $user = $users_model->addUser($this->get('request'));
 
-        $this->get('cache')->updateSiteTreeAccessUser($user);
+            $this->get('cache')->updateSiteTreeAccessUser($user);
 
-        $response = new Response(json_encode('ok'));
+            $response = new Response(json_encode('ok'));
+        } else {
+            $response = new Response(json_encode('no_rights'));
+        }
+
         $response->headers->set('Content-Type', 'application/json');
 
         return $response;
@@ -80,13 +88,16 @@ class UsersController extends Controller
         $em = $this->get('doctrine.orm.entity_manager');
         $acl = $this->get('acl');
 
-        $users_model = new UsersModel($em, $acl);
+        if ($acl->checkUserTreePermissions(false, $acl->getValueMask('edituser'))) {
+            $users_model = new UsersModel($em, $acl);
+            $users_model->deleteUser($this->get('request')->get('id'));
+            $this->get('cache')->deleteSiteTreeAccessUser($this->get('request')->get('id'));
 
-        $users_model->deleteUser($this->get('request')->get('id'));
-
-        $this->get('cache')->deleteSiteTreeAccessUser($this->get('request')->get('id'));
-
-        $response = new Response(json_encode('ok'));
+            $response = new Response(json_encode('ok'));
+        } else {
+            $response = new Response(json_encode('no_rights'));
+        }
+        
         $response->headers->set('Content-Type', 'application/json');
 
         return $response;

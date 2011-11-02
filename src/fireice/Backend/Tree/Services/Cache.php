@@ -160,10 +160,7 @@ class Cache
                     $access[$val['id_node']] = 'false';
                 }
             } else {
-                $tree_module = new module();
-                $tree_module->setId(-1);
-
-                if ($this->acl->checkUserTreePermissions($tree_module, $user, $this->acl->getValueMask('seehidenodes'))) {
+                if ($this->acl->checkUserTreePermissions($user, $this->acl->getValueMask('seehidenodes'))) {
                     if ($this->acl->checkUserPermissions($val['id_node'], $object_module, $user, MaskBuilder::MASK_VIEW)) {
                         $access[$val['id_node']] = 'true';
                     } else {

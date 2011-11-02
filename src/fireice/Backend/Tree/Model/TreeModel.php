@@ -498,14 +498,10 @@ Class TreeModel
     {
         $modules = $this->getModules($id);
 
-        // Модуль дерева, чтобы проверять права касающиеся дерева
-        $tree_module = new module();
-        $tree_module->setId(-1);
-
         $return = array ();
 
         // Определяем можно ли показывать пункт "Редактирование"
-        if ($acl->checkUserTreePermissions($tree_module, false, MaskBuilder::MASK_EDIT)) {
+        if ($acl->checkUserTreePermissions(false, MaskBuilder::MASK_EDIT)) {
             $return[] = array ('title' => 'Редактировать', 'action' => 'edit', 'id' => $id);
         } else {
             foreach ($this->getNodeModules($id, $acl, 'edit') as $val) {
@@ -518,25 +514,25 @@ Class TreeModel
         }
 
         // Определяем можно ли показывать пункт "Создание потомка"
-        if ($acl->checkUserTreePermissions($tree_module, false, MaskBuilder::MASK_CREATE)) {
+        if ($acl->checkUserTreePermissions(false, MaskBuilder::MASK_CREATE)) {
             if (count($modules) > 0) {
                 $return[] = array ('title' => 'Добавить потомка', 'action' => 'create', 'id' => $id);
             }
         }
 
         // Определяем можно ли показывать пункт "Удаление узла"
-        if ($id !== '1' && $acl->checkUserTreePermissions($tree_module, false, MaskBuilder::MASK_DELETE)) {
+        if ($id !== '1' && $acl->checkUserTreePermissions(false, MaskBuilder::MASK_DELETE)) {
             $return[] = array ('title' => 'Удалить раздел', 'action' => 'remove', 'id' => $id);
         }
 
         // Определяем можно ли показывать пункт "Права доступа"
-        if ($acl->checkUserTreePermissions($tree_module, false, $acl->getValueMask('editnodesrights'))) {
+        if ($acl->checkUserTreePermissions(false, $acl->getValueMask('editnodesrights'))) {
             $return[] = array ('title' => 'Права доступа', 'action' => 'rights', 'id' => $id);
         }
 
         // Определяем можно ли показывать пункты "Скрыть узел" и "Открыть узел"
-        if ($acl->checkUserTreePermissions($tree_module, false, $acl->getValueMask('shownodes')) ||
-            $acl->checkUserTreePermissions($tree_module, false, $acl->getValueMask('hidenodes'))) {
+        if ($acl->checkUserTreePermissions(false, $acl->getValueMask('shownodes')) ||
+            $acl->checkUserTreePermissions(false, $acl->getValueMask('hidenodes'))) {
             $query = $this->em->createQuery("
                 SELECT 
                     tr
@@ -549,8 +545,8 @@ Class TreeModel
             $result = $query->getOneOrNullResult();
 
             if (null !== $result) {
-                if ($result->getStatus() == 'active' && $acl->checkUserTreePermissions($tree_module, false, $acl->getValueMask('hidenodes'))) $return[] = array ('title' => 'Скрыть узел', 'action' => 'hidenode', 'id' => $id);
-                if ($result->getStatus() == 'hidden' && $acl->checkUserTreePermissions($tree_module, false, $acl->getValueMask('shownodes'))) $return[] = array ('title' => 'Открыть узел', 'action' => 'shownode', 'id' => $id);
+                if ($result->getStatus() == 'active' && $acl->checkUserTreePermissions(false, $acl->getValueMask('hidenodes'))) $return[] = array ('title' => 'Скрыть узел', 'action' => 'hidenode', 'id' => $id);
+                if ($result->getStatus() == 'hidden' && $acl->checkUserTreePermissions(false, $acl->getValueMask('shownodes'))) $return[] = array ('title' => 'Открыть узел', 'action' => 'shownode', 'id' => $id);
             }
         }
 
@@ -1290,10 +1286,7 @@ Class TreeModel
             $access = false;
 
             if ($val['type'] == 'sitetree_node') {
-                $service_module = new module();
-                $service_module->setId(-1);
-
-                if ($acl->checkUserTreePermissions($service_module, false, $acl->getValueMask($action))) {
+                if ($acl->checkUserTreePermissions(false, $acl->getValueMask($action))) {
                     $access = true;
                 }
             } else if ($val['type'] == 'user') {
@@ -1316,7 +1309,8 @@ Class TreeModel
                     'count' => $config['parameters']['count'],
                     'count-per-parent' => $config['parameters']['count-per-parent'],
                     'parent' => $config['parameters']['parent'],
-                    'module_type' => $config['parameters']['type']
+                    'module_type' => $config['parameters']['type'],
+                    'css_tab' => $config['parameters']['css_tab']
                 );
             }
         }

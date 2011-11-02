@@ -533,7 +533,8 @@ class TreeController extends Controller
     {
         switch ($group) {
             case 'God':
-                $rights = array ('create', 'edit', 'delete', 'editnodesrights', 'shownodes', 'hidenodes', 'seehidenodes');
+                $rights = array ('create', 'edit', 'delete', 'editnodesrights', 'shownodes', 'hidenodes', 'seehidenodes',
+                                 'viewusers', 'edituser', 'deleteuser', 'viewgroups', 'editgroup', 'deletegroup');
                 break;
             case 'Administrators':
                 $rights = array ('create', 'edit');
@@ -558,6 +559,13 @@ class TreeController extends Controller
             array ('name' => 'shownodes', 'title' => 'Право открывать узлы'),
             array ('name' => 'hidenodes', 'title' => 'Право скрывать узлы'),
             array ('name' => 'seehidenodes', 'title' => 'Право смотреть скрытые узлы во фронтенде'),
+            
+            array ('name' => 'viewusers', 'title' => 'Смотреть список юзеров'),
+            array ('name' => 'edituser', 'title' => 'Редактировать (добавлять) юзеров'),
+            array ('name' => 'deleteuser', 'title' => 'Удалять юзеров'),
+            array ('name' => 'viewgroups', 'title' => 'Смотреть список групп'),
+            array ('name' => 'editgroup', 'title' => 'Редактировать (добавлять) группы'),
+            array ('name' => 'deletegroup', 'title' => 'Удалять группы'),
         );
     }
 
