@@ -36,7 +36,7 @@ class FrontendModel extends GeneralModel
 
                 if (!isset($data[$plugin->getValue('name')])) $data[$plugin->getValue('name')] = $plugin->getNull();
             } else {
-                $data[$plugin->getValue('name')] = $plugin->getValues() + array ('value' => '');
+                $data[$plugin->getValue('name')] = $plugin->getNull();
             }
         }
 
