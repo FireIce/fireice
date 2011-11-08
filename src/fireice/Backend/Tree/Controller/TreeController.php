@@ -5,7 +5,9 @@ namespace fireice\Backend\Tree\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Acl\Permission\MaskBuilder;
 use fireice\Backend\Tree\Model\TreeModel;
+use fireice\Backend\Dialogs\Entity\module;
 
 class TreeController extends Controller
 {
@@ -45,8 +47,6 @@ class TreeController extends Controller
         } else {
             $parents = 'no_user';
         }
-
-        //return $this->render('DialogsBundle:Groups:index.html.twig', array('groups'=>array()));
 
         $response = new Response(json_encode($parents));
         $response->headers->set('Content-Type', 'application/json');
@@ -133,8 +133,6 @@ class TreeController extends Controller
 
         $context_menu = $tree_model->contextMenu($id, $this->get('acl'));
 
-        //return $this->render('DialogsBundle:Groups:index.html.twig', array('groups'=>array()));
-
         $response = new Response(json_encode($context_menu));
         $response->headers->set('Content-Type', 'application/json');
 
@@ -143,16 +141,19 @@ class TreeController extends Controller
 
     public function getModulesAction($id)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
-        $sess = $this->get('session');
-        $container = $this->container;
-        $tree_model = new TreeModel($em, $sess, $container);
+        if ($this->get('acl')->checkUserTreePermissions(false, $this->get('acl')->getValueMask('create'))) {
+            $em = $this->get('doctrine.orm.entity_manager');
+            $sess = $this->get('session');
+            $container = $this->container;
+            $tree_model = new TreeModel($em, $sess, $container);
 
-        $answer = array (
-            'option' => $tree_model->getModules($id),
-            'node_title' => $tree_model->getNodeTitle($id)
-        );
-
+            $answer = array (
+                'option' => $tree_model->getModules($id),
+                'node_title' => $tree_model->getNodeTitle($id)
+            );
+        } else {
+            $answer = 'no_rights';
+        }
         $response = new Response(json_encode($answer));
         $response->headers->set('Content-Type', 'application/json');
 
@@ -161,17 +162,21 @@ class TreeController extends Controller
 
     public function nodeCreateAction()
     {
-        $em = $this->get('doctrine.orm.entity_manager');
-        $sess = $this->get('session');
-        $container = $this->container;
-        $tree_model = new TreeModel($em, $sess, $container);
+        if ($this->get('acl')->checkUserTreePermissions(false, $this->get('acl')->getValueMask('create'))) {
+            $em = $this->get('doctrine.orm.entity_manager');
+            $sess = $this->get('session');
+            $container = $this->container;
+            $tree_model = new TreeModel($em, $sess, $container);
 
-        $answer = $tree_model->create($this->get('request'), $this->get('security.context'));
+            $answer = $tree_model->create($this->get('request'), $this->get('security.context'));
 
-        $this->get('cache')->updateSiteTreeStructure();
-        $this->get('cache')->updateSiteTreeAccessAll();
-
-        $response = new Response($answer);
+            $this->get('cache')->updateSiteTreeStructure();
+            $this->get('cache')->updateSiteTreeAccessAll();
+        } else {
+            $answer = 'no_rights';
+        }
+        $response = new Response(json_encode($answer));
+        $response->headers->set('Content-Type', 'application/json');
 
         return $response;
     }
@@ -206,68 +211,75 @@ class TreeController extends Controller
     {
         $em = $this->get('doctrine.orm.entity_manager');
         $sess = $this->get('session');
+        $acl = $this->get('acl');
+        $request = $this->get('request');
         $container = $this->container;
+
         $tree_model = new TreeModel($em, $sess, $container);
 
-        if ($this->get('request')->get('act') == 'show') {
-            $modules = $tree_model->getNodeModules($this->get('request')->get('id'), $this->get('acl'));
+        if ($request->get('act') == 'show') {
 
-            if (count($modules) > 0) {
-                $module_act = '\\'.$this->container->getParameter('project_name').'\\Modules\\'.$modules[$this->get('request')->get('id_module')]['directory'].'\\Controller\\BackendController';
+            $modules = $tree_model->getNodeModules($request->get('id'), $acl);
+
+            if (isset($modules[$request->get('id_module')])) {
+                $module_act = '\\'.$this->container->getParameter('project_name').'\\Modules\\'.$modules[$request->get('id_module')]['directory'].'\\Controller\\BackendController';
                 $module_act = new $module_act();
                 $module_act->setContainer($this->container);
 
-                $fields = $module_act->getData($this->get('request')->get('id'));
-            } else {
-                $fields = 'error';
-            }
-        } elseif ($this->get('request')->get('act') == 'edit') {
+                $fields = $module_act->getData($request->get('id'));
+            } else $fields = 'no_rights';
+        } elseif ($request->get('act') == 'edit') {
+
             $module = $em->getRepository('DialogsBundle:modules')->findOneBy(array (
-                'idd' => $this->get('request')->get('id_module'),
+                'idd' => $request->get('id_module'),
                 'final' => 'Y',
                 'status' => 'active'
                 ));
 
-            $module_controller = '\\'.$this->container->getParameter('project_name').'\\Modules\\'.$module->getName().'\\Controller\\BackendController';
+            if (($module->getType() === 'user' && $acl->checkUserPermissions($request->get('id'), new module($request->get('id_module')), false, $acl->getValueMask('edit'))) ||
+                ($module->getType() === 'sitetree_node' && $acl->checkUserTreePermissions(false, $acl->getValueMask('edit')))) {
+                $module_controller = '\\'.$this->container->getParameter('project_name').'\\Modules\\'.$module->getName().'\\Controller\\BackendController';
 
-            $module_act = new $module_controller();
-            $module_act->setContainer($this->container);
+                $module_act = new $module_controller();
+                $module_act->setContainer($this->container);
 
-            $module_act->createEdit();
+                $module_act->createEdit();
 
-            if ($module->getType() == 'sitetree_node') $this->get('cache')->updateSiteTreeStructure();
+                if ($module->getType() == 'sitetree_node') $this->get('cache')->updateSiteTreeStructure();
 
-            $fields = 'ok';
+                $fields = 'ok';
+            } else $fields = 'no_rights';
+        } elseif ($request->get('act') == 'get_row') {
+            if ($acl->checkUserPermissions($request->get('id'), new module($request->get('id_module')), false, $acl->getValueMask('edit'))) {
+                $module = $em->getRepository('DialogsBundle:modules')->findOneBy(array (
+                    'idd' => $request->get('id_module'),
+                    'final' => 'Y',
+                    'status' => 'active'
+                    ));
+
+                $module_act = '\\'.$this->container->getParameter('project_name').'\\Modules\\'.$module->getName().'\\Controller\\BackendController';
+                $module_act = new $module_act();
+                $module_act->setContainer($this->container);
+
+                $fields = $module_act->getRowData($request->get('id'), $request->get('id_module'), $request->get('row_id'));
+            } else $fields = 'no_rights';
+        } elseif ($request->get('act') == 'delete_row') {
+            if ($acl->checkUserPermissions($request->get('id'), new module($request->get('id_module')), false, $acl->getValueMask('deleteitem'))) {
+                $module = $em->getRepository('DialogsBundle:modules')->findOneBy(array (
+                    'idd' => $request->get('id_module'),
+                    'final' => 'Y',
+                    'status' => 'active'
+                    ));
+
+                $module_act = '\\'.$this->container->getParameter('project_name').'\\Modules\\'.$module->getName().'\\Controller\\BackendController';
+                $module_act = new $module_act();
+                $module_act->setContainer($this->container);
+
+                $module_act->deleteRow();
+
+                $fields = 'ok';
+            } else $fields = 'no_rights';
         }
-        elseif ($this->get('request')->get('act') == 'get_row') {
-            $module = $em->getRepository('DialogsBundle:modules')->findOneBy(array (
-                'idd' => $this->get('request')->get('id_module'),
-                'final' => 'Y',
-                'status' => 'active'
-                ));
-
-            $module_act = '\\'.$this->container->getParameter('project_name').'\\Modules\\'.$module->getName().'\\Controller\\BackendController';
-            $module_act = new $module_act();
-            $module_act->setContainer($this->container);
-
-            $fields = $module_act->getRowData($this->get('request')->get('id'), $this->get('request')->get('id_module'), $this->get('request')->get('row_id'));
-        } elseif ($this->get('request')->get('act') == 'delete_row') {
-            $module = $em->getRepository('DialogsBundle:modules')->findOneBy(array (
-                'idd' => $this->get('request')->get('id_module'),
-                'final' => 'Y',
-                'status' => 'active'
-                ));
-
-            $module_act = '\\'.$this->container->getParameter('project_name').'\\Modules\\'.$module->getName().'\\Controller\\BackendController';
-            $module_act = new $module_act();
-            $module_act->setContainer($this->container);
-
-            $module_act->deleteRow();
-
-            $fields = 'ok';
-        }
-
-        //return $this->render('DialogsBundle:Groups:index.html.twig', array('groups'=>array()));
 
         $response = new Response(json_encode($fields));
         $response->headers->set('Content-Type', 'application/json');
@@ -297,17 +309,21 @@ class TreeController extends Controller
 
     public function removeAction()
     {
-        $em = $this->get('doctrine.orm.entity_manager');
-        $sess = $this->get('session');
-        $container = $this->container;
-        $tree_model = new TreeModel($em, $sess, $container);
+        if ($this->get('acl')->checkUserTreePermissions(false, MaskBuilder::MASK_DELETE)) {
+            $em = $this->get('doctrine.orm.entity_manager');
+            $sess = $this->get('session');
+            $container = $this->container;
+            $tree_model = new TreeModel($em, $sess, $container);
 
-        $tree_model->removeAll($this->get('request')->get('id'), $this->get('security.context'));
+            $tree_model->removeAll($this->get('request')->get('id'), $this->get('security.context'));
 
-        $this->get('cache')->updateSiteTreeStructure();
-        $this->get('cache')->updateSiteTreeAccessAll();
+            $this->get('cache')->updateSiteTreeStructure();
+            $this->get('cache')->updateSiteTreeAccessAll();
 
-        $response = new Response(json_encode('ok'));
+            $response = new Response(json_encode('ok'));
+        } else {
+            $response = new Response(json_encode('no_rights'));
+        }
         $response->headers->set('Content-Type', 'application/json');
 
         return $response;
@@ -328,8 +344,6 @@ class TreeController extends Controller
         $module_act->setContainer($this->container);
 
         $history = $module_act->getHistory();
-
-        //return $this->render('DialogsBundle:Groups:index.html.twig', array('groups'=>array()));
 
         $response = new Response(json_encode($history));
         $response->headers->set('Content-Type', 'application/json');
@@ -444,19 +458,23 @@ class TreeController extends Controller
 
     public function hideNodeAction($id)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
-        $sess = $this->get('session');
-        $container = $this->container;
-        $tree_model = new TreeModel($em, $sess, $container);
+        if ($this->get('acl')->checkUserTreePermissions(false, $this->get('acl')->getValueMask('hidenodes'))) {
+            $em = $this->get('doctrine.orm.entity_manager');
+            $sess = $this->get('session');
+            $container = $this->container;
+            $tree_model = new TreeModel($em, $sess, $container);
 
-        if ($id != '1') {
-            $tree_model->hideNode($id, $this->get('security.context'));
+            if ($id != '1') {
+                $tree_model->hideNode($id, $this->get('security.context'));
 
-            $this->get('cache')->updateSiteTreeAccessAll();
-            $this->get('cache')->updateSiteTreeStructure();
+                $this->get('cache')->updateSiteTreeAccessAll();
+                $this->get('cache')->updateSiteTreeStructure();
 
-            $response = new Response(json_encode('ok'));
-        } else $response = new Response(json_encode('error'));
+                $response = new Response(json_encode('ok'));
+            } else $response = new Response(json_encode('error'));
+        } else {
+            $response = new Response(json_encode('no_rights'));
+        }
 
         $response->headers->set('Content-Type', 'application/json');
 
@@ -465,24 +483,28 @@ class TreeController extends Controller
 
     public function showNodeAction($id)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
-        $sess = $this->get('session');
-        $container = $this->container;
-        $tree_model = new TreeModel($em, $sess, $container);
+        if ($this->get('acl')->checkUserTreePermissions(false, $this->get('acl')->getValueMask('shownodes'))) {
+            $em = $this->get('doctrine.orm.entity_manager');
+            $sess = $this->get('session');
+            $container = $this->container;
+            $tree_model = new TreeModel($em, $sess, $container);
 
-        $tree_model->showNode($id, $this->get('security.context'));
+            $tree_model->showNode($id, $this->get('security.context'));
 
-        $this->get('cache')->updateSiteTreeAccessAll();
-        $this->get('cache')->updateSiteTreeStructure();
+            $this->get('cache')->updateSiteTreeAccessAll();
+            $this->get('cache')->updateSiteTreeStructure();
 
-        $response = new Response(json_encode('ok'));
+            $response = new Response(json_encode('ok'));
+        } else {
+            $response = new Response(json_encode('no_rights'));
+        }
         $response->headers->set('Content-Type', 'application/json');
 
         return $response;
     }
 
     public function getNodeModule($id_node, $id_module=false)
-    {  
+    {
         $this->sitetree = $this->container->get('cache')->getSiteTreeStructure();
 
         if (false !== $id_module) {
@@ -534,7 +556,7 @@ class TreeController extends Controller
         switch ($group) {
             case 'God':
                 $rights = array ('create', 'edit', 'delete', 'editnodesrights', 'shownodes', 'hidenodes', 'seehidenodes',
-                                 'viewusers', 'edituser', 'deleteuser', 'viewgroups', 'editgroup', 'deletegroup');
+                    'viewusers', 'edituser', 'deleteuser', 'viewgroups', 'editgroup', 'deletegroup');
                 break;
             case 'Administrators':
                 $rights = array ('create', 'edit');
@@ -553,13 +575,12 @@ class TreeController extends Controller
     {
         return array (
             array ('name' => 'create', 'title' => 'Создание узла'),
-            array ('name' => 'edit', 'title' => 'Изменение настроек'),
+            array ('name' => 'edit', 'title' => 'Редактирование узла'),
             array ('name' => 'delete', 'title' => 'Удаление узла'),
             array ('name' => 'editnodesrights', 'title' => 'Правка прав узлов-юзеров'),
             array ('name' => 'shownodes', 'title' => 'Право открывать узлы'),
             array ('name' => 'hidenodes', 'title' => 'Право скрывать узлы'),
             array ('name' => 'seehidenodes', 'title' => 'Право смотреть скрытые узлы во фронтенде'),
-            
             array ('name' => 'viewusers', 'title' => 'Смотреть список юзеров'),
             array ('name' => 'edituser', 'title' => 'Редактировать (добавлять) юзеров'),
             array ('name' => 'deleteuser', 'title' => 'Удалять юзеров'),

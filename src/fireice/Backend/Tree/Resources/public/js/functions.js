@@ -313,10 +313,12 @@ function showOpenDialog(hash)
     {   
         var module = rights( params['id'] );   
 
-        if (params['module'] != undefined)
-            showModuleRights(params['module']);
-        else
-            showModuleRights(module);  
+        if (false !== module) {
+            if (params['module'] != undefined)
+                showModuleRights(params['module']);
+            else
+                showModuleRights(module);  
+        }
     }
     else if (params['action'] == 'edit_rights' && params['id'] != undefined && params['module'] != undefined && params['user'] != undefined)
     {

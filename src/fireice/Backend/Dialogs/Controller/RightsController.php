@@ -20,16 +20,21 @@ class RightsController extends Controller
         $node_title = $rights_model->getNodeTitle($this->get('request')->get('id'));
 
         if ($node_title !== false) {
-            $modules = $rights_model->getModules($this->get('request')->get('id'));
+            if ($acl->checkUserTreePermissions(false, $acl->getValueMask('editnodesrights'))) {
+                $modules = $rights_model->getModules($this->get('request')->get('id'));
 
-            $response = new Response(json_encode(array (
-                        'node_title' => $node_title,
-                        'modules' => $modules
-                    )));
+                $answer = array (
+                    'node_title' => $node_title,
+                    'modules' => $modules
+                );
+            } else {
+                $answer = 'no_rights';
+            }
         } else {
-            $response = new Response(json_encode('error'));
+            $answer = 'error';
         }
 
+        $response = new Response(json_encode($answer));
         $response->headers->set('Content-Type', 'application/json');
 
         return $response;
@@ -41,13 +46,14 @@ class RightsController extends Controller
         $acl = $this->get('acl');
         $container = $this->container;
 
-        $rights_model = new RightsModel($em, $acl, $container);
+        if ($acl->checkUserTreePermissions(false, $acl->getValueMask('editnodesrights'))) {
+            $rights_model = new RightsModel($em, $acl, $container);
 
-        $users = $rights_model->getUsers($this->get('request'));
-
-        //return $this->render('RightsBundle:Groups:index.html.twig', array('groups'=>array()));
-
-        $response = new Response(json_encode($users));
+            $answer = $rights_model->getUsers($this->get('request'));
+        } else {
+            $answer = 'no_rights';
+        }
+        $response = new Response(json_encode($answer));
         $response->headers->set('Content-Type', 'application/json');
 
         return $response;
@@ -59,11 +65,14 @@ class RightsController extends Controller
         $acl = $this->get('acl');
         $container = $this->container;
 
-        $rights_model = new RightsModel($em, $acl, $container);
+        if ($acl->checkUserTreePermissions(false, $acl->getValueMask('editnodesrights'))) {
+            $rights_model = new RightsModel($em, $acl, $container);
 
-        $user = $rights_model->getUser($this->get('request'));
-
-        $response = new Response(json_encode($user));
+            $answer = $rights_model->getUser($this->get('request'));
+        } else {
+            $answer = 'no_rights';
+        }
+        $response = new Response(json_encode($answer));
         $response->headers->set('Content-Type', 'application/json');
 
         return $response;
@@ -75,16 +84,16 @@ class RightsController extends Controller
         $acl = $this->get('acl');
         $container = $this->container;
 
-        $rights_model = new RightsModel($em, $acl, $container);
+        if ($acl->checkUserTreePermissions(false, $acl->getValueMask('editnodesrights'))) {
+            $rights_model = new RightsModel($em, $acl, $container);
+            $rights_model->editUserRights($this->get('request'));
 
-        $rights_model->editUserRights($this->get('request'));
+            $this->get('cache')->updateSiteTreeAccessUser($rights_model->getUserObject($this->get('request')->get('id_user')));
 
-        //print_r($user); exit;
-        //return $this->render('RightsBundle:Groups:index.html.twig', array('groups'=>array()));
-
-        $this->get('cache')->updateSiteTreeAccessUser($rights_model->getUserObject($this->get('request')->get('id_user')));
-
-        $response = new Response(json_encode('ok'));
+            $response = new Response(json_encode('ok'));
+        } else {
+            $response = new Response(json_encode('no_rights'));
+        }
         $response->headers->set('Content-Type', 'application/json');
 
         return $response;

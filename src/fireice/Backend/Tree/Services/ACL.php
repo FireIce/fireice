@@ -30,6 +30,7 @@ class ACL
     const MASK_VIEWGROUPS = 8388608;      // Смотреть список групп
     const MASK_EDITGROUP = 16777216;      // Редактировать (добавлять) группы
     const MASK_DELETEGROUP = 33554432;      // Удалять группы    
+    const MASK_DELETEITEM = 67108864;       // Удалять запись в узлах типа новостей
     protected $em;
     protected $aclProvider;
     protected $securityContext;

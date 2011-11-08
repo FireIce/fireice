@@ -15,5 +15,9 @@ class module
     {
         $this->id = $id;
     }
-
+    
+    public function __construct($id=null)
+    {
+        if (null !== $id) $this->setId($id);
+    }
 }

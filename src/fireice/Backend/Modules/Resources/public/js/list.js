@@ -76,8 +76,12 @@ function editCreateRow(row_id, act)
         dataType : "json",   
         cache: false,                             
         success: function (answer, textStatus) { 
-
-            editCreateRow_callback(answer, row_id, act);
+            
+            if (answer === 'no_rights') {
+                errorAndToMain('Нет прав!', '#ff0000');
+            } else {                
+                editCreateRow_callback(answer, row_id, act);
+            }             
         }
     });       
 }
@@ -192,22 +196,17 @@ function deleteRow(id_row)
             cache: false,                             
             success: function (answer, textStatus) { 
                 
-                deleteRow_callback(answer);
+                if (answer == 'ok') {   
+                    showMessage('Удалено!', '#38bc50');        
+                    showTab(id_module);
+                } else if (answer == 'no_rights') {                    
+                    showMessage('Нет прав!', '#ff0000');
+                } else {
+                    showMessage('Ошибка!', '#ff0000');
+                }    
             }
         });         
     }         
-}
-function deleteRow_callback(answer)
-{
-    if (answer == 'ok')
-    {   
-        showMessage('Сохранено!', '#38bc50');
-        
-        showTab(id_module);
-        
-    } else {
-        showMessage('Ошибка!', '#ff0000');
-    }     
 }
 
 function updateOrders()
@@ -231,19 +230,12 @@ function updateOrders()
         cache: false,                             
         success: function (answer, textStatus) { 
                 
-            updateOrders_callback(answer);
+            if (answer == 'ok') {   
+                showMessage('Сохранено!', '#38bc50');        
+                showTab(id_module);        
+            } else {
+                showMessage('Ошибка!', '#ff0000');
+            } 
         }
     });      
-}
-function updateOrders_callback(answer)
-{
-    if (answer == 'ok')
-    {   
-        showMessage('Сохранено!', '#38bc50');
-        
-        showTab(id_module);
-        
-    } else {
-        showMessage('Ошибка!', '#ff0000');
-    } 
 }

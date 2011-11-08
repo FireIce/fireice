@@ -71,8 +71,12 @@ function showItemInner(data)
         
             $.history.load('action/' + act_tmp + '/id/' + id_action + '/module/' + id_module + '/history/true'); 
         });
-        $('#dialog_id .submit_button').click(function(){ editSubmit(); });
-        $('#dialog_id .cancel_button').click(function(){ $.history.load(''); });
+        $('#dialog_id .submit_button').click(function(){
+            editSubmit();
+        });
+        $('#dialog_id .cancel_button').click(function(){
+            $.history.load('');
+        });
     }
     else 
     {
@@ -130,21 +134,19 @@ function editSubmit()
         dataType : "json",   
         cache: false,                             
         success: function (answer, textStatus) { 
-                
-            editSubmit_callback(answer);
+
+            if (answer === 'ok') {
+                showMessage('Сохранено!', '#38bc50');    	                
+                getShowNodes(); 
+            } else if (answer === 'no_rights') {
+                errorAndToMain('Нет прав!', '#ff0000');
+            } else {                
+                showMessage('Ошибка!', '#ff0000');
+                getEditData_callback(data);
+            }             
         }
     });        
 }    
-function editSubmit_callback(data)
-{   
-    if (data == 'ok')
-    {   
-        showMessage('Сохранено!', '#38bc50');
-    	                
-        getShowNodes(); 
-        
-    } else { showMessage('Ошибка!', '#ff0000'); getEditData_callback(data); }	
-}
 
 function getHistory(id_mod)
 {           
@@ -215,11 +217,19 @@ function proveEditorAction()
         type: 'POST',
         success: function (answer, textStatus) { 
             if (answer == 'ok')
-                { showMessage('Материал подтверждён!', '#38bc50'); $('#dialog_id .inner .returnwriter_button').hide(); $('#dialog_id .inner .proveeditor_button').hide(); } 
+            {
+                showMessage('Материал подтверждён!', '#38bc50');
+                $('#dialog_id .inner .returnwriter_button').hide();
+                $('#dialog_id .inner .proveeditor_button').hide();
+            } 
             else if (answer == 'no_save')
-                { showMessage('Материал не отправлялся вам на подтверждение журналистом!', '#ff0000'); }
+            {
+                showMessage('Материал не отправлялся вам на подтверждение журналистом!', '#ff0000');
+            }
             else 
-                { showMessage('Ошибка!', '#ff0000'); } 
+            {
+                showMessage('Ошибка!', '#ff0000');
+            } 
         }
     });    
 }
@@ -236,11 +246,19 @@ function proveMainEditorAction()
         type: 'POST',        
         success: function (answer, textStatus) { 
             if (answer == 'ok')
-                { showMessage('Материал подтверждён и опубликован!', '#38bc50'); $('#dialog_id .inner .returneditor_button').hide(); $('#dialog_id .inner .provemaineditor_button').hide(); } 
+            {
+                showMessage('Материал подтверждён и опубликован!', '#38bc50');
+                $('#dialog_id .inner .returneditor_button').hide();
+                $('#dialog_id .inner .provemaineditor_button').hide();
+            } 
             else if (answer == 'no_save')
-                { showMessage('Материал не отправлялся вам на подтверждение редактором!', '#ff0000'); }
+            {
+                showMessage('Материал не отправлялся вам на подтверждение редактором!', '#ff0000');
+            }
             else 
-                { showMessage('Ошибка!', '#ff0000'); } 
+            {
+                showMessage('Ошибка!', '#ff0000');
+            } 
         }
     });      
 }
@@ -257,11 +275,18 @@ function sendToProveEditorAction()
         type: 'POST',        
         success: function (answer, textStatus) {                 
             if (answer == 'ok')
-                { showMessage('Отправлено на подтверждение!', '#38bc50'); $('#dialog_id .inner').html('Материал отправлен на подтверждение!'); } 
+            {
+                showMessage('Отправлено на подтверждение!', '#38bc50');
+                $('#dialog_id .inner').html('Материал отправлен на подтверждение!');
+            } 
             else if (answer == 'no_save')
-                { showMessage('Сохраните, прежде чем отправлять!', '#ff0000'); }
+            {
+                showMessage('Сохраните, прежде чем отправлять!', '#ff0000');
+            }
             else 
-                { showMessage('Ошибка!', '#ff0000'); }  
+            {
+                showMessage('Ошибка!', '#ff0000');
+            }  
         }
     }); 
 }
@@ -278,11 +303,18 @@ function sendToProveMainEditorAction()
         type: 'POST',        
         success: function (answer, textStatus) { 
             if (answer == 'ok')
-                { showMessage('Отправлено на подтверждение!', '#38bc50'); $('#dialog_id .inner').html('Материал отправлен на подтверждение!'); } 
+            {
+                showMessage('Отправлено на подтверждение!', '#38bc50');
+                $('#dialog_id .inner').html('Материал отправлен на подтверждение!');
+            } 
             else if (answer == 'no_save')
-                { showMessage('Сохраните, прежде чем отправлять!', '#ff0000'); }
+            {
+                showMessage('Сохраните, прежде чем отправлять!', '#ff0000');
+            }
             else 
-                { showMessage('Ошибка!', '#ff0000'); }  
+            {
+                showMessage('Ошибка!', '#ff0000');
+            }  
         }
     });    
 }
@@ -311,11 +343,19 @@ function returnWriterAction()
             type: 'POST',            
             success: function (answer, textStatus) { 
                 if (answer == 'ok')
-                    { showMessage('Материал отправлен на дорботку!', '#38bc50'); $('#dialog_id .inner .returnwriter_button').hide(); $('#dialog_id .inner .proveeditor_button').hide(); } 
+                {
+                    showMessage('Материал отправлен на дорботку!', '#38bc50');
+                    $('#dialog_id .inner .returnwriter_button').hide();
+                    $('#dialog_id .inner .proveeditor_button').hide();
+                } 
                 else if (answer == 'no_send')
-                    { showMessage('Материал не отправлялся вам на подтверждение журналистом!', '#ff0000'); }
+                {
+                    showMessage('Материал не отправлялся вам на подтверждение журналистом!', '#ff0000');
+                }
                 else 
-                    { showMessage('Ошибка!', '#ff0000'); } 
+                {
+                    showMessage('Ошибка!', '#ff0000');
+                } 
             }
         });         
         
@@ -350,11 +390,19 @@ function returnEditorAction()
             type: 'POST',            
             success: function (answer, textStatus) { 
                 if (answer == 'ok')
-                    { showMessage('Материал отправлен на дорботку!', '#38bc50'); $('#dialog_id .inner .returneditor_button').hide(); $('#dialog_id .inner .provemaineditor_button').hide(); } 
+                {
+                    showMessage('Материал отправлен на дорботку!', '#38bc50');
+                    $('#dialog_id .inner .returneditor_button').hide();
+                    $('#dialog_id .inner .provemaineditor_button').hide();
+                } 
                 else if (answer == 'no_send')
-                    { showMessage('Материал не отправлялся вам на подтверждение редактором!', '#ff0000'); }
+                {
+                    showMessage('Материал не отправлялся вам на подтверждение редактором!', '#ff0000');
+                }
                 else 
-                    { showMessage('Ошибка!', '#ff0000'); } 
+                {
+                    showMessage('Ошибка!', '#ff0000');
+                } 
             }
         });  
      

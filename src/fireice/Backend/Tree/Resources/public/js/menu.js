@@ -249,7 +249,7 @@ function toMoveLeft()
             left = i * (options.block_width + options.block_padding*2);  	// Сколько должно было быть 
             $(options.main_div + ' #level_' + i).animate({
                 left: (left - to_mov*j) + 'px'
-                }, 
+            }, 
             options.animate_speed, 
             function (){
                 $(this).addClass('back')
@@ -276,11 +276,11 @@ function toMoveRight()
             left = i * (options.block_width + options.block_padding*2);  	// Сколько должно было быть  
             $(options.main_div + ' #level_' + i).animate({
                 left: (left - to_mov*j) + 'px'
-                }, options.animate_speed);   
+            }, options.animate_speed);   
         } 
         $(options.main_div + ' #level_' + i).animate({
             left: (left - to_mov*(j-1) + (options.block_width + options.block_padding*2)) + 'px'
-            }, 
+        }, 
         options.animate_speed, 
         function (){
             $(this).removeClass('back')
@@ -293,7 +293,7 @@ function toMoveRight()
             left = i * (options.block_width + options.block_padding*2);  	              
             $(options.main_div + ' #level_' + i).animate({
                 left: left + 'px'
-                }, 
+            }, 
             options.animate_speed, 
             function (){
                 $(this).removeClass('back');
@@ -513,7 +513,11 @@ function showSelectModule(id_act, act)
         cache: false,                             
         success: function (answer, textStatus) { 
 
-            showSelectModule_callback(answer);
+            if (answer === 'no_rights') {
+                errorAndToMain('Нет прав!', '#ff0000');
+            } else {                
+                showSelectModule_callback(answer);
+            }             
         }
     });     
 }
@@ -555,7 +559,11 @@ function selectModuleSubmit()
         cache: false,                             
         success: function (answer, textStatus) { 
 
-            showCreate(answer);
+            if (answer === 'no_rights') {
+                errorAndToMain('Нет прав!', '#ff0000');
+            } else {                
+                showCreate(answer);
+            }  
         }
     });     
 }
@@ -652,18 +660,20 @@ function showTab(id_mod, is_show_row)
             dataType : "json",   
             cache: false,                             
             success: function (answer, textStatus) { 
-                
-                showTab_callback(answer);
+
+                if (answer === 'error') {
+                    errorAndToMain('Ошибка!', '#ff0000');
+                } else if (answer === 'no_rights') {
+                    errorAndToMain('Нет прав!', '#ff0000');
+                } else {                
+                    if (module_type == 'item')
+                        showItemInner(answer);
+                    else if (module_type == 'list')
+                        showListInner(answer.data);  
+                }                 
             }
         });    
     }
-}
-function showTab_callback(answer)
-{  
-    if (module_type == 'item')
-        showItemInner(answer);
-    else if (module_type == 'list')
-        showListInner(answer.data);   
 }
 
 
@@ -679,23 +689,18 @@ function deleteNode(id_node)
             dataType : "json",   
             cache: false,                             
             success: function (answer, textStatus) { 
-                
-                deleteNode_callback(answer);
+
+                if (answer === 'error') {
+                    showMessage('Ошибка!', '#ff0000');
+                } else if (answer === 'no_rights') {
+                    showMessage('Нет прав!', '#ff0000');
+                } else {                
+                    showMessage('Узел удалён!', '#38bc50');     	                
+                    getShowNodes(); 
+                }                 
             }
         });         
     }   
-}
-function deleteNode_callback(answer)
-{   
-    if (answer == 'ok')
-    {   
-        showMessage('Узел удалён!', '#38bc50'); 
-    	                
-        getShowNodes();  
-        
-    } else {
-        showMessage('Ошибка!', '#ff0000');
-    }         
 }
 
 function hideNode(id)
@@ -708,22 +713,17 @@ function hideNode(id)
         dataType : "json",   
         cache: false,                             
         success: function (answer, textStatus) { 
-                
-            hideNode_callback(answer);
+
+            if (answer === 'error') {
+                showMessage('Ошибка!', '#ff0000');
+            } else if (answer === 'no_rights') {
+                showMessage('Нет прав!', '#ff0000');
+            } else {                
+                showMessage('Узел скрыт!', '#38bc50');     	                
+                getShowNodes(); 
+            }              
         }
     });     
-}
-function hideNode_callback(answer)
-{
-    if (answer == 'ok')
-    {   
-        showMessage('Узел скрыт!', '#38bc50'); 
-    	                
-        getShowNodes();  
-        
-    } else {
-        showMessage('Ошибка!', '#ff0000');
-    }   
 }
 
 function showNode(id)
@@ -736,22 +736,17 @@ function showNode(id)
         dataType : "json",   
         cache: false,                             
         success: function (answer, textStatus) { 
-                
-            showNode_callback(answer);
+
+            if (answer === 'error') {
+                showMessage('Ошибка!', '#ff0000');
+            } else if (answer === 'no_rights') {
+                showMessage('Нет прав!', '#ff0000');
+            } else {                
+                showMessage('Узел открыт!', '#38bc50');     	                
+                getShowNodes(); 
+            }             
         }
     });     
-}
-function showNode_callback(answer)
-{
-    if (answer == 'ok')
-    {   
-        showMessage('Узел открыт!', '#38bc50'); 
-    	                
-        getShowNodes();  
-        
-    } else {
-        showMessage('Ошибка!', '#ff0000');
-    } 
 }
 
 

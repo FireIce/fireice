@@ -1290,10 +1290,8 @@ Class TreeModel
                     $access = true;
                 }
             } else if ($val['type'] == 'user') {
-                $service_module = new module();
-                $service_module->setId($val['id']);
 
-                if ($acl->checkUserPermissions($id, $service_module, false, $acl->getValueMask($action))) {
+                if ($acl->checkUserPermissions($id, new module($val['id']), false, $acl->getValueMask($action))) {
                     $access = true;
                 }
             }

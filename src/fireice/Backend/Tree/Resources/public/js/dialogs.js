@@ -630,11 +630,19 @@ function rights(id)
         dataType : "json",   
         cache: false,                             
         success: function (answer, textStatus) { 
-                
-            tmp = getRightsData_callback(answer);
+                                       
+            if (answer === 'error') {
+                errorAndToMain('Ошибка!', '#ff0000');
+                tmp = false;
+            } else if (answer === 'no_rights') {
+                errorAndToMain('Нет прав!', '#ff0000');
+                tmp = false;
+            } else {                
+                tmp = getRightsData_callback(answer);
+            }               
         }
     });     
-    
+
     return tmp;
 }
 
@@ -681,8 +689,14 @@ function showModuleRights(id_mod)
         dataType : "json",   
         cache: false,                             
         success: function (answer, textStatus) { 
-                
-            showModuleRights_callback(answer);
+
+            if (answer === 'error') {
+                errorAndToMain('Ошибка!', '#ff0000');
+            } else if (answer === 'no_rights') {
+                errorAndToMain('Нет прав!', '#ff0000');
+            } else {                
+                showModuleRights_callback(answer);
+            }                 
         }
     });    
 }
@@ -717,8 +731,14 @@ function editRights(id_act, id_mod, id_user)
         dataType : "json",   
         cache: false,                             
         success: function (answer, textStatus) { 
-                
-            editRights_callback(answer);
+
+            if (answer === 'error') {
+                errorAndToMain('Ошибка!', '#ff0000');
+            } else if (answer === 'no_rights') {
+                errorAndToMain('Нет прав!', '#ff0000');
+            } else {                
+                editRights_callback(answer);
+            }             
         }
     });    
 }
