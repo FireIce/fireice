@@ -12,7 +12,8 @@
         {{/each}}
     </td>
     <td align="center" width="250">
-        <input id_group="${gr_id}" class="edit_group" type="button" value="Редактировать">
-        <input id_group="${gr_id}" class="del_group" type="button" value="Удалить">
+        {{if edit_right == true}}<input id_group="${gr_id}" class="edit_group" type="button" value="Редактировать">{{/if}}
+        {{if delete_right == true}}<input id_group="${gr_id}" class="del_group" type="button" value="Удалить">{{/if}}
+		{{if edit_right == false && delete_right == false}} <i>Нет прав</i> {{/if}}
     </td>
 </tr>

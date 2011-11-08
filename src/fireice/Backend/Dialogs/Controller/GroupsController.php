@@ -21,35 +21,46 @@ class GroupsController extends Controller
         $em = $this->get('doctrine.orm.entity_manager');
         $container = $this->container;
 
-        $groups_model = new GroupsModel($em, $acl, $container);
+        if ($acl->checkUserTreePermissions(false, $acl->getValueMask('viewgroups'))) {
+            $groups_model = new GroupsModel($em, $acl, $container);
 
-        $modules = $groups_model->getModules();
+            $modules = $groups_model->getModules();
 
-        $groups = $groups_model->findAll();
+            $groups = $groups_model->findAll();
 
-        // Для каждой группы узнаем установленные права
-        foreach ($groups as &$group) {
-            $groups_rights = array ();
+            // Для каждой группы узнаем установленные права
+            foreach ($groups as &$group) {
+                $groups_rights = array ();
 
-            $identy_group = new RoleSecurityIdentity('group_'.$group['gr_id']);
+                $identy_group = new RoleSecurityIdentity('group_'.$group['gr_id']);
 
-            foreach ($modules as $key => $module) {
-                $object_module = new module();
-                $object_module->setId($module['id']);
+                foreach ($modules as $key => $module) {
+                    $object_module = new module();
+                    $object_module->setId($module['id']);
 
-                $groups_rights[$module['name']] = array ();
+                    $groups_rights[$module['name']] = array ();
 
-                foreach ($module['module_object']->getRights() as $right) {
-                    if ($acl->checkGroupPermissions($object_module, $identy_group, $acl->getValueMask($right['name']))) {
-                        $groups_rights[$module['name']][] = $right['name'];
+                    foreach ($module['module_object']->getRights() as $right) {
+                        if ($acl->checkGroupPermissions($object_module, $identy_group, $acl->getValueMask($right['name']))) {
+                            $groups_rights[$module['name']][] = $right['name'];
+                        }
                     }
                 }
-            }
 
-            $group['gr_rights'] = $groups_rights;
+                $group['gr_rights'] = $groups_rights;
+            }
+            unset($group);
+            
+            $answer = array(
+                'list' => $groups,
+                'edit_right' => $acl->checkUserTreePermissions(false, $acl->getValueMask('editgroup')),
+                'delete_right' => $acl->checkUserTreePermissions(false, $acl->getValueMask('deletegroup')),                
+            );
+        } else {
+            $answer = 'no_rights';
         }
 
-        $response = new Response(json_encode($groups));
+        $response = new Response(json_encode($answer));
         $response->headers->set('Content-Type', 'application/json');
 
         return $response;
@@ -61,11 +72,13 @@ class GroupsController extends Controller
         $em = $this->get('doctrine.orm.entity_manager');
         $container = $this->container;
 
-        $groups_model = new GroupsModel($em, $acl, $container);
-
-        $group_data = $groups_model->getGroupData($this->get('request')->get('id'));
-
-        $response = new Response(json_encode($group_data));
+        if ($acl->checkUserTreePermissions(false, $acl->getValueMask('editgroup'))) {
+            $groups_model = new GroupsModel($em, $acl, $container);
+            $answer = $groups_model->getGroupData($this->get('request')->get('id'));
+        } else {
+            $answer = 'no_rights';
+        }
+        $response = new Response(json_encode($answer));
         $response->headers->set('Content-Type', 'application/json');
 
         return $response;
@@ -77,13 +90,16 @@ class GroupsController extends Controller
         $em = $this->get('doctrine.orm.entity_manager');
         $container = $this->container;
 
-        $groups_model = new GroupsModel($em, $acl, $container);
+        if ($acl->checkUserTreePermissions(false, $acl->getValueMask('editgroup'))) {
+            $groups_model = new GroupsModel($em, $acl, $container);
+            $groups_model->editGroup($this->get('request'));
 
-        $groups_model->editGroup($this->get('request'));
+            $this->get('cache')->updateSiteTreeAccessGroup($this->get('request')->get('id'));
 
-        $this->get('cache')->updateSiteTreeAccessGroup($this->get('request')->get('id'));
-
-        $response = new Response(json_encode('ok'));
+            $response = new Response(json_encode('ok'));
+        } else {
+            $response = new Response(json_encode('no_rights'));
+        }
         $response->headers->set('Content-Type', 'application/json');
 
         return $response;
@@ -95,11 +111,14 @@ class GroupsController extends Controller
         $em = $this->get('doctrine.orm.entity_manager');
         $container = $this->container;
 
-        $groups_model = new GroupsModel($em, $acl, $container);
+        if ($acl->checkUserTreePermissions(false, $acl->getValueMask('editgroup'))) {
+            $groups_model = new GroupsModel($em, $acl, $container);
+            $groups_model->addGroup($this->get('request'));
 
-        $groups_model->addGroup($this->get('request'));
-
-        $response = new Response(json_encode('ok'));
+            $response = new Response(json_encode('ok'));
+        } else {
+            $response = new Response(json_encode('no_rights'));
+        }
         $response->headers->set('Content-Type', 'application/json');
 
         return $response;
@@ -111,11 +130,14 @@ class GroupsController extends Controller
         $em = $this->get('doctrine.orm.entity_manager');
         $container = $this->container;
 
-        $groups_model = new GroupsModel($em, $acl, $container);
+        if ($acl->checkUserTreePermissions(false, $acl->getValueMask('deletegroup'))) {
+            $groups_model = new GroupsModel($em, $acl, $container);
+            $groups_model->deleteGroup($this->get('request')->get('id'), $this->get('cache'));
 
-        $groups_model->deleteGroup($this->get('request')->get('id'), $this->get('cache'));
-
-        $response = new Response(json_encode('ok'));
+            $response = new Response(json_encode('ok'));
+        } else {
+            $response = new Response(json_encode('no_rights'));
+        }
         $response->headers->set('Content-Type', 'application/json');
 
         return $response;
@@ -195,7 +217,7 @@ class GroupsController extends Controller
                 }
                 $acl->createPermissionsForGroup($object, $group, $builder->get());
             }
- 
+
             // Создаём супер-пользователя
             $super_user = new users();
             $super_user->setLogin('god');

@@ -320,8 +320,14 @@ function getGroups()
         dataType : "json",   
         cache: false,                             
         success: function (answer, textStatus) { 
-                
-            getGroupsData_callback(answer);
+
+            if (answer === 'error') {
+                errorAndToMain('Ошибка!', '#ff0000');
+            } else if (answer === 'no_rights') {
+                errorAndToMain('Нет прав!', '#ff0000');
+            } else {
+                getGroupsData_callback(answer);
+            }            
         }
     });     
 }
@@ -330,9 +336,15 @@ function getGroupsData_callback(answer)
     var template = getTemplate(options.assets + '/tree/templates/groups/groups.html');
     var list_template = '<script type="text/x-jquery-tmpl">' + getTemplate(options.assets + '/tree/templates/groups/groups_list.html') + '</script>';    
     
-    $('#dialog_id').html( template );
+    $('#dialog_id').html('');
+    $( template ).tmpl( {add: answer.edit_right} ).appendTo( '#dialog_id' );
     
-    $( list_template ).tmpl( answer ).appendTo( '#groups_list_id' );
+    for (var i=0; i<answer.list.length; i++) {
+        answer.list[i]['edit_right'] = answer.edit_right;
+        answer.list[i]['delete_right'] = answer.delete_right;
+    }    
+    
+    $( list_template ).tmpl( answer.list ).appendTo( '#groups_list_id' );
     
     $('#progress_id').hide();
     
@@ -373,9 +385,15 @@ function editGroup(id_group)
         async: true,
         dataType : "json",   
         cache: false,                             
-        success: function (answer, textStatus) { 
-                
-            getGroupData_callback(answer);
+        success: function (answer, textStatus) {                             
+            
+            if (answer === 'error') {
+                errorAndToMain('Ошибка!', '#ff0000');
+            } else if (answer === 'no_rights') {
+                errorAndToMain('Нет прав!', '#ff0000');
+            } else {                
+                getGroupData_callback(answer);
+            }            
         }
     });    
 }
@@ -472,8 +490,14 @@ function addGroup()
         dataType : "json",   
         cache: false,                             
         success: function (answer, textStatus) { 
-                
-            getCreateGroupData_callback(answer);
+                                        
+            if (answer === 'error') {
+                errorAndToMain('Ошибка!', '#ff0000');
+            } else if (answer === 'no_rights') {
+                errorAndToMain('Нет прав!', '#ff0000');
+            } else {                
+                getCreateGroupData_callback(answer);
+            }                 
         }
     });    
 }
@@ -527,9 +551,15 @@ function addGroupSubmit()
         async: true,
         dataType : "json",   
         cache: false,                             
-        success: function (answer, textStatus) { 
-                
-            addGroupSubmit_callback(answer);
+        success: function (answer, textStatus) {                             
+            
+            if (answer === 'error') {
+                errorAndToMain('Ошибка!', '#ff0000');
+            } else if (answer === 'no_rights') {
+                errorAndToMain('Нет прав!', '#ff0000');
+            } else {                
+                addGroupSubmit_callback(answer);
+            }            
         }
     });    
 }
@@ -569,13 +599,13 @@ function deleteGroup_callback(answer)
 {    
     if (answer == 'ok')
     {   
-        showMessage('Группа удалена!', '#38bc50'); 
-    	                
+        showMessage('Группа удалена!', '#38bc50');     	                
         getGroups();
-        
+    } else if (answer == 'no_rights') {
+        showMessage('Нет прав!', '#ff0000');
     } else {
         showMessage('Ошибка!', '#ff0000');
-    }     
+    }            
 }
 
 
