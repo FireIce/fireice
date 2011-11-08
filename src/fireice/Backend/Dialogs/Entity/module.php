@@ -18,6 +18,6 @@ class module
     
     public function __construct($id=null)
     {
-        if (null !== $id) $this->setId($id);
+        $this->setId($id);
     }
 }
