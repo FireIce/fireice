@@ -40,9 +40,15 @@ function getUsersData_callback(answer)
     var template = getTemplate(options.assets + '/tree/templates/users/users.html');
     var list_template = '<script type="text/x-jquery-tmpl">' + getTemplate(options.assets + '/tree/templates/users/users_list.html') + '</script>';    
     
-    $('#dialog_id').html( template );
+    $('#dialog_id').html('');
+    $( template ).tmpl( {add: answer.edit_right} ).appendTo('#dialog_id');
     
-    $( list_template ).tmpl( answer ).appendTo( '#users_list_id' );
+    for (var i=0; i<answer.list.length; i++) {
+        answer.list[i]['edit_right'] = answer.edit_right;
+        answer.list[i]['delete_right'] = answer.delete_right;
+    }        
+    
+    $( list_template ).tmpl( answer.list ).appendTo( '#users_list_id' );
     
     $('#progress_id').hide();
     

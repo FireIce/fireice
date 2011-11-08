@@ -6,7 +6,8 @@
     <td>${us_email}</td>
     <td>${gr_title}</td>
     <td align="center" width="250">
-        <input id_user="${us_id}" class="edit_user" type="button" value="Редактировать">
-        <input id_user="${us_id}" class="del_user" type="button" value="Удалить">
+        {{if edit_right == true}}<input id_user="${us_id}" class="edit_user" type="button" value="Редактировать">{{/if}}
+        {{if delete_right == true}}<input id_user="${us_id}" class="del_user" type="button" value="Удалить">{{/if}}
+		{{if edit_right == false && delete_right == false}} <i>Нет прав</i> {{/if}}
     </td>
 </tr>

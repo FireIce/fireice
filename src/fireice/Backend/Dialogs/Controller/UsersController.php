@@ -17,7 +17,14 @@ class UsersController extends Controller
 
         if ($acl->checkUserTreePermissions(false, $acl->getValueMask('viewusers'))) {
             $users_model = new UsersModel($em, $acl);
-            $answer = $users_model->getUsers();
+            $users = $users_model->getUsers();
+            
+            $answer = array(
+                'list' => $users,
+                'edit_right' => $acl->checkUserTreePermissions(false, $acl->getValueMask('edituser')),
+                'delete_right' => $acl->checkUserTreePermissions(false, $acl->getValueMask('deleteuser')),
+            );
+            
         } else {
             $answer = 'no_rights';
         }
@@ -51,11 +58,16 @@ class UsersController extends Controller
         $em = $this->get('doctrine.orm.entity_manager');
         $acl = $this->get('acl');
 
-        $users_model = new UsersModel($em, $acl);
+        if ($acl->checkUserTreePermissions(false, $acl->getValueMask('edituser'))) {
+            $users_model = new UsersModel($em, $acl);
+            $user = $users_model->editUser($this->get('request'));
+            
+            $this->get('cache')->updateSiteTreeAccessUser($user);
 
-        $users_model->editUser($this->get('request'));
-
-        $response = new Response(json_encode('ok'));
+            $response = new Response(json_encode('ok'));
+        } else {
+            $response = new Response(json_encode('no_rights'));
+        }
         $response->headers->set('Content-Type', 'application/json');
 
         return $response;
@@ -68,7 +80,6 @@ class UsersController extends Controller
 
         if ($acl->checkUserTreePermissions(false, $acl->getValueMask('edituser'))) {
             $users_model = new UsersModel($em, $acl);
-
             $user = $users_model->addUser($this->get('request'));
 
             $this->get('cache')->updateSiteTreeAccessUser($user);
@@ -88,7 +99,7 @@ class UsersController extends Controller
         $em = $this->get('doctrine.orm.entity_manager');
         $acl = $this->get('acl');
 
-        if ($acl->checkUserTreePermissions(false, $acl->getValueMask('edituser'))) {
+        if ($acl->checkUserTreePermissions(false, $acl->getValueMask('deleteuser'))) {
             $users_model = new UsersModel($em, $acl);
             $users_model->deleteUser($this->get('request')->get('id'));
             $this->get('cache')->deleteSiteTreeAccessUser($this->get('request')->get('id'));
@@ -97,7 +108,7 @@ class UsersController extends Controller
         } else {
             $response = new Response(json_encode('no_rights'));
         }
-        
+
         $response->headers->set('Content-Type', 'application/json');
 
         return $response;

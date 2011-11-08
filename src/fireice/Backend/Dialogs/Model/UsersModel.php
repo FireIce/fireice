@@ -104,6 +104,8 @@ class UsersModel
 
             $this->em->persist($user);
             $this->em->flush();
+            
+            return $user;
         }
     }
 
