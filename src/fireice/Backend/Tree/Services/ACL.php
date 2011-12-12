@@ -63,7 +63,7 @@ class ACL
                 DialogsBundle:moduleslink md_l, 
                 DialogsBundle:aclnodesrights acl
             WHERE acl.up_modules_link = md_l.id
-            AND acl.up_user = ".$id_user);
+            AND acl.up_user = :id_user")->setParameter('id_user', $id_user);
 
         $result = $query->getResult();
 
@@ -251,8 +251,14 @@ class ACL
 
             $this->removePermissionsForModule($module, $group);
         }
+        
+        $query = $this->em->getConnection()->prepare("
+                DELETE FROM acl_security_identities 
+                WHERE identifier = :identifer");
 
-        $this->em->getConnection()->executeQuery("DELETE FROM acl_security_identities WHERE identifier='".$group->getRole()."'");
+        $tmp = $group->getRole();
+        $query->bindParam(':identifer', $tmp, \PDO::PARAM_STR);
+        $query->execute();
     }
 
     public function getValueMask($mask)

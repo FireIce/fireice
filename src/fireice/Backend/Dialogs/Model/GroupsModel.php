@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
 use fireice\Backend\Dialogs\Entity\groups;
 use fireice\Backend\Dialogs\Entity\module;
+use fireice\Backend\Tree\Controller\TreeController;
 
 class GroupsModel
 {
@@ -38,7 +39,7 @@ class GroupsModel
 
     public function getModules()
     {
-        $tree_controller = new \fireice\Backend\Tree\Controller\TreeController();
+        $tree_controller = new TreeController();
 
         $return_modules[0] = array (
             'id' => -1,
@@ -65,7 +66,7 @@ class GroupsModel
             $module_controller = $this->container->getParameter('project_name').'\\Modules\\'.ucfirst($config['parameters']['name']).'\\Controller\\BackendController';
 
             $module_controller = new $module_controller();
-            
+
             $module_object = $this->container->getParameter('project_name').'\\Modules\\'.$module->getName().'\\Controller\\BackendController';
             $module_object = new $module_object();
 
@@ -83,11 +84,13 @@ class GroupsModel
 
     public function getGroupData($id)
     {
-        $query = $this->em->createQuery("SELECT 
-                                             gr 
-                                         FROM 
-                                             DialogsBundle:groups gr 
-    	                                 WHERE gr.id='".$id."'");
+        $query = $this->em->createQuery("
+            SELECT 
+                gr 
+            FROM 
+                DialogsBundle:groups gr 
+    	    WHERE gr.id = :id")->setParameter('id', $id);
+        
         $query->setMaxResults(1);
 
         $result = $query->getArrayResult();

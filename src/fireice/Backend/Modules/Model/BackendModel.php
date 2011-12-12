@@ -115,13 +115,20 @@ class BackendModel extends GeneralModel
                         DialogsBundle:moduleslink m_l,
                         DialogsBundle:modulespluginslink mp_l
                     WHERE md.status = 'active'            
-                    AND m_l.up_tree = ".$this->request->get('id')."
-                    AND m_l.up_module = ".$this->request->get('id_module')."
+                    AND m_l.up_tree = :up_tree
+                    AND m_l.up_module = :up_module
                     AND m_l.id = mp_l.up_link
                     AND mp_l.up_plugin = md.idd
                     AND md.final = 'Y'
-                    AND md.plugin_name = '".$plugin->getValue('name')."'
-                    AND md.plugin_type = '".$plugin->getValue('type')."'");
+                    AND md.plugin_name = :plugin_name
+                    AND md.plugin_type = :plugin_type");
+                
+                $query->setParameters(array(
+                    'up_tree' => $this->request->get('id'),
+                    'up_module' => $this->request->get('id_module'),
+                    'plugin_name' => $plugin->getValue('name'),
+                    'plugin_type' => $plugin->getValue('type')
+                ));
 
                 $result = $query->getResult();
 
@@ -140,7 +147,19 @@ class BackendModel extends GeneralModel
 
                     $hid = $history->getId();
 
-                    $query = $this->em->createQuery("UPDATE ".$this->getBundleName().':'.$this->getEntityName()." md SET md.final='N', md.eid = ".$hid." WHERE md.idd = ".$result['idd']." AND md.final = 'Y' AND md.eid IS NULL");
+                    $query = $this->em->createQuery("
+                        UPDATE 
+                            ".$this->getBundleName().':'.$this->getEntityName()." md 
+                        SET md.final='N', md.eid = :eid
+                        WHERE md.idd = :idd 
+                        AND md.final = 'Y' 
+                        AND md.eid IS NULL");
+                    
+                    $query->setParameters(array(
+                        'eid' => $hid,
+                        'idd' => $result['idd']
+                    ));
+                    
                     $query->getResult();
 
                     $new_module_record = $this->getModuleEntity();
@@ -211,13 +230,20 @@ class BackendModel extends GeneralModel
                             DialogsBundle:moduleslink m_l,
                             DialogsBundle:modulespluginslink mp_l
                         WHERE md.eid IS NULL            
-                        AND m_l.up_tree = ".$this->request->get('id')."
-                        AND m_l.up_module = ".$this->request->get('id_module')."
+                        AND m_l.up_tree = :up_tree
+                        AND m_l.up_module = :up_module
                         AND m_l.id = mp_l.up_link
                         AND mp_l.up_plugin = md.idd
                         AND md.final != 'N'
-                        AND md.plugin_name = '".$plugin->getValue('name')."'
-                        AND md.plugin_type = '".$plugin->getValue('type')."'");
+                        AND md.plugin_name = :plugin_name
+                        AND md.plugin_type = :plugin_type");
+                    
+                    $query->setParameters(array(
+                        'up_tree' => $this->request->get('id'),
+                        'up_module' => $this->request->get('id_module'),
+                        'plugin_name' => $plugin->getValue('name'),
+                        'plugin_type' => $plugin->getValue('type')
+                    ));
 
                     $result = $query->getResult();
 
@@ -301,12 +327,19 @@ class BackendModel extends GeneralModel
                             DialogsBundle:modulespluginslink mp_l
                         WHERE (md.final = 'Y' OR md.final = 'W')
                         AND md.eid IS NULL
-                        AND m_l.up_tree = ".$this->request->get('id')."
-                        AND m_l.up_module = ".$this->request->get('id_module')."
+                        AND m_l.up_tree = :up_tree
+                        AND m_l.up_module = :up_module
                         AND m_l.id = mp_l.up_link
                         AND mp_l.up_plugin = md.idd
-                        AND md.plugin_name = '".$plugin->getValue('name')."'
-                        AND md.plugin_type = '".$plugin->getValue('type')."'");
+                        AND md.plugin_name = :plugin_name
+                        AND md.plugin_type = :plugin_type");
+                    
+                    $query->setParameters(array(
+                        'up_tree' => $this->request->get('id'),
+                        'up_module' => $this->request->get('id_module'),
+                        'plugin_name' => $plugin->getValue('name'),
+                        'plugin_type' => $plugin->getValue('type')
+                    ));
 
                     $result = $query->getResult();
 
@@ -397,11 +430,16 @@ class BackendModel extends GeneralModel
                 DialogsBundle:moduleslink m_l,
                 DialogsBundle:modulespluginslink mp_l
             WHERE md.status = 'active' 
-            AND m_l.up_tree = ".$this->request->get('id')."
-            AND m_l.up_module = ".$this->request->get('id_module')."
+            AND m_l.up_tree = :up_tree
+            AND m_l.up_module = :up_module
             AND m_l.id = mp_l.up_link
             AND mp_l.up_plugin = md.idd");
 
+        $query->setParameters(array(
+            'up_tree' => $this->request->get('id'),
+            'up_module' => $this->request->get('id_module')
+        ));
+        
         $result = $query->getResult();
         // --- Главный запрос, получающий список записей в таблице модуля
         // +++ Обрабатываем результат и забиваем в массивы
@@ -511,9 +549,7 @@ class BackendModel extends GeneralModel
                 'values' => $history_values,
             );
         }
-
-        //print_r($history); exit;        
-
+        
         return $history;
     }
 
@@ -581,8 +617,8 @@ class BackendModel extends GeneralModel
             AND md_l.up_tree = tr.idd
             AND md_l.up_module = md.idd
             AND tr.final = 'Y'
-            AND tr.idd='".$data['id_node']."'
-            AND md.type = 'user'");
+            AND tr.idd = :idd
+            AND md.type = 'user'")->setParameter('idd', $data['id_node']);       
 
         $result = $query->getSingleResult();
 
@@ -610,9 +646,9 @@ class BackendModel extends GeneralModel
             AND md_l.up_module = md.idd
             AND (tr.status = 'active' OR tr.status = 'hidden')
             AND tr.final = 'Y'
-            AND tr.idd='".$data['id_node']."'
+            AND tr.idd = :idd
             AND md.type='user'
-            ORDER BY md.type");
+            ORDER BY md.type")->setParameter('idd', $data['id_node']);
 
         $node_modules = $query->getOneOrNullResult();
 
@@ -628,13 +664,19 @@ class BackendModel extends GeneralModel
             WHERE (md.final = 'Y' OR md.final = 'W')
             AND md.eid IS NULL
 
-            AND m_l.up_tree = '".$data['id_node']."'
-            AND m_l.up_module = ".$node_modules['id_module']."
+            AND m_l.up_tree = :up_tree
+            AND m_l.up_module = :up_module
             AND m_l.id = mp_l.up_link
             AND mp_l.up_plugin = md.idd
 
             AND md.plugin_id = plg.id
-            AND md.plugin_name = '".$data['title']."'");
+            AND md.plugin_name = :plugin_name");
+        
+        $query->setParameters(array(
+            'up_tree' => $data['id_node'],
+            'up_module' => $node_modules['id_module'],
+            'plugin_name' => $data['title']
+        ));
 
         $сhoices = array ();
 

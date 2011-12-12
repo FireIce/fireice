@@ -49,7 +49,7 @@ class UsersModel
     public function getUserData($user_id)
     {
         $query = $this->em->createQuery("SELECT user FROM DialogsBundle:users user 
-    	                                 WHERE user.id='".$user_id."'");
+    	                                 WHERE user.id = :id")->setParameter('id', $user_id);
 
         $query->setMaxResults(1);
 
@@ -98,7 +98,6 @@ class UsersModel
 
             foreach ($m as $o) {
                 $set_method = 'set'.ucfirst($o['name']);
-
                 $user->$set_method($request->get($o['name']));
             }
 

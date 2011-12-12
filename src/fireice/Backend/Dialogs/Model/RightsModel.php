@@ -45,7 +45,7 @@ class RightsModel
             AND md_l.up_module = md.idd
             AND (tr.status = 'active' OR tr.status = 'hidden')
             AND tr.final = 'Y'
-            AND tr.idd=".$id);
+            AND tr.idd = :idd")->setParameter('idd', $id);
 
         $result = $query->getResult();
 
@@ -61,13 +61,18 @@ class RightsModel
                 DialogsBundle:moduleslink md_l, 
                 DialogsBundle:modulespluginslink md_pl_l,
                 Module".$result['name']."Bundle:".$result['table_name']." stm
-            WHERE md_l.up_tree = ".$id."
-            AND md_l.up_module = ".$result['id']."
+            WHERE md_l.up_tree = :up_tree
+            AND md_l.up_module = :up_module
             AND md_pl_l.up_link = md_l.id
             AND md_pl_l.up_plugin = stm.idd
             AND stm.plugin_name = 'fireice_node_title'
             AND stm.final = 'Y'
             AND stm.status = 'active'");
+        
+        $query->setParameters(array(
+            'up_tree' => $id,
+            'up_module' => $result['id']
+        ));
 
         $result = $query->getSingleResult();
 
@@ -76,7 +81,7 @@ class RightsModel
                 plg.value
             FROM 
                 FireicePlugins".ucfirst($result['plugin_type'])."Bundle:plugin".$result['plugin_type']." plg
-            WHERE plg.id = ".$result['plugin_id']);
+            WHERE plg.id = :id")->setParameter('id', $result['plugin_id']);
 
         $result2 = $query->getSingleResult();
 
@@ -101,8 +106,8 @@ class RightsModel
             AND md_l.up_module = md.idd
             AND (tr.status = 'active' OR tr.status = 'hidden')
             AND tr.final = 'Y'
-            AND tr.idd=".$id."
-            ORDER BY md.type");
+            AND tr.idd = :idd
+            ORDER BY md.type")->setParameter('idd', $id);
 
         $modules = array ();
 
@@ -131,7 +136,7 @@ class RightsModel
             FROM 
                 DialogsBundle:users us, 
                 DialogsBundle:groups gr
-            WHERE us.groups=gr.id");
+            WHERE us.groups = gr.id");
 
         $users_result = $query->getResult();
 
@@ -149,10 +154,15 @@ class RightsModel
             FROM 
                 DialogsBundle:moduleslink md_l, 
                 DialogsBundle:aclnodesrights acl
-            WHERE md_l.up_tree = ".$request->get('id_node')."
-            AND md_l.up_module = ".$request->get('id_module')."
+            WHERE md_l.up_tree = :up_tree
+            AND md_l.up_module = :up_module
             AND acl.up_modules_link = md_l.id
             AND acl.up_user IN (".implode(',', $users).")");
+        
+        $query->setParameters(array(
+            'up_tree' => $request->get('id_node'),
+            'up_module' => $request->get('id_module')
+        ));
 
         $result = $query->getResult();
 
@@ -170,7 +180,7 @@ class RightsModel
                 DialogsBundle:modules md
             WHERE md.final = 'Y'
             AND md.status = 'active'
-            AND md.idd = ".$request->get('id_module'));
+            AND md.idd = :idd")->setParameter('idd', $request->get('id_module'));
 
         $module = $query->getSingleResult();
 
@@ -220,8 +230,6 @@ class RightsModel
             );
         }
 
-        //print_r($users); exit;
-
         return $users;
     }
 
@@ -236,9 +244,15 @@ class RightsModel
                 DialogsBundle:modules md
             WHERE md.final = 'Y'
             AND md.status = 'active'
-            AND md.idd = ".$request->get('id_module')."
-            AND md_l.up_tree = ".$request->get('id_node')."
-            AND md_l.up_module = ".$request->get('id_module'));
+            AND md.idd = :idd
+            AND md_l.up_tree = :up_tree
+            AND md_l.up_module = :up_module");
+        
+        $query->setParameters(array(
+            'idd' => $request->get('id_module'),
+            'up_tree' => $request->get('id_node'),
+            'up_module' => $request->get('id_module')
+        ));
 
         $module = $query->getResult();
 
@@ -260,8 +274,8 @@ class RightsModel
             FROM 
                 DialogsBundle:users us, 
                 DialogsBundle:groups gr
-            WHERE us.groups=gr.id
-            AND us.id = ".$request->get('id_user'));
+            WHERE us.groups = gr.id
+            AND us.id = :id")->setParameter('id', $request->get('id_user'));
 
         $user_result = $query->getSingleResult();
 
@@ -271,10 +285,16 @@ class RightsModel
             FROM 
                 DialogsBundle:moduleslink md_l, 
                 DialogsBundle:aclnodesrights acl
-            WHERE md_l.up_tree = ".$request->get('id_node')."
-            AND md_l.up_module = ".$request->get('id_module')."
+            WHERE md_l.up_tree = :up_tree
+            AND md_l.up_module = :up_module
             AND acl.up_modules_link = md_l.id
-            AND acl.up_user = ".$request->get('id_user'));
+            AND acl.up_user = :up_user");
+        
+        $query->setParameters(array(
+            'up_tree' => $request->get('id_node'),
+            'up_module' => $request->get('id_module'),
+            'up_user' => $request->get('id_user')
+        ));
 
         $notrights_result = $query->getResult();
 
@@ -318,8 +338,6 @@ class RightsModel
             );
         }
 
-        //print_r($user_rights); exit; 
-
         return array (
             'user' => $user_result['username'],
             'group' => $user_result['grouptitle'],
@@ -338,14 +356,20 @@ class RightsModel
         $query = $this->em->createQuery("
             DELETE 
                 DialogsBundle:aclnodesrights acl 
-            WHERE acl.up_user = ".$request->get('id_user')."
+            WHERE acl.up_user = :up_user
             AND acl.up_modules_link = (
                 SELECT 
                     md_l.id
                 FROM
                     DialogsBundle:moduleslink md_l
-                WHERE md_l.up_tree = ".$request->get('id_node')."
-                AND md_l.up_module = ".$request->get('id_module').")");
+                WHERE md_l.up_tree = :up_tree
+                AND md_l.up_module = :up_module)");
+        
+        $query->setParameters(array(
+            'up_user' => $request->get('id_user'),
+            'up_tree' => $request->get('id_node'),
+            'up_module' => $request->get('id_module')
+        ));
 
         $query->getResult();
 

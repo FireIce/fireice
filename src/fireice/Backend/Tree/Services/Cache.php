@@ -259,14 +259,19 @@ class Cache
                         DialogsBundle:modulespluginslink mp_l
                     WHERE md.status = 'active'
             
-                    AND m_l.up_tree In (".implode(',', $type['ids']).")
-                    AND m_l.up_module = ".$type['module_id']."
+                    AND m_l.up_tree IN (".implode(',', $type['ids']).")
+                    AND m_l.up_module = :id_module
                     AND m_l.id = mp_l.up_link
                     AND mp_l.up_plugin = md.idd
 
                     AND md.final = 'Y'
                     AND md.plugin_id = plg.id
-                    AND md.plugin_type = '".$plugin."'");
+                    AND md.plugin_type = :plugin_type");
+
+                $query->setParameters(array (
+                    'id_module' => $type['module_id'],
+                    'plugin_type' => $plugin
+                ));
 
                 $plugins_values = array_merge($query->getResult(), $plugins_values);
             }

@@ -636,43 +636,45 @@ function getNodeModules_callback(answer)
 } 
 function showTab(id_mod, is_show_row)
 { 
-    ckeditorInstancesDestroy();
+    if (id_mod !== undefined) {
+        ckeditorInstancesDestroy();
     
-    $('#dialog_id .tab').removeClass('current');
-    $('#dialog_id .form .tab').each(function(){
-        if ($(this).attr('id_module') == id_mod)
-        {
-            module_type = $(this).attr('module_type');
-            $(this).addClass('current');
-        }
-    });        
-    
-    id_module = id_mod;
-    
-    $('#dialog_id .inner').html(options.progress_block_html);   
-    
-    if (is_show_row !== true)
-    {
-        $.ajax({
-            url: options.url + 'dialog_create_edit',
-            data: 'act=show&id=' + id_action + '&id_module=' + id_module,
-            async: true,
-            dataType : "json",   
-            cache: false,                             
-            success: function (answer, textStatus) { 
-
-                if (answer === 'error') {
-                    errorAndToMain('Ошибка!', '#ff0000');
-                } else if (answer === 'no_rights') {
-                    errorAndToMain('Нет прав!', '#ff0000');
-                } else {                
-                    if (module_type == 'item')
-                        showItemInner(answer);
-                    else if (module_type == 'list')
-                        showListInner(answer.data);  
-                }                 
+        $('#dialog_id .tab').removeClass('current');
+        $('#dialog_id .form .tab').each(function(){
+            if ($(this).attr('id_module') == id_mod)
+            {
+                module_type = $(this).attr('module_type');
+                $(this).addClass('current');
             }
-        });    
+        });        
+    
+        id_module = id_mod;
+    
+        $('#dialog_id .inner').html(options.progress_block_html);   
+    
+        if (is_show_row !== true)
+        {
+            $.ajax({
+                url: options.url + 'dialog_create_edit',
+                data: 'act=show&id=' + id_action + '&id_module=' + id_module,
+                async: true,
+                dataType : "json",   
+                cache: false,                             
+                success: function (answer, textStatus) { 
+
+                    if (answer === 'error') {
+                        errorAndToMain('Ошибка!', '#ff0000');
+                    } else if (answer === 'no_rights') {
+                        errorAndToMain('Нет прав!', '#ff0000');
+                    } else {                
+                        if (module_type == 'item')
+                            showItemInner(answer);
+                        else if (module_type == 'list')
+                            showListInner(answer.data);  
+                    }                 
+                }
+            });    
+        }
     }
 }
 

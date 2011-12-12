@@ -27,21 +27,21 @@ class GeneralModel
     {
         return ucfirst($this->module_name);
     }
-    
+
     public function getEntityName()
     {
         return 'module'.strtolower($this->module_name);
-    }    
-    
+    }
+
     public function getBundleName()
     {
-        return 'Module'.ucfirst($this->module_name).'Bundle';        
+        return 'Module'.ucfirst($this->module_name).'Bundle';
     }
-    
+
     public function getModuleEntity()
     {
-        $module = '\\'.$this->container->getParameter('project_name').'\\Modules\\'.$this->getModuleDir().'\\Entity\\'.$this->getEntityName(); 
-        
+        $module = '\\'.$this->container->getParameter('project_name').'\\Modules\\'.$this->getModuleDir().'\\Entity\\'.$this->getEntityName();
+
         return new $module();
     }
 
@@ -65,7 +65,7 @@ class GeneralModel
         if (true === empty($this->plugins)) {
 
             $config = $this->getModuleEntity()->getConfig();
-            
+
             foreach ($config as $val) {
                 $this->addPlugin($val);
             }
@@ -95,8 +95,7 @@ class GeneralModel
             usort($array, array ($tmp, 'cmp'));
 
             return $array;
-        }
-        else {
+        } else {
             // По какому плагину сортировать не указано
             // Если есть плагин с 'name' => 'fireice_order', то сортируем по нему
             foreach ($module->getConfig() as $val) {

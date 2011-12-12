@@ -44,7 +44,7 @@ Class TreeModel
             AND md_l.up_module = md.idd
             AND (tr.status = 'active' OR tr.status = 'hidden')
             AND tr.final = 'Y'
-            AND tr.idd=".$id);
+            AND tr.idd=:id")->setParameter('id', $id);
 
         $result = $query->getResult();
 
@@ -60,13 +60,16 @@ Class TreeModel
                 DialogsBundle:moduleslink md_l, 
                 DialogsBundle:modulespluginslink md_pl_l,
                 Module".$result['name']."Bundle:".$result['table_name']." stm
-            WHERE md_l.up_tree = ".$id."
-            AND md_l.up_module = ".$result['id']."
+            WHERE md_l.up_tree = :up_tree
+            AND md_l.up_module = :up_module
             AND md_pl_l.up_link = md_l.id
             AND md_pl_l.up_plugin = stm.idd
             AND stm.plugin_name = 'fireice_node_title'
             AND stm.final = 'Y'
-            AND stm.status = 'active'");
+            AND stm.status = 'active'")->setParameters(array (
+            'up_tree' => $id,
+            'up_module' => $result['id'],
+            ));
 
         $result = $query->getResult();
 
@@ -78,7 +81,7 @@ Class TreeModel
                 plg.value
             FROM 
                 FireicePlugins".ucfirst($result['plugin_type'])."Bundle:plugin".$result['plugin_type']." plg
-            WHERE plg.id = ".$result['plugin_id']);
+            WHERE plg.id = :id")->setParameter('id', $result['plugin_id']);
 
         $result2 = $query->getSingleResult();
 
@@ -114,7 +117,7 @@ Class TreeModel
                 DialogsBundle:modules md
             WHERE md.final = 'Y'
             AND md.status = 'active'
-            AND md.idd='".$request->get('module_id')."'");
+            AND md.idd = :id")->setParameter('id', $request->get('module_id'));
 
         $module = $query->getSingleResult();
 
@@ -229,7 +232,7 @@ Class TreeModel
             WHERE (tr.status = 'active' OR tr.status = 'hidden')
             AND tr.final = 'Y'
             AND tr.eid IS NULL
-            AND tr.idd = ".$id);
+            AND tr.idd = :id")->setParameter('id', $id);
 
         $old_node = $query->getOneOrNullResult();
 
@@ -238,13 +241,19 @@ Class TreeModel
         $this->em->persist($old_node);
         $this->em->flush();
 
-        $query = $this->em->createQuery("UPDATE 
-                                             TreeBundle:modulesitetree st 
-                                         SET st.cid=".$history->getId().", st.up_parent = ".$old_node->getUpParent()." 
-                                         WHERE st.idd = ".$id." 
-                                         AND st.final = 'Y' 
-                                         AND st.eid IS NULL
-                                         AND st.status = 'deleted'");
+        $query = $this->em->createQuery("
+            UPDATE 
+                TreeBundle:modulesitetree st 
+            SET st.cid = :cid, st.up_parent = :up_parent 
+            WHERE st.idd = :id 
+            AND st.final = 'Y' 
+            AND st.eid IS NULL
+            AND st.status = 'deleted'")->setParameters(array (
+            'cid' => $history->getId(),
+            'up_parent' => $old_node->getUpParent(),
+            'id' => $id
+            ));
+
         $query->getResult();
     }
 
@@ -311,14 +320,14 @@ Class TreeModel
                 WHERE md.status = 'active'
             
                 AND m_l.up_tree = 1
-                AND m_l.up_module = ".$result1['id']."
+                AND m_l.up_module = :up_module
                 AND m_l.id = mp_l.up_link
                 AND mp_l.up_plugin = md.idd
 
                 AND md.final = 'Y'
                 AND md.plugin_id = plg.id
                 AND md.plugin_name = 'fireice_node_title'
-                AND md.plugin_type = 'text'");
+                AND md.plugin_type = 'text'")->setParameter('up_module', $result1['id']);
 
             $result2 = $query->getSingleResult();
 
@@ -352,10 +361,10 @@ Class TreeModel
             AND tr.idd IN (
                 SELECT tr2.idd
                 FROM TreeBundle:modulesitetree tr2
-                WHERE tr2.up_parent = ".$id."
+                WHERE tr2.up_parent = :up_parent
                 AND tr2.final = 'Y'
                 AND (tr2.status = 'active' OR tr2.status = 'hidden')
-            )");
+            )")->setParameter('up_parent', $id);
 
         $result = $query->getResult();
 
@@ -386,25 +395,25 @@ Class TreeModel
 
             foreach ($node_types as $key => $type) {
                 $query = $this->em->createQuery("
-                SELECT 
-                    m_l.up_tree AS up_tree,
-                    plg.value AS title
-                FROM 
-                    Module".$type['bundle'].'Bundle:'.$key." md, 
-                    FireicePluginsTextBundle:plugintext plg,
-                    DialogsBundle:moduleslink m_l,
-                    DialogsBundle:modulespluginslink mp_l
-                WHERE md.status = 'active'
+                    SELECT 
+                        m_l.up_tree AS up_tree,
+                        plg.value AS title
+                    FROM 
+                        Module".$type['bundle'].'Bundle:'.$key." md, 
+                        FireicePluginsTextBundle:plugintext plg,
+                        DialogsBundle:moduleslink m_l,
+                        DialogsBundle:modulespluginslink mp_l
+                    WHERE md.status = 'active'
             
-                AND m_l.up_tree IN (".implode(',', $type['ids']).")
-                AND m_l.up_module = ".$type['id']."
-                AND m_l.id = mp_l.up_link
-                AND mp_l.up_plugin = md.idd
+                    AND m_l.up_tree IN (".implode(',', $type['ids']).")
+                    AND m_l.up_module = :up_module
+                    AND m_l.id = mp_l.up_link
+                    AND mp_l.up_plugin = md.idd
 
-                AND md.final = 'Y'
-                AND md.plugin_id = plg.id
-                AND md.plugin_name = 'fireice_node_title'
-                AND md.plugin_type = 'text'");
+                    AND md.final = 'Y'
+                    AND md.plugin_id = plg.id
+                    AND md.plugin_name = 'fireice_node_title'
+                    AND md.plugin_type = 'text'")->setParameter('up_module', $type['id']);
 
                 foreach ($query->getResult() as $val) {
                     $childs_node[$val['up_tree']]['name'] = $val['title'];
@@ -419,28 +428,28 @@ Class TreeModel
             }
 
             $query = $this->em->createQuery("
-            SELECT 
-                tr.up_parent AS parent_id,
-                COUNT (tr.up_parent) AS number_of
-            FROM 
-                TreeBundle:modulesitetree tr, 
-                DialogsBundle:moduleslink md_l, 
-                DialogsBundle:modules md
-            WHERE md.final = 'Y'
-            AND md.status = 'active'
-            AND md_l.up_tree = tr.idd
-            AND md_l.up_module = md.idd
-            AND (tr.status = 'active' OR tr.status = 'hidden')
-            AND tr.final = 'Y'
-            AND md.type='sitetree_node'
-            AND tr.idd IN (
-                SELECT tr2.idd
-                FROM TreeBundle:modulesitetree tr2
-                WHERE tr2.up_parent IN(".implode(",", $tmp).")
-                AND tr2.final = 'Y'
-                AND (tr2.status = 'active' OR tr2.status = 'hidden')
-            ) 
-            GROUP BY tr.up_parent");
+                SELECT 
+                    tr.up_parent AS parent_id,
+                    COUNT (tr.up_parent) AS number_of
+                FROM 
+                    TreeBundle:modulesitetree tr, 
+                    DialogsBundle:moduleslink md_l, 
+                    DialogsBundle:modules md
+                WHERE md.final = 'Y'
+                AND md.status = 'active'
+                AND md_l.up_tree = tr.idd
+                AND md_l.up_module = md.idd
+                AND (tr.status = 'active' OR tr.status = 'hidden')
+                AND tr.final = 'Y'
+                AND md.type='sitetree_node'
+                AND tr.idd IN (
+                    SELECT tr2.idd
+                    FROM TreeBundle:modulesitetree tr2
+                    WHERE tr2.up_parent IN(".implode(",", $tmp).")
+                    AND tr2.final = 'Y'
+                    AND (tr2.status = 'active' OR tr2.status = 'hidden')
+                ) 
+                GROUP BY tr.up_parent");
 
             $children = $query->getResult();
 
@@ -540,7 +549,7 @@ Class TreeModel
                     TreeBundle:modulesitetree tr
                 WHERE (tr.status = 'active' OR tr.status = 'hidden')
                 AND tr.final = 'Y'
-                AND tr.idd=".$id);
+                AND tr.idd = :id")->setParameter('id', $id);
 
             $result = $query->getOneOrNullResult();
 
@@ -575,9 +584,9 @@ Class TreeModel
             AND md_l.up_module = md.idd
             AND (tr.status = 'active' OR tr.status = 'hidden')
             AND tr.final = 'Y'
-            AND tr.idd=".$node_id."
-            AND md.type='user'
-            ORDER BY md.type");
+            AND tr.idd = :id
+            AND md.type = 'user'
+            ORDER BY md.type")->setParameter('id', $node_id);
 
         $node_modules = array ();
 
@@ -632,7 +641,7 @@ Class TreeModel
                             AND md_l.up_module = md.idd
                             AND (tr.status = 'active' OR tr.status = 'hidden')
                             AND tr.final = 'Y'
-                            AND md.idd=".$user_module['id']);
+                            AND md.idd = :idd")->setParameter('idd', $user_module['id']);
 
                         $count = $query->getSingleResult();
                         $count = $count['cnt'];
@@ -650,8 +659,11 @@ Class TreeModel
                             AND md_l.up_module = md.idd
                             AND (tr.status = 'active' OR tr.status = 'hidden')
                             AND tr.final = 'Y'
-                            AND tr.up_parent='".$node_id."'
-                            AND md.idd=".$user_module['id']);
+                            AND tr.up_parent = :up_parent
+                            AND md.idd = :idd")->setParameters(array (
+                            'up_parent' => $node_id,
+                            'idd' => $user_module['id']
+                            ));
 
                         $count_per_parent = $query->getSingleResult();
                         $count_per_parent = $count['cnt'];
@@ -696,7 +708,7 @@ Class TreeModel
                 DialogsBundle:modules md
             WHERE md.final = 'Y'
             AND md.status = 'active'
-            AND md.idd='".$request->get('id_module')."'");
+            AND md.idd = :idd")->setParameter('idd', $request->get('id_module'));
 
         $module = $query->getSingleResult();
 
@@ -711,18 +723,25 @@ Class TreeModel
                      md.plugin_id,
                      md.cid
                   FROM 
-                     ".$module->getName().':'.$module->getTableName()." md,
+                     Module".$module->getName().'Bundle:'.$module->getTableName()." md,
                     DialogsBundle:moduleslink m_l,
                     DialogsBundle:modulespluginslink mp_l
                 WHERE md.eid IS NULL            
-                AND m_l.up_tree = ".$request->get('id')."
-                AND m_l.up_module = ".$request->get('id_module')."
+                AND m_l.up_tree = :up_tree
+                AND m_l.up_module = :up_module
                 AND m_l.id = mp_l.up_link
                 AND mp_l.up_plugin = md.idd
                 AND md.final = 'W'
                 AND md.status = 'sendtoproveeditor'
-                AND md.plugin_name = '".$plugin['name']."'
-                AND md.plugin_type = '".$plugin['type']."'");
+                AND md.plugin_name = :plugin_name
+                AND md.plugin_type = :plugin_type");
+
+            $query->setParameters(array (
+                'up_tree' => $request->get('id'),
+                'up_module' => $request->get('id_module'),
+                'plugin_name' => $plugin['name'],
+                'plugin_type' => $plugin['type']
+            ));
 
             $result = $query->getResult();
 
@@ -743,7 +762,19 @@ Class TreeModel
 
                 $hid = $history->getId();
 
-                $query = $this->em->createQuery("UPDATE ".$module->getName().':'.$module->getTableName()." md SET md.final='N', md.eid = ".$hid." WHERE md.idd = ".$result['idd']." AND md.final = 'W' AND md.status = 'sendtoproveeditor'");
+                $query = $this->em->createQuery("
+                    UPDATE 
+                        Module".$module->getName().'Bundle:'.$module->getTableName()." md 
+                    SET md.final='N', md.eid = :eid 
+                    WHERE md.idd = :idd 
+                    AND md.final = 'W' 
+                    AND md.status = 'sendtoproveeditor'");
+
+                $query->setParameters(array (
+                    'eid' => $hid,
+                    'idd' => $result['idd']
+                ));
+
                 $query->getResult();
 
                 $new_module_record = '\\'.$this->container->getParameter('project_name').'\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
@@ -783,7 +814,7 @@ Class TreeModel
                 DialogsBundle:modules md
             WHERE md.final = 'Y'
             AND md.status = 'active'
-            AND md.idd='".$request->get('id_module')."'");
+            AND md.idd = :idd")->setParameter('idd', $request->get('id_module'));
 
         $module = $query->getSingleResult();
 
@@ -798,18 +829,25 @@ Class TreeModel
                      md.plugin_id,
                      md.cid
                   FROM 
-                     ".$module->getName().':'.$module->getTableName()." md,
+                     Module".$module->getName().'Bundle:'.$module->getTableName()." md,
                     DialogsBundle:moduleslink m_l,
                     DialogsBundle:modulespluginslink mp_l
                 WHERE md.eid IS NULL            
-                AND m_l.up_tree = ".$request->get('id')."
-                AND m_l.up_module = ".$request->get('id_module')."
+                AND m_l.up_tree = :up_tree
+                AND m_l.up_module = :up_module
                 AND m_l.id = mp_l.up_link
                 AND mp_l.up_plugin = md.idd
                 AND md.final = 'W'
                 AND md.status = 'sendtoprovemaineditor'
-                AND md.plugin_name = '".$plugin['name']."'
-                AND md.plugin_type = '".$plugin['type']."'");
+                AND md.plugin_name = :plugin_name
+                AND md.plugin_type = :plugin_type");
+
+            $query->setParameters(array (
+                'up_tree' => $request->get('id'),
+                'up_module' => $request->get('id_module'),
+                'plugin_name' => $plugin['name'],
+                'plugin_type' => $plugin['type']
+            ));
 
             $result = $query->getResult();
 
@@ -830,10 +868,27 @@ Class TreeModel
 
                 $hid = $history->getId();
 
-                $query = $this->em->createQuery("UPDATE ".$module->getName().':'.$module->getTableName()." md SET md.final='N', md.eid = ".$hid." WHERE md.idd = ".$result['idd']." AND md.final = 'W' AND md.status = 'sendtoprovemaineditor'");
+                $query = $this->em->createQuery("
+                    UPDATE 
+                        Module".$module->getName().'Bundle:'.$module->getTableName()." md 
+                    SET md.final='N', md.eid = :eid 
+                    WHERE md.idd = :idd 
+                    AND md.final = 'W' 
+                    AND md.status = 'sendtoprovemaineditor'");
+
+                $query->setParameters(array (
+                    'eid' => $hid,
+                    'idd' => $result['idd']
+                ));
+
                 $query->getResult();
 
-                $query = $this->em->createQuery("UPDATE ".$module->getName().':'.$module->getTableName()." md SET md.final='N' WHERE md.idd = ".$result['idd']." AND md.final = 'Y'");
+                $query = $this->em->createQuery("
+                    UPDATE 
+                        Module".$module->getName().'Bundle:'.$module->getTableName()." md 
+                    SET md.final='N' 
+                    WHERE md.idd = :idd 
+                    AND md.final = 'Y'")->setParameter('idd', $result['idd']);
                 $query->getResult();
 
                 $new_module_record = '\\'.$this->container->getParameter('project_name').'\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
@@ -873,7 +928,7 @@ Class TreeModel
                 DialogsBundle:modules md
             WHERE md.final = 'Y'
             AND md.status = 'active'
-            AND md.idd='".$request->get('id_module')."'");
+            AND md.idd = :idd")->setParameter('idd', $request->get('id_module'));
 
         $module = $query->getSingleResult();
 
@@ -887,18 +942,25 @@ Class TreeModel
                      md.idd,
                      md.plugin_id
                   FROM 
-                     ".$module->getName().':'.$module->getTableName()." md,
+                     Module".$module->getName().'Bundle:'.$module->getTableName()." md,
                     DialogsBundle:moduleslink m_l,
                     DialogsBundle:modulespluginslink mp_l
                 WHERE md.eid IS NULL            
-                AND m_l.up_tree = ".$request->get('id')."
-                AND m_l.up_module = ".$request->get('id_module')."
+                AND m_l.up_tree = :up_tree
+                AND m_l.up_module = :up_module
                 AND m_l.id = mp_l.up_link
                 AND mp_l.up_plugin = md.idd
                 AND md.final != 'N'
                 AND md.status = 'edit'
-                AND md.plugin_name = '".$plugin['name']."'
-                AND md.plugin_type = '".$plugin['type']."'");
+                AND md.plugin_name = :plugin_name
+                AND md.plugin_type = :plugin_type");
+
+            $query->setParameters(array (
+                'up_tree' => $request->get('id'),
+                'up_module' => $request->get('id_module'),
+                'plugin_name' => $plugin['name'],
+                'plugin_type' => $plugin['type']
+            ));
 
             $result = $query->getResult();
 
@@ -918,7 +980,18 @@ Class TreeModel
 
                 $hid = $history->getId();
 
-                $query = $this->em->createQuery("UPDATE ".$module->getName().':'.$module->getTableName()." md SET md.final='N', md.eid = ".$hid." WHERE md.idd = ".$result['idd']." AND md.final = 'W'");
+                $query = $this->em->createQuery("
+                    UPDATE 
+                        Module".$module->getName().'Bundle:'.$module->getTableName()." md 
+                    SET md.final='N', md.eid = :eid 
+                    WHERE md.idd = :idd 
+                    AND md.final = 'W'");
+
+                $query->setParameters(array (
+                    'eid' => $hid,
+                    'idd' => $result['idd']
+                ));
+
                 $query->getResult();
 
                 $new_module_record = '\\'.$this->container->getParameter('project_name').'\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
@@ -974,7 +1047,7 @@ Class TreeModel
                 DialogsBundle:modules md
             WHERE md.final = 'Y'
             AND md.status = 'active'
-            AND md.idd='".$request->get('id_module')."'");
+            AND md.idd = :idd")->setParameter('idd', $request->get('id_module'));
 
         $module = $query->getSingleResult();
 
@@ -988,18 +1061,25 @@ Class TreeModel
                      md.idd,
                      md.plugin_id
                   FROM 
-                     ".$module->getName().':'.$module->getTableName()." md,
+                     Module".$module->getName().'Bundle:'.$module->getTableName()." md,
                     DialogsBundle:moduleslink m_l,
                     DialogsBundle:modulespluginslink mp_l
                 WHERE md.eid IS NULL            
-                AND m_l.up_tree = ".$request->get('id')."
-                AND m_l.up_module = ".$request->get('id_module')."
+                AND m_l.up_tree = :up_tree
+                AND m_l.up_module = :up_module
                 AND m_l.id = mp_l.up_link
                 AND mp_l.up_plugin = md.idd
                 AND md.final != 'N'
                 AND (md.status = 'proveeditor' OR md.status = 'edit')
-                AND md.plugin_name = '".$plugin['name']."'
-                AND md.plugin_type = '".$plugin['type']."'");
+                AND md.plugin_name = :plugin_name
+                AND md.plugin_type = :plugin_type");
+
+            $query->setParameters(array (
+                'up_tree' => $request->get('id'),
+                'up_module' => $request->get('id_module'),
+                'plugin_name' => $plugin['name'],
+                'plugin_type' => $plugin['type']
+            ));
 
             $result = $query->getResult();
 
@@ -1019,7 +1099,18 @@ Class TreeModel
 
                 $hid = $history->getId();
 
-                $query = $this->em->createQuery("UPDATE ".$module->getName().':'.$module->getTableName()." md SET md.final='N', md.eid = ".$hid." WHERE md.idd = ".$result['idd']." AND md.final = 'W'");
+                $query = $this->em->createQuery("
+                    UPDATE 
+                        Module".$module->getName().'Bundle:'.$module->getTableName()." md 
+                    SET md.final='N', md.eid = :eid 
+                    WHERE md.idd = :idd 
+                    AND md.final = 'W'");
+
+                $query->setParameters(array (
+                    'eid' => $hid,
+                    'idd' => $result['idd']
+                ));
+
                 $query->getResult();
 
                 $new_module_record = '\\'.$this->container->getParameter('project_name').'\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
@@ -1075,7 +1166,7 @@ Class TreeModel
                 DialogsBundle:modules md
             WHERE md.final = 'Y'
             AND md.status = 'active'
-            AND md.idd='".$request->get('id_module')."'");
+            AND md.idd = :idd")->setParameter('idd', $request->get('id_module'));
 
         $module = $query->getSingleResult();
 
@@ -1090,18 +1181,25 @@ Class TreeModel
                      md.plugin_id,
                      md.cid
                   FROM 
-                     ".$module->getName().':'.$module->getTableName()." md,
+                     Module".$module->getName().'Bundle:'.$module->getTableName()." md,
                     DialogsBundle:moduleslink m_l,
                     DialogsBundle:modulespluginslink mp_l
                 WHERE md.eid IS NULL            
-                AND m_l.up_tree = ".$request->get('id')."
-                AND m_l.up_module = ".$request->get('id_module')."
+                AND m_l.up_tree = :up_tree
+                AND m_l.up_module = :up_module
                 AND m_l.id = mp_l.up_link
                 AND mp_l.up_plugin = md.idd
                 AND md.final = 'W'
                 AND md.status = 'sendtoproveeditor'
-                AND md.plugin_name = '".$plugin['name']."'
-                AND md.plugin_type = '".$plugin['type']."'");
+                AND md.plugin_name = :plugin_name
+                AND md.plugin_type = :plugin_type");
+
+            $query->setParameters(array (
+                'up_tree' => $request->get('id'),
+                'up_module' => $request->get('id_module'),
+                'plugin_name' => $plugin['name'],
+                'plugin_type' => $plugin['type']
+            ));
 
             $result = $query->getResult();
 
@@ -1122,7 +1220,19 @@ Class TreeModel
 
                 $hid = $history->getId();
 
-                $query = $this->em->createQuery("UPDATE ".$module->getName().':'.$module->getTableName()." md SET md.final='N', md.eid = ".$hid." WHERE md.idd = ".$result['idd']." AND md.final = 'W' AND md.status = 'sendtoproveeditor'");
+                $query = $this->em->createQuery("
+                    UPDATE 
+                        Module".$module->getName().'Bundle:'.$module->getTableName()." md 
+                    SET md.final='N', md.eid = :eid 
+                    WHERE md.idd = :idd 
+                    AND md.final = 'W' 
+                    AND md.status = 'sendtoproveeditor'");
+
+                $query->setParameters(array (
+                    'eid' => $hid,
+                    'idd' => $result['idd']
+                ));
+
                 $query->getResult();
 
                 $new_module_record = '\\'.$this->container->getParameter('project_name').'\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
@@ -1165,7 +1275,7 @@ Class TreeModel
                 DialogsBundle:modules md
             WHERE md.final = 'Y'
             AND md.status = 'active'
-            AND md.idd='".$request->get('id_module')."'");
+            AND md.idd = :idd")->setParameter('idd', $request->get('id_module'));
 
         $module = $query->getSingleResult();
 
@@ -1180,18 +1290,25 @@ Class TreeModel
                      md.plugin_id,
                      md.cid
                   FROM 
-                     ".$module->getName().':'.$module->getTableName()." md,
+                     Module".$module->getName().'Bundle:'.$module->getTableName()." md,
                     DialogsBundle:moduleslink m_l,
                     DialogsBundle:modulespluginslink mp_l
                 WHERE md.eid IS NULL            
-                AND m_l.up_tree = ".$request->get('id')."
-                AND m_l.up_module = ".$request->get('id_module')."
+                AND m_l.up_tree = :up_tree
+                AND m_l.up_module = :up_module
                 AND m_l.id = mp_l.up_link
                 AND mp_l.up_plugin = md.idd
                 AND md.final = 'W'
                 AND md.status = 'sendtoprovemaineditor'
-                AND md.plugin_name = '".$plugin['name']."'
-                AND md.plugin_type = '".$plugin['type']."'");
+                AND md.plugin_name = :plugin_name
+                AND md.plugin_type = :plugin_type");
+
+            $query->setParameters(array (
+                'up_tree' => $request->get('id'),
+                'up_module' => $request->get('id_module'),
+                'plugin_name' => $plugin['name'],
+                'plugin_type' => $plugin['type']
+            ));
 
             $result = $query->getResult();
 
@@ -1212,7 +1329,19 @@ Class TreeModel
 
                 $hid = $history->getId();
 
-                $query = $this->em->createQuery("UPDATE ".$module->getName().':'.$module->getTableName()." md SET md.final='N', md.eid = ".$hid." WHERE md.idd = ".$result['idd']." AND md.final = 'W' AND md.status = 'sendtoprovemaineditor'");
+                $query = $this->em->createQuery("
+                    UPDATE 
+                        Module".$module->getName().'Bundle:'.$module->getTableName()." md 
+                    SET md.final='N', md.eid = :eid 
+                    WHERE md.idd = :idd 
+                    AND md.final = 'W' 
+                    AND md.status = 'sendtoprovemaineditor'");
+
+                $query->setParameters(array (
+                    'eid' => $hid,
+                    'idd' => $result['idd']
+                ));
+
                 $query->getResult();
 
                 $new_module_record = '\\'.$this->container->getParameter('project_name').'\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
@@ -1277,8 +1406,8 @@ Class TreeModel
             AND md_l.up_module = md.idd
             AND (tr.status = 'active' OR tr.status = 'hidden')
             AND tr.final = 'Y'
-            AND tr.idd=".$id."
-            ORDER BY md.type DESC");
+            AND tr.idd = :idd
+            ORDER BY md.type DESC")->setParameter('idd', $id);
 
         $modules = array ();
 
@@ -1323,8 +1452,8 @@ Class TreeModel
                 COUNT(msg) AS cnt
             FROM 
                 TreeBundle:messages msg
-            WHERE msg.send_for = ".$security->getToken()->getUser()->getId()."
-            AND msg.is_read = 0");
+            WHERE msg.send_for = :id
+            AND msg.is_read = 0")->setParameter('id', $security->getToken()->getUser()->getId());
 
         $result = $query->getSingleResult();
 
@@ -1360,13 +1489,21 @@ Class TreeModel
         $this->em->persist($old_node);
         $this->em->flush();
 
-        $query = $this->em->createQuery("UPDATE 
-                                             TreeBundle:modulesitetree st 
-                                         SET st.cid=".$history->getId().", st.up_parent = ".$old_node->getUpParent()." 
-                                         WHERE st.idd = ".$id." 
-                                         AND st.final = 'Y' 
-                                         AND st.eid IS NULL
-                                         AND st.status = 'hidden'");
+        $query = $this->em->createQuery("
+            UPDATE 
+                TreeBundle:modulesitetree st 
+            SET st.cid = :cid, st.up_parent = :up_parent 
+            WHERE st.idd = :idd 
+            AND st.final = 'Y' 
+            AND st.eid IS NULL
+            AND st.status = 'hidden'");
+        
+        $query->setParameters(array(
+            'idd' => $id,
+            'cid' => $history->getId(),
+            'up_parent' => $old_node->getUpParent()
+        ));
+        
         $query->getResult();
     }
 
@@ -1399,13 +1536,21 @@ Class TreeModel
         $this->em->persist($old_node);
         $this->em->flush();
 
-        $query = $this->em->createQuery("UPDATE 
-                                             TreeBundle:modulesitetree st 
-                                         SET st.cid=".$history->getId().", st.up_parent = ".$old_node->getUpParent()." 
-                                         WHERE st.idd = ".$id." 
-                                         AND st.final = 'Y' 
-                                         AND st.eid IS NULL
-                                         AND st.status = 'active'");
+        $query = $this->em->createQuery("
+            UPDATE 
+                TreeBundle:modulesitetree st 
+            SET st.cid = :cid, st.up_parent = :up_parent 
+            WHERE st.idd = :idd 
+            AND st.final = 'Y' 
+            AND st.eid IS NULL
+            AND st.status = 'active'");
+        
+        $query->setParameters(array(
+            'idd' => $id,
+            'cid' => $history->getId(),
+            'up_parent' => $old_node->getUpParent()
+        ));        
+        
         $query->getResult();
     }
 

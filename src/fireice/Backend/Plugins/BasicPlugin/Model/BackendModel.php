@@ -31,13 +31,19 @@ class BackendModel
             WHERE (md.final = 'Y' OR md.final = 'W')
             AND md.eid IS NULL
             ".(($rows !== false) ? 'AND md.row_id IN ('.implode(',', $rows).')' : '')."
-            AND m_l.up_tree = ".$sitetree_id."
-            AND m_l.up_module = ".$module_id."
+            AND m_l.up_tree = :up_tree
+            AND m_l.up_module = :up_module
             AND m_l.id = mp_l.up_link
             AND mp_l.up_plugin = md.idd
 
             AND md.plugin_id = plg.id
-            AND md.plugin_type = '".$this->controller->getValue('type')."'");
+            AND md.plugin_type = :plugin_type");
+        
+        $query->setParameters(array(
+            'up_tree' => $sitetree_id,
+            'up_module' => $module_id,
+            'plugin_type' => $this->controller->getValue('type')
+        ));
 
         return $query->getScalarResult();
     }
@@ -78,11 +84,16 @@ class BackendModel
                 FROM 
                     DialogsBundle:modules mds,
                     DialogsBundle:moduleslink m_l
-                WHERE m_l.up_tree = ".$config['data']['id_node']."
-                AND m_l.up_module = ".$config['data']['id_module']."
+                WHERE m_l.up_tree = :up_tree
+                AND m_l.up_module = :up_module
                 AND m_l.up_module = mds.idd
                 AND mds.final = 'Y'
                 AND mds.status = 'active'");
+            
+            $query->setParameters(array(
+                'up_tree' => $config['data']['id_node'],
+                'up_module' => $config['data']['id_module']
+            ));
 
             $result = $query->getOneOrNullResult();
 
@@ -104,13 +115,19 @@ class BackendModel
                 WHERE md.status = 'active'
                 AND md.final = 'Y'
                 
-                AND m_l.up_tree = ".$config['data']['id_node']."
-                AND m_l.up_module = ".$config['data']['id_module']."
+                AND m_l.up_tree = :up_tree
+                AND m_l.up_module = :up_module
                 AND m_l.id = mp_l.up_link
                 AND mp_l.up_plugin = md.idd
 
                 AND md.plugin_id = plg.id
-                AND md.plugin_name = '".$plugin_for_title['name']."'");
+                AND md.plugin_name = :plugin_name");
+            
+            $query->setParameters(array(
+                'up_tree' => $config['data']['id_node'],
+                'up_module' => $config['data']['id_module'],
+                'plugin_name' => $plugin_for_title['name']
+            ));
 
             $result = $query->getScalarResult();
 
@@ -123,7 +140,6 @@ class BackendModel
             // Если источник типа ajax, то возвращаем false
             return false;
         }
-
 
         return $сhoices;
     }
