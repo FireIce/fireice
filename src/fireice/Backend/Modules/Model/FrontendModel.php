@@ -7,11 +7,11 @@ class FrontendModel extends GeneralModel
 
     public function getFrontendData($sitetree_id, $module_id, $params=array ())
     {
-        $values = array ();
+        $values = array ();        
 
         foreach ($this->getPlugins() as $plugin) {
             if (!isset($values[$plugin->getValue('type')])) {
-                $values[$plugin->getValue('type')] = $plugin->getData($sitetree_id, $this->getBundleName().':'.$this->getEntityName(), $module_id, self::TYPE_ITEM);
+                $values[$plugin->getValue('type')] = $plugin->getData($sitetree_id, $this->getBundleName().':'.$this->getEntityName(), $module_id, self::TYPE_ITEM);                            
             }
         }
 

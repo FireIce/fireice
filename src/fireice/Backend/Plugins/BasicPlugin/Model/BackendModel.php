@@ -108,7 +108,7 @@ class BackendModel
                     md.row_id, 
                     plg.value
                 FROM 
-                    ".$result['name'].":".$result['table_name']." md, 
+                    Module".$result['name']."Bundle:".$result['table_name']." md, 
                     FireicePlugins".ucfirst($plugin_for_title['type'])."Bundle:plugin".$plugin_for_title['type']." plg,
                     DialogsBundle:moduleslink m_l,
                     DialogsBundle:modulespluginslink mp_l
