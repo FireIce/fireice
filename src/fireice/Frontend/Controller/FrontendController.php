@@ -83,10 +83,13 @@ class FrontendController extends Controller
 
     public function showPage($id_node, $params='')
     {
+        $tree = new TreeController;
+        $tree->setContainer($this->container);        
+        
         $frontend_model = $this->getModel();
 
         if ($frontend_model->checkAccess($id_node)) {
-            $node_modules = $frontend_model->getNodeModules($id_node);
+            $node_modules = $frontend_model->getNodeUsersModules($id_node);
 
             foreach ($node_modules as $key => $val) {
 
