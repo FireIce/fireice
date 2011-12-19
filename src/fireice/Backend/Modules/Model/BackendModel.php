@@ -534,7 +534,7 @@ class BackendModel extends GeneralModel
             if (isset($cids[$cid])) {
                 // Для получение инфы по записи (всем плагинам записи) берём cid одной из записи
                 $data = $cids[$cid]['date_create'];
-                $user = $users[$cids[$cid]['up_user']];
+                $user = isset($users[$cids[$cid]['up_user']]) ? $users[$cids[$cid]['up_user']] : 'no_data';
                 $action_code = $cids[$cid]['action_code'];
             } else {
                 $data = 'Нет записи в таблице истории!';
