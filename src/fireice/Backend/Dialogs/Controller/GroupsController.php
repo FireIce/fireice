@@ -11,6 +11,13 @@ use fireice\Backend\Dialogs\Model\GroupsModel;
 use fireice\Backend\Dialogs\Entity\groups;
 use fireice\Backend\Dialogs\Entity\module;
 use fireice\Backend\Dialogs\Entity\users;
+use Symfony\Component\Finder\Finder;
+use fireice\Backend\Dialogs\Entity\modules;
+use fireice\Backend\Tree\Entity\modulesitetree;
+use Symfony\Component\Yaml\Yaml;
+use fireice\Backend\Plugins\Text\Entity\plugintext;
+use fireice\Backend\Dialogs\Entity\moduleslink;
+use fireice\Backend\Dialogs\Entity\modulespluginslink;
 
 class GroupsController extends Controller
 {
