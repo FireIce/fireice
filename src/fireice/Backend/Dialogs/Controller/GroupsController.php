@@ -243,6 +243,128 @@ class GroupsController extends Controller
             $em->flush();
 
             $message = 'Был зарегистрирован первый пользователь! Логин: god, пароль: god.';
+            
+            // --------------------------------------------------------------------------------------------
+            // Создаём записи в таблице модулей
+            $finder = new Finder();
+            $finder->directories()->in($this->container->getParameter('project_modules_directory'))->depth('== 0');
+
+            foreach ($finder as $key => $value) {
+                $module = new modules();
+                $module->setIdd(0);
+                $module->setCid(0);
+                $module->setEid(null);
+                $module->setFinal('Y');
+                if (stripos($value->getFilename(), 'FireiceNode') === false) {
+                    $module->setType('user');
+                } else {
+                    $module->setType('sitetree_node');
+                }
+                $module->setTableName('module'.strtolower($value->getFilename()));
+                $module->setName($value->getFilename());
+                $module->setStatus('active');
+                $module->setDateCreate(new \DateTime());
+                $em->persist($module);
+                $em->flush();
+
+                $module->setIdd($module->getId());
+                $module->setCid($module->getId());
+                $em->persist($module);
+                $em->flush();
+            }
+
+            // Создали запись в таблице module_sitetree
+            $node = new modulesitetree();
+            $node->setIdd(0);
+            $node->setCid(1);
+            $node->setEid(null);
+            $node->setFinal('Y');
+            $node->setUpParent(null);
+            $node->setStatus('active');
+            $node->setDateCreate(new \DateTime());
+            $em->persist($node);
+            $em->flush();
+
+            $node->setIdd($node->getId());
+            $em->persist($node);
+            $em->flush();
+
+            // Определили какой модуль дерева должен быть привязан к узлу Главной страницы
+            $config = Yaml::parse($this->container->getParameter('project_modules_directory').'/Mainpage/Resources/config/config.yml');
+            $nodeModule = $config['parameters']['modules']['sitetree'];
+
+            // Создадим записи в таблице 
+            // Сущность модуля
+            $path = $this->container->getParameter('project_name').'\\Modules\\'.$nodeModule.'\\Entity\\'.'module'.strtolower($nodeModule);
+
+            // Создаём записи в таблице модуля и плагинах
+            $text = new plugintext();
+            $text->setValue('mainpage');
+            $em->persist($text);
+            $em->flush();
+
+            $module = new $path;
+            $module->setIdd(0);
+            $module->setCid(1);
+            $module->setEid(null);
+            $module->setFinal('Y');
+            $module->setPluginId($text->getId());
+            $module->setPluginType('text');
+            $module->setPluginName('fireice_node_name');
+            $module->setStatus('active');
+            $module->setDateCreate(new \DateTime());
+            $em->persist($module);
+            $em->flush();
+            $module->setIdd($module->getId());
+            $em->persist($module);
+            $em->flush();
+
+            $text = new plugintext();
+            $text->setValue('Главная страница');
+            $em->persist($text);
+            $em->flush();
+
+            $module = new $path;
+            $module->setIdd(0);
+            $module->setCid(1);
+            $module->setEid(null);
+            $module->setFinal('Y');
+            $module->setPluginId($text->getId());
+            $module->setPluginType('text');
+            $module->setPluginName('fireice_node_title');
+            $module->setStatus('active');
+            $module->setDateCreate(new \DateTime());
+            $em->persist($module);
+            $em->flush();
+            $module->setIdd($module->getId());
+            $em->persist($module);
+            $em->flush();
+
+            // Создаём записи в таблице modules_link
+            foreach ($config['parameters']['modules'] as $value) {
+                $module = $em->getRepository('DialogsBundle:modules')->findOneBy(array (
+                    'name' => $value
+                    ));
+
+                $moduleslink = new moduleslink();
+                $moduleslink->setUpTree(1);
+                $moduleslink->setUpModule($module->getId());
+                $em->persist($moduleslink);
+                $em->flush();
+
+                if (stripos($value, 'FireiceNode') !== false) {
+
+                    $records = $em->getRepository('Module'.$value.'Bundle:module'.strtolower($value))->findAll();
+
+                    foreach ($records as $val) {
+                        $modulespluginslink = new modulespluginslink();
+                        $modulespluginslink->setUpLink($moduleslink->getId());
+                        $modulespluginslink->setUpPlugin($val->getId());
+                        $em->persist($modulespluginslink);
+                        $em->flush();
+                    }
+                }
+            }            
         } else {
             $message = '';
         }
