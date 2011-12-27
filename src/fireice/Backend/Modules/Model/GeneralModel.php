@@ -3,6 +3,7 @@
 namespace fireice\Backend\Modules\Model;
 
 use Doctrine\ORM\EntityManager;
+use Symfony\Component\Yaml\Yaml;
 use fireice\Backend\Dialogs\Entity\module;
 
 class GeneralModel
@@ -21,7 +22,16 @@ class GeneralModel
         $this->container = $container;
         $this->em = $em;
         $this->request = $request;
+        $this->module_name = $this->getModuleName();
     }
+    
+    public function getModuleName()
+    {
+    	$parts =  explode('Modules\\',get_class($this));
+    	$parts = explode('\\',$parts[1]);
+    	$config = Yaml::parse($this->container->getParameter('project_modules_directory').'/'.$parts[0].'/Resources/config/config.yml');
+        return $config['parameters']['name'];
+	}
 
     public function getModuleDir()
     {
