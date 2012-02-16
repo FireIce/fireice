@@ -9,14 +9,24 @@ use fireice\Backend\Dialogs\Model\UsersModel;
 
 class UsersController extends Controller
 {
+    protected $model = null;
+
+    protected function getModel() 
+    {
+        if (null === $this->model) {
+            $em = $this->get('doctrine.orm.entity_manager');
+            $acl = $this->get('acl');
+            $this->model = new UsersModel($em, $acl);
+        }
+        return $this->model;
+    }
 
     public function getUsersAction()
     {
-        $em = $this->get('doctrine.orm.entity_manager');
         $acl = $this->get('acl');
 
         if ($acl->checkUserTreePermissions(false, $acl->getValueMask('viewusers'))) {
-            $users_model = new UsersModel($em, $acl);
+            $users_model =  $this->getModel();
             $users = $users_model->getUsers();
             
             $answer = array(
@@ -37,11 +47,10 @@ class UsersController extends Controller
 
     public function getUserDataAction()
     {
-        $em = $this->get('doctrine.orm.entity_manager');
         $acl = $this->get('acl');
 
         if ($acl->checkUserTreePermissions(false, $acl->getValueMask('edituser'))) {
-            $users_model = new UsersModel($em, $acl);
+            $users_model = $this->getModel();
             $answer = $users_model->getUserData($this->get('request')->get('id'));
         } else {
             $answer = 'no_rights';
@@ -55,11 +64,10 @@ class UsersController extends Controller
 
     public function editUserAction()
     {
-        $em = $this->get('doctrine.orm.entity_manager');
         $acl = $this->get('acl');
 
         if ($acl->checkUserTreePermissions(false, $acl->getValueMask('edituser'))) {
-            $users_model = new UsersModel($em, $acl);
+            $users_model = $this->getModel();
             $user = $users_model->editUser();
             
             $this->get('cache')->updateSiteTreeAccessUser($user);
@@ -75,11 +83,10 @@ class UsersController extends Controller
 
     public function addUserAction()
     {
-        $em = $this->get('doctrine.orm.entity_manager');
         $acl = $this->get('acl');
 
         if ($acl->checkUserTreePermissions(false, $acl->getValueMask('edituser'))) {
-            $users_model = new UsersModel($em, $acl);
+            $users_model = $this->getModel();
             $user = $users_model->addUser();
 
             $this->get('cache')->updateSiteTreeAccessUser($user);
@@ -96,11 +103,10 @@ class UsersController extends Controller
 
     public function deleteUserAction()
     {
-        $em = $this->get('doctrine.orm.entity_manager');
         $acl = $this->get('acl');
 
         if ($acl->checkUserTreePermissions(false, $acl->getValueMask('deleteuser'))) {
-            $users_model = new UsersModel($em, $acl);
+            $users_model = $this->getModel();
             $users_model->deleteUser($this->get('request')->get('id'));
             $this->get('cache')->deleteSiteTreeAccessUser($this->get('request')->get('id'));
 

@@ -19,17 +19,27 @@ use fireice\Backend\Plugins\Text\Entity\plugintext;
 use fireice\Backend\Dialogs\Entity\moduleslink;
 use fireice\Backend\Dialogs\Entity\modulespluginslink;
 
-class GroupsController extends Controller
-{
+class GroupsController extends Controller {
 
-    public function getGroupsAction()
+    protected $model = null;
+
+    protected function getModel() 
+    {
+        if (null === $this->model) {
+            $acl = $this->get('acl');
+            $em = $this->get('doctrine.orm.entity_manager');
+            $container = $this->container;
+            $this->model = new GroupsModel($em, $acl, $container);
+        }
+        return $this->model;
+    }
+
+    public function getGroupsAction() 
     {
         $acl = $this->get('acl');
-        $em = $this->get('doctrine.orm.entity_manager');
-        $container = $this->container;
 
         if ($acl->checkUserTreePermissions(false, $acl->getValueMask('viewgroups'))) {
-            $groups_model = new GroupsModel($em, $acl, $container);
+            $groups_model = $this->getModel();
 
             $modules = $groups_model->getModules();
 
@@ -37,15 +47,15 @@ class GroupsController extends Controller
 
             // Для каждой группы узнаем установленные права
             foreach ($groups as &$group) {
-                $groups_rights = array ();
+                $groups_rights = array();
 
-                $identy_group = new RoleSecurityIdentity('group_'.$group['gr_id']);
+                $identy_group = new RoleSecurityIdentity('group_' . $group['gr_id']);
 
                 foreach ($modules as $key => $module) {
                     $object_module = new module();
                     $object_module->setId($module['id']);
 
-                    $groups_rights[$module['name']] = array ();
+                    $groups_rights[$module['name']] = array();
 
                     foreach ($module['module_object']->getRights() as $right) {
                         if ($acl->checkGroupPermissions($object_module, $identy_group, $acl->getValueMask($right['name']))) {
@@ -57,11 +67,11 @@ class GroupsController extends Controller
                 $group['gr_rights'] = $groups_rights;
             }
             unset($group);
-            
+
             $answer = array(
                 'list' => $groups,
                 'edit_right' => $acl->checkUserTreePermissions(false, $acl->getValueMask('editgroup')),
-                'delete_right' => $acl->checkUserTreePermissions(false, $acl->getValueMask('deletegroup')),                
+                'delete_right' => $acl->checkUserTreePermissions(false, $acl->getValueMask('deletegroup')),
             );
         } else {
             $answer = 'no_rights';
@@ -73,14 +83,12 @@ class GroupsController extends Controller
         return $response;
     }
 
-    public function getGroupDataAction()
+    public function getGroupDataAction() 
     {
         $acl = $this->get('acl');
-        $em = $this->get('doctrine.orm.entity_manager');
-        $container = $this->container;
 
         if ($acl->checkUserTreePermissions(false, $acl->getValueMask('editgroup'))) {
-            $groups_model = new GroupsModel($em, $acl, $container);
+            $groups_model = $this->getModel();
             $answer = $groups_model->getGroupData($this->get('request')->get('id'));
         } else {
             $answer = 'no_rights';
@@ -91,14 +99,12 @@ class GroupsController extends Controller
         return $response;
     }
 
-    public function editGroupAction()
-    {
+    public function editGroupAction() {
         $acl = $this->get('acl');
-        $em = $this->get('doctrine.orm.entity_manager');
-        $container = $this->container;
+
 
         if ($acl->checkUserTreePermissions(false, $acl->getValueMask('editgroup'))) {
-            $groups_model = new GroupsModel($em, $acl, $container);
+            $groups_model = $this->getModel();
             $groups_model->editGroup();
 
             $this->get('cache')->updateSiteTreeAccessGroup($this->get('request')->get('id'));
@@ -112,14 +118,13 @@ class GroupsController extends Controller
         return $response;
     }
 
-    public function addGroupAction()
+    public function addGroupAction() 
     {
         $acl = $this->get('acl');
-        $em = $this->get('doctrine.orm.entity_manager');
-        $container = $this->container;
+
 
         if ($acl->checkUserTreePermissions(false, $acl->getValueMask('editgroup'))) {
-            $groups_model = new GroupsModel($em, $acl, $container);
+            $groups_model = $this->getModel();
             $groups_model->addGroup();
 
             $response = new Response(json_encode('ok'));
@@ -131,14 +136,12 @@ class GroupsController extends Controller
         return $response;
     }
 
-    public function deleteGroupAction()
+    public function deleteGroupAction() 
     {
         $acl = $this->get('acl');
-        $em = $this->get('doctrine.orm.entity_manager');
-        $container = $this->container;
 
         if ($acl->checkUserTreePermissions(false, $acl->getValueMask('deletegroup'))) {
-            $groups_model = new GroupsModel($em, $acl, $container);
+            $groups_model = $this->getModel();
             $groups_model->deleteGroup($this->get('request')->get('id'), $this->get('cache'));
 
             $response = new Response(json_encode('ok'));
@@ -150,12 +153,11 @@ class GroupsController extends Controller
         return $response;
     }
 
-    public function loginAction()
+    public function loginAction() 
     {
         // Если нет 3х групп по умолчанию, то нужно их создать и создать суперпользователя  
         $acl = $this->get('acl');
         $em = $this->get('doctrine.orm.entity_manager');
-        $container = $this->container;
 
         $groups = $em->getRepository('DialogsBundle:groups')->findAll();
 
@@ -186,7 +188,7 @@ class GroupsController extends Controller
             $em->flush();
 
             // Присваиваем права каждому узлу                                                                                       
-            $groups_model = new GroupsModel($em, $acl, $container);
+            $groups_model = $this->getModel();
 
             $modules = $groups_model->getModules();
 
@@ -196,28 +198,28 @@ class GroupsController extends Controller
 
                 $module_object = $module['module_object'];
 
-                $group = new \Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity('group_'.$god_group->getId());
+                $group = new \Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity('group_' . $god_group->getId());
                 $builder = new MaskBuilder();
                 foreach ($module_object->getDefaultRights('God') as $right) {
                     $builder->add($acl->getValueMask($right));
                 }
                 $acl->createPermissionsForGroup($object, $group, $builder->get());
 
-                $group = new \Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity('group_'.$admins_group->getId());
+                $group = new \Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity('group_' . $admins_group->getId());
                 $builder = new MaskBuilder();
                 foreach ($module_object->getDefaultRights('Administrators') as $right) {
                     $builder->add($acl->getValueMask($right));
                 }
                 $acl->createPermissionsForGroup($object, $group, $builder->get());
 
-                $group = new \Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity('group_'.$users_group->getId());
+                $group = new \Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity('group_' . $users_group->getId());
                 $builder = new MaskBuilder();
                 foreach ($module_object->getDefaultRights('Users') as $right) {
                     $builder->add($acl->getValueMask($right));
                 }
                 $acl->createPermissionsForGroup($object, $group, $builder->get());
 
-                $group = new \Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity('group_'.$anonim_group->getId());
+                $group = new \Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity('group_' . $anonim_group->getId());
                 $builder = new MaskBuilder();
                 foreach ($module_object->getDefaultRights('Anonymous') as $right) {
                     $builder->add($acl->getValueMask($right));
@@ -250,7 +252,7 @@ class GroupsController extends Controller
             $em->flush();
 
             $message = 'Был зарегистрирован первый пользователь! Логин: god, пароль: god.';
-            
+
             // --------------------------------------------------------------------------------------------
             // Создаём записи в таблице модулей
             $finder = new Finder();
@@ -267,7 +269,7 @@ class GroupsController extends Controller
                 } else {
                     $module->setType('sitetree_node');
                 }
-                $module->setTableName('module'.strtolower($value->getFilename()));
+                $module->setTableName('module' . strtolower($value->getFilename()));
                 $module->setName($value->getFilename());
                 $module->setStatus('active');
                 $module->setDateCreate(new \DateTime());
@@ -297,12 +299,12 @@ class GroupsController extends Controller
             $em->flush();
 
             // Определили какой модуль дерева должен быть привязан к узлу Главной страницы
-            $config = Yaml::parse($this->container->getParameter('project_modules_directory').'/Mainpage/Resources/config/config.yml');
+            $config = Yaml::parse($this->container->getParameter('project_modules_directory') . '/Mainpage/Resources/config/config.yml');
             $nodeModule = $config['parameters']['modules']['sitetree'];
 
             // Создадим записи в таблице 
             // Сущность модуля
-            $path = '\\project\\Modules\\'.$nodeModule.'\\Entity\\'.'module'.strtolower($nodeModule);
+            $path = '\\project\\Modules\\' . $nodeModule . '\\Entity\\' . 'module' . strtolower($nodeModule);
 
             // Создаём записи в таблице модуля и плагинах
             $text = new plugintext();
@@ -349,9 +351,9 @@ class GroupsController extends Controller
 
             // Создаём записи в таблице modules_link
             foreach ($config['parameters']['modules'] as $value) {
-                $module = $em->getRepository('DialogsBundle:modules')->findOneBy(array (
+                $module = $em->getRepository('DialogsBundle:modules')->findOneBy(array(
                     'name' => $value
-                    ));
+                        ));
 
                 $moduleslink = new moduleslink();
                 $moduleslink->setUpTree(1);
@@ -361,7 +363,7 @@ class GroupsController extends Controller
 
                 if (stripos($value, 'FireiceNode') !== false) {
 
-                    $records = $em->getRepository('Module'.$value.'Bundle:module'.strtolower($value))->findAll();
+                    $records = $em->getRepository('Module' . $value . 'Bundle:module' . strtolower($value))->findAll();
 
                     foreach ($records as $val) {
                         $modulespluginslink = new modulespluginslink();
@@ -371,7 +373,7 @@ class GroupsController extends Controller
                         $em->flush();
                     }
                 }
-            }            
+            }
         } else {
             $message = '';
         }
@@ -382,11 +384,11 @@ class GroupsController extends Controller
             $error = $this->get('request')->getSession()->get(SecurityContext::AUTHENTICATION_ERROR);
         }
 
-        return $this->render('DialogsBundle::login.html.twig', array (
-                'last_username' => $this->get('request')->getSession()->get(SecurityContext::LAST_USERNAME),
-                'error' => $error,
-                'message' => $message
-            ));
+        return $this->render('DialogsBundle::login.html.twig', array(
+                    'last_username' => $this->get('request')->getSession()->get(SecurityContext::LAST_USERNAME),
+                    'error' => $error,
+                    'message' => $message
+                ));
     }
 
 }

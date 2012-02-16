@@ -8,14 +8,24 @@ use fireice\Backend\Dialogs\Model\RightsModel;
 
 class RightsController extends Controller
 {
+    
+    protected $model = null;
+
+    protected function getModel() 
+    {
+        if (null === $this->model) {
+            $em = $this->get('doctrine.orm.entity_manager');
+            $acl = $this->get('acl');
+            $container = $this->container;
+            $this->model = new RightsModel($em, $acl, $container);
+        }
+        return $this->model;
+    }
 
     public function getModulesAction()
     {
-        $em = $this->get('doctrine.orm.entity_manager');
         $acl = $this->get('acl');
-        $container = $this->container;
-
-        $rights_model = new RightsModel($em, $acl, $container);
+        $rights_model = $this->getModel();
 
         $node_title = $rights_model->getNodeTitle($this->get('request')->get('id'));
 
@@ -42,12 +52,10 @@ class RightsController extends Controller
 
     public function getUsersAction()
     {
-        $em = $this->get('doctrine.orm.entity_manager');
         $acl = $this->get('acl');
-        $container = $this->container;
 
         if ($acl->checkUserTreePermissions(false, $acl->getValueMask('editnodesrights'))) {
-            $rights_model = new RightsModel($em, $acl, $container);
+            $rights_model = $this->getModel();
 
             $answer = $rights_model->getUsers();
         } else {
@@ -61,12 +69,10 @@ class RightsController extends Controller
 
     public function getUserAction()
     {
-        $em = $this->get('doctrine.orm.entity_manager');
         $acl = $this->get('acl');
-        $container = $this->container;
 
         if ($acl->checkUserTreePermissions(false, $acl->getValueMask('editnodesrights'))) {
-            $rights_model = new RightsModel($em, $acl, $container);
+            $rights_model = $this->getModel();
 
             $answer = $rights_model->getUser();
         } else {
@@ -80,12 +86,10 @@ class RightsController extends Controller
 
     public function editUserAction()
     {
-        $em = $this->get('doctrine.orm.entity_manager');
         $acl = $this->get('acl');
-        $container = $this->container;
 
         if ($acl->checkUserTreePermissions(false, $acl->getValueMask('editnodesrights'))) {
-            $rights_model = new RightsModel($em, $acl, $container);
+            $rights_model = $this->getModel();
             $rights_model->editUserRights();
 
             $this->get('cache')->updateSiteTreeAccessUser($rights_model->getUserObject($this->get('request')->get('id_user')));

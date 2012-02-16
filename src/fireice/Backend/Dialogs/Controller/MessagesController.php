@@ -8,10 +8,20 @@ use fireice\Backend\Dialogs\Model\MessagesModel;
 
 class MessagesController extends Controller
 {
+    protected $model = null;
 
+    protected function getModel() 
+    {
+        if (null === $this->model) {
+
+            $this->model = new MessagesModel($this->get('doctrine.orm.entity_manager'));
+        }
+        return $this->model;
+    }
+    
     public function getMessagesAction()
     {
-        $rights_model = new MessagesModel($this->get('doctrine.orm.entity_manager'));
+        $rights_model = $this->getModel();
 
         $messages = $rights_model->getMessages($this->get('security.context'));
 
@@ -23,7 +33,7 @@ class MessagesController extends Controller
 
     public function getMessageAction()
     {
-        $rights_model = new MessagesModel($this->get('doctrine.orm.entity_manager'));
+        $rights_model = $this->getModel();
 
         $message = $rights_model->getMessage($this->get('request')->get('id'), $this->get('security.context'));
 
@@ -37,7 +47,7 @@ class MessagesController extends Controller
 
     public function deleteMessageAction()
     {
-        $rights_model = new MessagesModel($this->get('doctrine.orm.entity_manager'));
+        $rights_model =  $this->getModel();
 
         $answer = $rights_model->deleteMessage($this->get('request')->get('id'), $this->get('security.context'));
 

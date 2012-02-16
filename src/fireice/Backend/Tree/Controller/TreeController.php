@@ -12,12 +12,21 @@ use fireice\Backend\Dialogs\Entity\module;
 class TreeController extends Controller
 {
 
+    protected $model = null;
+
+    protected function getModel() 
+    {
+        if (null === $this->model) {
+            $em = $this->get('doctrine.orm.entity_manager');
+            $sess = $this->get('session');
+            $container = $this->container;
+            $this->model = new TreeModel($em, $sess, $container);
+        }
+        return $this->model;
+    }
     public function backOfficeAction()
     {
-        $em = $this->get('doctrine.orm.entity_manager');
-        $sess = $this->get('session');
-        $container = $this->container;
-        $tree_model = new TreeModel($em, $sess, $container);
+        $tree_model = $this->getModel();
 
         $messages = $tree_model->getNewMessages($this->get('security.context'));
 
@@ -31,10 +40,7 @@ class TreeController extends Controller
 
     public function getParentsAction($id)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
-        $sess = $this->get('session');
-        $container = $this->container;
-        $tree_model = new TreeModel($em, $sess, $container);
+        $tree_model = $this->getModel();
 
         $securityContext = $this->container->get('security.context');
         $userCurrent = $securityContext->getToken()->getUser();
@@ -56,10 +62,7 @@ class TreeController extends Controller
 
     public function getShowNodesAction()
     {
-        $em = $this->get('doctrine.orm.entity_manager');
-        $sess = $this->get('session');
-        $container = $this->container;
-        $tree_model = new TreeModel($em, $sess, $container);
+        $tree_model = $this->getModel();
 
         $securityContext = $this->container->get('security.context');
         $userCurrent = $securityContext->getToken()->getUser();
@@ -91,10 +94,7 @@ class TreeController extends Controller
 
     public function getNewNodesAction($id)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
-        $sess = $this->get('session');
-        $container = $this->container;
-        $tree_model = new TreeModel($em, $sess, $container);
+        $tree_model = $this->getModel();
 
         $securityContext = $this->container->get('security.context');
         $userCurrent = $securityContext->getToken()->getUser();
@@ -129,7 +129,7 @@ class TreeController extends Controller
         $em = $this->get('doctrine.orm.entity_manager');
         $sess = $this->get('session');
         $container = $this->container;
-        $tree_model = new TreeModel($em, $sess, $container);
+        $tree_model = $this->getModel();
 
         $context_menu = $tree_model->contextMenu($id, $this->get('acl'));
 
@@ -142,10 +142,7 @@ class TreeController extends Controller
     public function getModulesAction($id)
     {
         if ($this->get('acl')->checkUserTreePermissions(false, $this->get('acl')->getValueMask('create'))) {
-            $em = $this->get('doctrine.orm.entity_manager');
-            $sess = $this->get('session');
-            $container = $this->container;
-            $tree_model = new TreeModel($em, $sess, $container);
+            $tree_model = $this->getModel();
 
             $answer = array (
                 'option' => $tree_model->getModules($id),
@@ -163,10 +160,7 @@ class TreeController extends Controller
     public function nodeCreateAction()
     {
         if ($this->get('acl')->checkUserTreePermissions(false, $this->get('acl')->getValueMask('create'))) {
-            $em = $this->get('doctrine.orm.entity_manager');
-            $sess = $this->get('session');
-            $container = $this->container;
-            $tree_model = new TreeModel($em, $sess, $container);
+            $tree_model = $this->getModel();
 
             $answer = $tree_model->create($this->get('security.context'));
 
@@ -183,10 +177,7 @@ class TreeController extends Controller
 
     public function getNodeModulesAction()
     {
-        $em = $this->get('doctrine.orm.entity_manager');
-        $sess = $this->get('session');
-        $container = $this->container;
-        $tree_model = new TreeModel($em, $sess, $container);
+        $tree_model = $this->getModel();
 
         $modules = $tree_model->getNodeModules($this->get('request')->get('id'), $this->get('acl'));
 
@@ -210,12 +201,12 @@ class TreeController extends Controller
     public function dialogCreateEditAction()
     {
         $em = $this->get('doctrine.orm.entity_manager');
-        $sess = $this->get('session');
+
         $acl = $this->get('acl');
         $request = $this->get('request');
-        $container = $this->container;
 
-        $tree_model = new TreeModel($em, $sess, $container);
+
+        $tree_model = $this->getModel();
 
         if ($request->get('act') == 'show') {
 
@@ -310,10 +301,8 @@ class TreeController extends Controller
     public function removeAction()
     {
         if ($this->get('acl')->checkUserTreePermissions(false, MaskBuilder::MASK_DELETE)) {
-            $em = $this->get('doctrine.orm.entity_manager');
-            $sess = $this->get('session');
-            $container = $this->container;
-            $tree_model = new TreeModel($em, $sess, $container);
+
+            $tree_model = $this->getModel();
 
             $tree_model->removeAll($this->get('request')->get('id'), $this->get('security.context'));
 
@@ -332,9 +321,8 @@ class TreeController extends Controller
     public function getHistoryAction()
     {
         $em = $this->get('doctrine.orm.entity_manager');
-        $sess = $this->get('session');
-        $container = $this->container;
-        $tree_model = new TreeModel($em, $sess, $container);
+ 
+        $tree_model = $this->getModel();
 
         $module = $em->getRepository('DialogsBundle:modules')->findOneBy(array ('id' => $this->get('request')->get('id_module')));
 
@@ -353,10 +341,8 @@ class TreeController extends Controller
 
     public function proveEditorAction()
     {
-        $em = $this->get('doctrine.orm.entity_manager');
-        $sess = $this->get('session');
-        $container = $this->container;
-        $tree_model = new TreeModel($em, $sess, $container);
+
+        $tree_model = $this->getModel();
 
         $answer = $tree_model->proveEditor($this->get('security.context'));
 
@@ -368,10 +354,8 @@ class TreeController extends Controller
 
     public function proveMainEditorAction()
     {
-        $em = $this->get('doctrine.orm.entity_manager');
-        $sess = $this->get('session');
-        $container = $this->container;
-        $tree_model = new TreeModel($em, $sess, $container);
+
+        $tree_model = $this->getModel();
 
         $answer = $tree_model->proveMainEditor($this->get('security.context'));
 
@@ -383,10 +367,8 @@ class TreeController extends Controller
 
     public function sendToProveEditorAction()
     {
-        $em = $this->get('doctrine.orm.entity_manager');
-        $sess = $this->get('session');
-        $container = $this->container;
-        $tree_model = new TreeModel($em, $sess, $container);
+
+        $tree_model = $this->getModel();
 
         $answer = $tree_model->sendToProveEditor($this->get('security.context'), $this->get('acl'));
 
@@ -398,10 +380,8 @@ class TreeController extends Controller
 
     public function sendToProveMainEditorAction()
     {
-        $em = $this->get('doctrine.orm.entity_manager');
-        $sess = $this->get('session');
-        $container = $this->container;
-        $tree_model = new TreeModel($em, $sess, $container);
+
+        $tree_model = $this->getModel();
 
         $answer = $tree_model->sendToProveMainEditor($this->get('security.context'), $this->get('acl'));
 
@@ -413,10 +393,8 @@ class TreeController extends Controller
 
     public function returnWriterAction()
     {
-        $em = $this->get('doctrine.orm.entity_manager');
-        $sess = $this->get('session');
-        $container = $this->container;
-        $tree_model = new TreeModel($em, $sess, $container);
+
+        $tree_model = $this->getModel();
 
         $answer = $tree_model->returnWriter($this->get('security.context'));
 
@@ -428,10 +406,8 @@ class TreeController extends Controller
 
     public function returnEditorAction()
     {
-        $em = $this->get('doctrine.orm.entity_manager');
-        $sess = $this->get('session');
-        $container = $this->container;
-        $tree_model = new TreeModel($em, $sess, $container);
+
+        $tree_model = $this->getModel();
 
         $answer = $tree_model->returnEditor($this->get('security.context'));
 
@@ -443,10 +419,8 @@ class TreeController extends Controller
 
     public function getNewMessagesAction()
     {
-        $em = $this->get('doctrine.orm.entity_manager');
-        $sess = $this->get('session');
-        $container = $this->container;
-        $tree_model = new TreeModel($em, $sess, $container);
+
+        $tree_model = $this->getModel();
 
         $answer = $tree_model->getNewMessages($this->get('security.context'));
 
@@ -459,10 +433,8 @@ class TreeController extends Controller
     public function hideNodeAction($id)
     {
         if ($this->get('acl')->checkUserTreePermissions(false, $this->get('acl')->getValueMask('hidenodes'))) {
-            $em = $this->get('doctrine.orm.entity_manager');
-            $sess = $this->get('session');
-            $container = $this->container;
-            $tree_model = new TreeModel($em, $sess, $container);
+
+            $tree_model = $this->getModel();
 
             if ($id != '1') {
                 $tree_model->hideNode($id, $this->get('security.context'));
@@ -484,10 +456,8 @@ class TreeController extends Controller
     public function showNodeAction($id)
     {
         if ($this->get('acl')->checkUserTreePermissions(false, $this->get('acl')->getValueMask('shownodes'))) {
-            $em = $this->get('doctrine.orm.entity_manager');
-            $sess = $this->get('session');
-            $container = $this->container;
-            $tree_model = new TreeModel($em, $sess, $container);
+
+            $tree_model = $this->getModel();
 
             $tree_model->showNode($id, $this->get('security.context'));
 
@@ -526,10 +496,8 @@ class TreeController extends Controller
 
     public function ajaxLoadAction()
     {
-        $em = $this->get('doctrine.orm.entity_manager');
-        $sess = $this->get('session');
-        $container = $this->container;
-        $tree_model = new TreeModel($em, $sess, $container);
+
+        $tree_model = $this->getModel();
 
         $modules = $tree_model->getNodeModules($this->get('request')->get('id'), $this->get('acl'));
 
