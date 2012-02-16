@@ -222,7 +222,7 @@ class TreeController extends Controller
             $modules = $tree_model->getNodeModules($request->get('id'), $acl);
 
             if (isset($modules[$request->get('id_module')])) {
-                $module_act = '\\'.$this->container->getParameter('project_name').'\\Modules\\'.$modules[$request->get('id_module')]['directory'].'\\Controller\\BackendController';
+                $module_act = '\\project\\Modules\\'.$modules[$request->get('id_module')]['directory'].'\\Controller\\BackendController';
                 $module_act = new $module_act();
                 $module_act->setContainer($this->container);
 
@@ -238,7 +238,7 @@ class TreeController extends Controller
 
             if (($module->getType() === 'user' && $acl->checkUserPermissions($request->get('id'), new module($request->get('id_module')), false, $acl->getValueMask('edit'))) ||
                 ($module->getType() === 'sitetree_node' && $acl->checkUserTreePermissions(false, $acl->getValueMask('edit')))) {
-                $module_controller = '\\'.$this->container->getParameter('project_name').'\\Modules\\'.$module->getName().'\\Controller\\BackendController';
+                $module_controller = '\\project\\Modules\\'.$module->getName().'\\Controller\\BackendController';
 
                 $module_act = new $module_controller();
                 $module_act->setContainer($this->container);
@@ -257,7 +257,7 @@ class TreeController extends Controller
                     'status' => 'active'
                     ));
 
-                $module_act = '\\'.$this->container->getParameter('project_name').'\\Modules\\'.$module->getName().'\\Controller\\BackendController';
+                $module_act = '\\project\\Modules\\'.$module->getName().'\\Controller\\BackendController';
                 $module_act = new $module_act();
                 $module_act->setContainer($this->container);
 
@@ -271,7 +271,7 @@ class TreeController extends Controller
                     'status' => 'active'
                     ));
 
-                $module_act = '\\'.$this->container->getParameter('project_name').'\\Modules\\'.$module->getName().'\\Controller\\BackendController';
+                $module_act = '\\project\\Modules\\'.$module->getName().'\\Controller\\BackendController';
                 $module_act = new $module_act();
                 $module_act->setContainer($this->container);
 
@@ -295,7 +295,7 @@ class TreeController extends Controller
             'status' => 'active'
             ));
 
-        $module_act = '\\'.$this->container->getParameter('project_name').'\\Modules\\'.$module->getName().'\\Controller\\BackendController';
+        $module_act = '\\project\\Modules\\'.$module->getName().'\\Controller\\BackendController';
         $module_act = new $module_act();
         $module_act->setContainer($this->container);
 
@@ -338,7 +338,7 @@ class TreeController extends Controller
 
         $module = $em->getRepository('DialogsBundle:modules')->findOneBy(array ('id' => $this->get('request')->get('id_module')));
 
-        $module_controller = '\\'.$this->container->getParameter('project_name').'\\Modules\\'.$module->getName().'\\Controller\\BackendController';
+        $module_controller = '\\project\\Modules\\'.$module->getName().'\\Controller\\BackendController';
 
         $module_act = new $module_controller();
         $module_act->setContainer($this->container);
@@ -517,7 +517,7 @@ class TreeController extends Controller
             }
         }
 
-        $controller = '\\'.$this->container->getParameter('project_name').'\\Modules\\'.$module.'\\Controller\\FrontendController';
+        $controller = '\\project\\Modules\\'.$module.'\\Controller\\FrontendController';
         $controller = new $controller($id_node, $id_module);
         $controller->setContainer($this->container);
 
@@ -534,7 +534,7 @@ class TreeController extends Controller
         $modules = $tree_model->getNodeModules($this->get('request')->get('id'), $this->get('acl'));
 
         if (count($modules) > 0) {
-            $module_act = '\\'.$this->container->getParameter('project_name').'\\Modules\\'.$modules[$this->get('request')->get('id_module')]['directory'].'\\Controller\\BackendController';
+            $module_act = '\\project\\Modules\\'.$modules[$this->get('request')->get('id_module')]['directory'].'\\Controller\\BackendController';
             $module_act = new $module_act();
             $module_act->setContainer($this->container);
 

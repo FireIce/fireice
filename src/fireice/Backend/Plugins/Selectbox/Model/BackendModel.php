@@ -41,7 +41,7 @@ class BackendModel extends \fireice\Backend\Plugins\BasicPlugin\Model\BackendMod
 
         $tmp = explode(':', $module);
 
-        $entity = $this->container->getParameter('project_name').'\\Modules\\'.substr($tmp[0], 6, -6).'\\Entity\\'.$tmp[1];
+        $entity = '\\project\\Modules\\'.substr($tmp[0], 6, -6).'\\Entity\\'.$tmp[1];
         $entity = new $entity();
 
         $return = array ();

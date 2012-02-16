@@ -302,7 +302,7 @@ class GroupsController extends Controller
 
             // Создадим записи в таблице 
             // Сущность модуля
-            $path = $this->container->getParameter('project_name').'\\Modules\\'.$nodeModule.'\\Entity\\'.'module'.strtolower($nodeModule);
+            $path = '\\project\\Modules\\'.$nodeModule.'\\Entity\\'.'module'.strtolower($nodeModule);
 
             // Создаём записи в таблице модуля и плагинах
             $text = new plugintext();

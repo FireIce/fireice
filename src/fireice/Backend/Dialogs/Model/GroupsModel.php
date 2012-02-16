@@ -63,11 +63,11 @@ class GroupsModel
         foreach ($modules as $module) {
             $config = \Symfony\Component\Yaml\Yaml::parse($this->container->getParameter('project_modules_directory').'//'.$module->getName().'//Resources//config//config.yml');
 
-            $module_controller = $this->container->getParameter('project_name').'\\Modules\\'.ucfirst($config['parameters']['name']).'\\Controller\\BackendController';
+            $module_controller = '\\project\\Modules\\'.ucfirst($config['parameters']['name']).'\\Controller\\BackendController';
 
             $module_controller = new $module_controller();
 
-            $module_object = $this->container->getParameter('project_name').'\\Modules\\'.$module->getName().'\\Controller\\BackendController';
+            $module_object = '\\project\\Modules\\'.$module->getName().'\\Controller\\BackendController';
             $module_object = new $module_object();
 
             $return_modules[] = array (

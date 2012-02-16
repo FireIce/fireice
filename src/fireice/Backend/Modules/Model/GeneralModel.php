@@ -54,7 +54,7 @@ class GeneralModel
 
     public function getModuleEntity()
     {
-        $module = '\\'.$this->container->getParameter('project_name').'\\Modules\\'.$this->getModuleDir().'\\Entity\\'.$this->getEntityName();
+        $module = '\\project\\Modules\\'.$this->getModuleDir().'\\Entity\\'.$this->getEntityName();
 
         return new $module();
     }

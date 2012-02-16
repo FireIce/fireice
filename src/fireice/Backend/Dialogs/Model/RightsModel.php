@@ -184,7 +184,7 @@ class RightsModel
 
         $module = $query->getSingleResult();
 
-        $module_object = $this->container->getParameter('project_name').'\\Modules\\'.$module['name'].'\\Controller\\BackendController';
+        $module_object = '\\project\\Modules\\'.$module['name'].'\\Controller\\BackendController';
         $module_object = new $module_object();
 
         $groups_rights = array ();
@@ -262,7 +262,7 @@ class RightsModel
 
         $module = $module[0];
 
-        $module_object = $this->container->getParameter('project_name').'\\Modules\\'.$module['name'].'\\Controller\\BackendController';
+        $module_object = '\\project\\Modules\\'.$module['name'].'\\Controller\\BackendController';
         $module_object = new $module_object();
 
         $query = $this->em->createQuery("

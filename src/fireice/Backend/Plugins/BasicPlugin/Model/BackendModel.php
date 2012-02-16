@@ -97,7 +97,7 @@ class BackendModel
 
             $result = $query->getOneOrNullResult();
 
-            $entity = $this->container->getParameter('project_name').'\\Modules\\'.$result['name'].'\\Entity\\'.$result['table_name'];
+            $entity = '\\project\\Modules\\'.$result['name'].'\\Entity\\'.$result['table_name'];
             $entity = new $entity();
 
             $cnf = $entity->getConfig();

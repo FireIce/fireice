@@ -712,7 +712,7 @@ Class TreeModel
 
         $module = $query->getSingleResult();
 
-        $module_obj = '\\'.$this->container->getParameter('project_name').'\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
+        $module_obj = '\\project\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
         $module_obj = new $module_obj();
 
         foreach ($module_obj->getConfig() as $plugin) {
@@ -777,7 +777,7 @@ Class TreeModel
 
                 $query->getResult();
 
-                $new_module_record = '\\'.$this->container->getParameter('project_name').'\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
+                $new_module_record = '\\project\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
                 $new_module_record = new $new_module_record();
                 $new_module_record->setIdd($result['idd']);
                 $new_module_record->setCid($hid);
@@ -818,7 +818,7 @@ Class TreeModel
 
         $module = $query->getSingleResult();
 
-        $module_obj = '\\'.$this->container->getParameter('project_name').'\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
+        $module_obj = '\\project\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
         $module_obj = new $module_obj();
 
         foreach ($module_obj->getConfig() as $plugin) {
@@ -891,7 +891,7 @@ Class TreeModel
                     AND md.final = 'Y'")->setParameter('idd', $result['idd']);
                 $query->getResult();
 
-                $new_module_record = '\\'.$this->container->getParameter('project_name').'\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
+                $new_module_record = '\\project\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
                 $new_module_record = new $new_module_record();
                 $new_module_record->setIdd($result['idd']);
                 $new_module_record->setCid($hid);
@@ -932,7 +932,7 @@ Class TreeModel
 
         $module = $query->getSingleResult();
 
-        $module_obj = '\\'.$this->container->getParameter('project_name').'\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
+        $module_obj = '\\project\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
         $module_obj = new $module_obj();
 
         foreach ($module_obj->getConfig() as $plugin) {
@@ -994,7 +994,7 @@ Class TreeModel
 
                 $query->getResult();
 
-                $new_module_record = '\\'.$this->container->getParameter('project_name').'\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
+                $new_module_record = '\\project\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
                 $new_module_record = new $new_module_record();
                 $new_module_record->setIdd($result['idd']);
                 $new_module_record->setCid($hid);
@@ -1051,7 +1051,7 @@ Class TreeModel
 
         $module = $query->getSingleResult();
 
-        $module_obj = '\\'.$this->container->getParameter('project_name').'\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
+        $module_obj = '\\project\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
         $module_obj = new $module_obj();
 
         foreach ($module_obj->getConfig() as $plugin) {
@@ -1113,7 +1113,7 @@ Class TreeModel
 
                 $query->getResult();
 
-                $new_module_record = '\\'.$this->container->getParameter('project_name').'\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
+                $new_module_record = '\\project\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
                 $new_module_record = new $new_module_record();
                 $new_module_record->setIdd($result['idd']);
                 $new_module_record->setCid($hid);
@@ -1170,7 +1170,7 @@ Class TreeModel
 
         $module = $query->getSingleResult();
 
-        $module_obj = '\\'.$this->container->getParameter('project_name').'\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
+        $module_obj = '\\project\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
         $module_obj = new $module_obj();
 
         foreach ($module_obj->getConfig() as $plugin) {
@@ -1235,7 +1235,7 @@ Class TreeModel
 
                 $query->getResult();
 
-                $new_module_record = '\\'.$this->container->getParameter('project_name').'\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
+                $new_module_record = '\\project\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
                 $new_module_record = new $new_module_record();
                 $new_module_record->setIdd($result['idd']);
                 $new_module_record->setCid($hid);
@@ -1279,7 +1279,7 @@ Class TreeModel
 
         $module = $query->getSingleResult();
 
-        $module_obj = '\\'.$this->container->getParameter('project_name').'\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
+        $module_obj = '\\project\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
         $module_obj = new $module_obj();
 
         foreach ($module_obj->getConfig() as $plugin) {
@@ -1344,7 +1344,7 @@ Class TreeModel
 
                 $query->getResult();
 
-                $new_module_record = '\\'.$this->container->getParameter('project_name').'\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
+                $new_module_record = '\\project\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
                 $new_module_record = new $new_module_record();
                 $new_module_record->setIdd($result['idd']);
                 $new_module_record->setCid($hid);
