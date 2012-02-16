@@ -60,7 +60,7 @@ class UsersController extends Controller
 
         if ($acl->checkUserTreePermissions(false, $acl->getValueMask('edituser'))) {
             $users_model = new UsersModel($em, $acl);
-            $user = $users_model->editUser($this->get('request'));
+            $user = $users_model->editUser();
             
             $this->get('cache')->updateSiteTreeAccessUser($user);
 
@@ -80,7 +80,7 @@ class UsersController extends Controller
 
         if ($acl->checkUserTreePermissions(false, $acl->getValueMask('edituser'))) {
             $users_model = new UsersModel($em, $acl);
-            $user = $users_model->addUser($this->get('request'));
+            $user = $users_model->addUser();
 
             $this->get('cache')->updateSiteTreeAccessUser($user);
 

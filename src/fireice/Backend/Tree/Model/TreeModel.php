@@ -11,18 +11,21 @@ use fireice\Backend\Tree\Entity\messages;
 use fireice\Backend\Tree\Entity\history;
 use fireice\Backend\Dialogs\Entity\module;
 use fireice\Backend\Dialogs\Entity\moduleslink;
+use Symfony\Component\HttpFoundation\Request;
 
 Class TreeModel
 {
     protected $em, $sess;
     protected $tree_childs = array ();
-
+    protected $request;
+     
     public function __construct(EntityManager $em, $sess, $container)
     {
+        $this->request = Request::createFromGlobals();
         $this->em = $em;
         $this->sess = $sess;
         $this->container = $container;
-    }
+     }
 
     public function getNodeTitle($id)
     {
@@ -88,11 +91,11 @@ Class TreeModel
         return $result2['value'];
     }
 
-    public function create($request, $security)
+    public function create($security)//*****
     {
         $node = new modulesitetree();
         $node->setFinal('Y');
-        $node->setUpParent($request->get('id'));
+        $node->setUpParent($this->request->get('id'));
         $node->setStatus('hidden');
         $this->em->persist($node);
         $this->em->flush();
@@ -117,7 +120,7 @@ Class TreeModel
                 DialogsBundle:modules md
             WHERE md.final = 'Y'
             AND md.status = 'active'
-            AND md.idd = :id")->setParameter('id', $request->get('module_id'));
+            AND md.idd = :id")->setParameter('id', $this->request->get('module_id'));
 
         $module = $query->getSingleResult();
 
@@ -699,7 +702,7 @@ Class TreeModel
     }
 
     // Подтвердить на уровне редактора
-    public function proveEditor($request, $security)
+    public function proveEditor($security) //*****
     {
         $query = $this->em->createQuery("
             SELECT 
@@ -708,7 +711,7 @@ Class TreeModel
                 DialogsBundle:modules md
             WHERE md.final = 'Y'
             AND md.status = 'active'
-            AND md.idd = :idd")->setParameter('idd', $request->get('id_module'));
+            AND md.idd = :idd")->setParameter('idd', $this->request->get('id_module'));
 
         $module = $query->getSingleResult();
 
@@ -737,8 +740,8 @@ Class TreeModel
                 AND md.plugin_type = :plugin_type");
 
             $query->setParameters(array (
-                'up_tree' => $request->get('id'),
-                'up_module' => $request->get('id_module'),
+                'up_tree' => $this->request->get('id'),
+                'up_module' => $this->request->get('id_module'),
                 'plugin_name' => $plugin['name'],
                 'plugin_type' => $plugin['type']
             ));
@@ -797,7 +800,7 @@ Class TreeModel
         $current_user = $security->getToken()->getUser();
 
         $subject = 'Материал утверждён.';
-        $message = 'Пользователем '.$current_user->getLogin().' утверждён материал, отправленный вами ему на утверждение. Ссылка на материал: http://localhost/app_dev.php/backoffice/#action/node_edit/id/'.$request->get('id').'/type/'.$request->get('id_module');
+        $message = 'Пользователем '.$current_user->getLogin().' утверждён материал, отправленный вами ему на утверждение. Ссылка на материал: http://localhost/app_dev.php/backoffice/#action/node_edit/id/'.$this->request->get('id').'/type/'.$this->request->get('id_module');
 
         $this->sendMessage($current_user->getId(), $history_record->getUpUser(), $subject, $message);
 
@@ -805,7 +808,7 @@ Class TreeModel
     }
 
     // Подтвердить на уровне главного редактора
-    public function proveMainEditor($request, $security)
+    public function proveMainEditor($security) //*****
     {
         $query = $this->em->createQuery("
             SELECT 
@@ -814,7 +817,7 @@ Class TreeModel
                 DialogsBundle:modules md
             WHERE md.final = 'Y'
             AND md.status = 'active'
-            AND md.idd = :idd")->setParameter('idd', $request->get('id_module'));
+            AND md.idd = :idd")->setParameter('idd', $this->request->get('id_module'));
 
         $module = $query->getSingleResult();
 
@@ -843,8 +846,8 @@ Class TreeModel
                 AND md.plugin_type = :plugin_type");
 
             $query->setParameters(array (
-                'up_tree' => $request->get('id'),
-                'up_module' => $request->get('id_module'),
+                'up_tree' => $this->request->get('id'),
+                'up_module' => $this->request->get('id_module'),
                 'plugin_name' => $plugin['name'],
                 'plugin_type' => $plugin['type']
             ));
@@ -911,7 +914,7 @@ Class TreeModel
         $current_user = $security->getToken()->getUser();
 
         $subject = 'Материал утверждён.';
-        $message = 'Пользователем '.$current_user->getLogin().' утверждён материал, отправленный вами ему на утверждение. Ссылка на материал: http://localhost/app_dev.php/backoffice/#action/node_edit/id/'.$request->get('id').'/type/'.$request->get('id_module');
+        $message = 'Пользователем '.$current_user->getLogin().' утверждён материал, отправленный вами ему на утверждение. Ссылка на материал: http://localhost/app_dev.php/backoffice/#action/node_edit/id/'.$this->request->get('id').'/type/'.$this->request->get('id_module');
 
         $this->sendMessage($current_user->getId(), $history_record->getUpUser(), $subject, $message);
 
@@ -919,7 +922,7 @@ Class TreeModel
     }
 
     // Отправить на подтверждение редактору   
-    public function sendToProveEditor($request, $security, $acl)
+    public function sendToProveEditor( $security, $acl) //*****
     {
         $query = $this->em->createQuery("
             SELECT 
@@ -928,7 +931,7 @@ Class TreeModel
                 DialogsBundle:modules md
             WHERE md.final = 'Y'
             AND md.status = 'active'
-            AND md.idd = :idd")->setParameter('idd', $request->get('id_module'));
+            AND md.idd = :idd")->setParameter('idd', $this->request->get('id_module'));
 
         $module = $query->getSingleResult();
 
@@ -956,8 +959,8 @@ Class TreeModel
                 AND md.plugin_type = :plugin_type");
 
             $query->setParameters(array (
-                'up_tree' => $request->get('id'),
-                'up_module' => $request->get('id_module'),
+                'up_tree' => $this->request->get('id'),
+                'up_module' => $this->request->get('id_module'),
                 'plugin_name' => $plugin['name'],
                 'plugin_type' => $plugin['type']
             ));
@@ -1014,7 +1017,7 @@ Class TreeModel
             $groups[$group->getId()] = $group;
         }
 
-        $module = $this->em->getRepository('DialogsBundle:modules')->findOneBy(array ('idd' => $request->get('id_module'), 'final' => 'Y'));
+        $module = $this->em->getRepository('DialogsBundle:modules')->findOneBy(array ('idd' => $this->request->get('id_module'), 'final' => 'Y'));
         $users = $this->em->getRepository('DialogsBundle:users')->findAll();
         $current_user = $security->getToken()->getUser();
 
@@ -1028,7 +1031,7 @@ Class TreeModel
 
             if ($acl->checkGroupPermissions($service_module, $group, $acl->getValueMask('proveeditor'))) {
                 $subject = 'Отправлен материал на утверждение.';
-                $message = 'Пользователем '.$current_user->getLogin().' отправлен материал на утверждение. Ссылка на материал: http://localhost/app_dev.php/backoffice/#action/node_edit/id/'.$request->get('id').'/type/'.$request->get('id_module');
+                $message = 'Пользователем '.$current_user->getLogin().' отправлен материал на утверждение. Ссылка на материал: http://localhost/app_dev.php/backoffice/#action/node_edit/id/'.$this->request->get('id').'/type/'.$this->request->get('id_module');
 
                 $this->sendMessage($current_user->getId(), $user->getId(), $subject, $message);
             }
@@ -1038,7 +1041,7 @@ Class TreeModel
     }
 
     // Отправить на подтверждение главному редактору
-    public function sendToProveMainEditor($request, $security, $acl)
+    public function sendToProveMainEditor($security, $acl) //*****
     {
         $query = $this->em->createQuery("
             SELECT 
@@ -1047,7 +1050,7 @@ Class TreeModel
                 DialogsBundle:modules md
             WHERE md.final = 'Y'
             AND md.status = 'active'
-            AND md.idd = :idd")->setParameter('idd', $request->get('id_module'));
+            AND md.idd = :idd")->setParameter('idd', $this->request->get('id_module'));
 
         $module = $query->getSingleResult();
 
@@ -1075,8 +1078,8 @@ Class TreeModel
                 AND md.plugin_type = :plugin_type");
 
             $query->setParameters(array (
-                'up_tree' => $request->get('id'),
-                'up_module' => $request->get('id_module'),
+                'up_tree' => $this->request->get('id'),
+                'up_module' => $this->request->get('id_module'),
                 'plugin_name' => $plugin['name'],
                 'plugin_type' => $plugin['type']
             ));
@@ -1133,7 +1136,7 @@ Class TreeModel
             $groups[$group->getId()] = $group;
         }
 
-        $module = $this->em->getRepository('DialogsBundle:modules')->findOneBy(array ('idd' => $request->get('id_module'), 'final' => 'Y'));
+        $module = $this->em->getRepository('DialogsBundle:modules')->findOneBy(array ('idd' => $this->request->get('id_module'), 'final' => 'Y'));
         $users = $this->em->getRepository('DialogsBundle:users')->findAll();
         $current_user = $security->getToken()->getUser();
 
@@ -1147,7 +1150,7 @@ Class TreeModel
 
             if ($acl->checkGroupPermissions($service_module, $group, $acl->getValueMask('provemaineditor'))) {
                 $subject = 'Отправлен материал на утверждение.';
-                $message = 'Пользователем '.$current_user->getLogin().' отправлен материал на утверждение. Ссылка на материал: http://localhost/app_dev.php/backoffice/#action/node_edit/id/'.$request->get('id').'/type/'.$request->get('id_module');
+                $message = 'Пользователем '.$current_user->getLogin().' отправлен материал на утверждение. Ссылка на материал: http://localhost/app_dev.php/backoffice/#action/node_edit/id/'.$this->request->get('id').'/type/'.$this->request->get('id_module');
 
                 $this->sendMessage($current_user->getId(), $user->getId(), $subject, $message);
             }
@@ -1157,7 +1160,7 @@ Class TreeModel
     }
 
     // Вернуть на доработку писателю (рядовому журналисту)
-    public function returnWriter($request, $security)
+    public function returnWriter($security) //*****
     {
         $query = $this->em->createQuery("
             SELECT 
@@ -1166,7 +1169,7 @@ Class TreeModel
                 DialogsBundle:modules md
             WHERE md.final = 'Y'
             AND md.status = 'active'
-            AND md.idd = :idd")->setParameter('idd', $request->get('id_module'));
+            AND md.idd = :idd")->setParameter('idd', $this->request->get('id_module'));
 
         $module = $query->getSingleResult();
 
@@ -1195,8 +1198,8 @@ Class TreeModel
                 AND md.plugin_type = :plugin_type");
 
             $query->setParameters(array (
-                'up_tree' => $request->get('id'),
-                'up_module' => $request->get('id_module'),
+                'up_tree' => $this->request->get('id'),
+                'up_module' => $this->request->get('id_module'),
                 'plugin_name' => $plugin['name'],
                 'plugin_type' => $plugin['type']
             ));
@@ -1257,8 +1260,8 @@ Class TreeModel
         $subject = 'Материал возвращён на доработку.';
         $message = 'Пользователем '.$current_user->getLogin().' возвращён на доработку материал, 
                     отправленный вами ему на утверждение. 
-                    Ссылка на материал: http://localhost/app_dev.php/backoffice/#action/node_edit/id/'.$request->get('id').'/type/'.$request->get('id_module').'
-                    Причина возврата: '.$request->get('comment');
+                    Ссылка на материал: http://localhost/app_dev.php/backoffice/#action/node_edit/id/'.$this->request->get('id').'/type/'.$this->request->get('id_module').'
+                    Причина возврата: '.$this->request->get('comment');
 
         $this->sendMessage($current_user->getId(), $history_record->getUpUser(), $subject, $message);
 
@@ -1266,7 +1269,7 @@ Class TreeModel
     }
 
     // Вернуть на доработку редактору
-    public function returnEditor($request, $security)
+    public function returnEditor($security) //*****
     {
         $query = $this->em->createQuery("
             SELECT 
@@ -1275,7 +1278,7 @@ Class TreeModel
                 DialogsBundle:modules md
             WHERE md.final = 'Y'
             AND md.status = 'active'
-            AND md.idd = :idd")->setParameter('idd', $request->get('id_module'));
+            AND md.idd = :idd")->setParameter('idd', $this->request->get('id_module'));
 
         $module = $query->getSingleResult();
 
@@ -1304,8 +1307,8 @@ Class TreeModel
                 AND md.plugin_type = :plugin_type");
 
             $query->setParameters(array (
-                'up_tree' => $request->get('id'),
-                'up_module' => $request->get('id_module'),
+                'up_tree' => $this->request->get('id'),
+                'up_module' => $this->request->get('id_module'),
                 'plugin_name' => $plugin['name'],
                 'plugin_type' => $plugin['type']
             ));
@@ -1366,8 +1369,8 @@ Class TreeModel
         $subject = 'Материал возвращён на доработку.';
         $message = 'Пользователем '.$current_user->getLogin().' возвращён на доработку материал, 
                     отправленный вами ему на утверждение. 
-                    Ссылка на материал: http://localhost/app_dev.php/backoffice/#action/node_edit/id/'.$request->get('id').'/type/'.$request->get('id_module').'
-                    Причина возврата: '.$request->get('comment');
+                    Ссылка на материал: http://localhost/app_dev.php/backoffice/#action/node_edit/id/'.$this->request->get('id').'/type/'.$this->request->get('id_module').'
+                    Причина возврата: '.$this->request->get('comment');
 
         $this->sendMessage($current_user->getId(), $history_record->getUpUser(), $subject, $message);
 

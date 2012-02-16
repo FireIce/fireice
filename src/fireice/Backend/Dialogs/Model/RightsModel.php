@@ -8,18 +8,21 @@ use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
 use fireice\Backend\Dialogs\Entity\module;
 use fireice\Backend\Dialogs\Entity\aclnodesrights;
+use Symfony\Component\HttpFoundation\Request;
 
 class RightsModel
 {
     protected $em;
     protected $acl;
     protected $container;
+    protected $request;
 
     public function __construct(EntityManager $em, $acl, $container)
     {
         $this->em = $em;
         $this->acl = $acl;
         $this->container = $container;
+        $this->request = Request::createFromGlobals();
     }
 
     public function getUserObject($id)
@@ -124,7 +127,7 @@ class RightsModel
         return $modules;
     }
 
-    public function getUsers($request)
+    public function getUsers()
     {
         // Общий запрос все юзеров
         $query = $this->em->createQuery("
@@ -160,8 +163,8 @@ class RightsModel
             AND acl.up_user IN (".implode(',', $users).")");
         
         $query->setParameters(array(
-            'up_tree' => $request->get('id_node'),
-            'up_module' => $request->get('id_module')
+            'up_tree' => $this->request->get('id_node'),
+            'up_module' => $this->request->get('id_module')
         ));
 
         $result = $query->getResult();
@@ -180,7 +183,7 @@ class RightsModel
                 DialogsBundle:modules md
             WHERE md.final = 'Y'
             AND md.status = 'active'
-            AND md.idd = :idd")->setParameter('idd', $request->get('id_module'));
+            AND md.idd = :idd")->setParameter('idd', $this->request->get('id_module'));
 
         $module = $query->getSingleResult();
 
@@ -191,7 +194,7 @@ class RightsModel
         $users = array ();
 
         $object_module = new module();
-        $object_module->setId($request->get('id_module'));
+        $object_module->setId($this->request->get('id_module'));
 
         // Собираем все вместе
         foreach ($users_result as $val) {
@@ -233,7 +236,7 @@ class RightsModel
         return $users;
     }
 
-    public function getUser($request)
+    public function getUser()
     {
         // Вытаскиваем инфу о модуле        
         $query = $this->em->createQuery("
@@ -249,9 +252,9 @@ class RightsModel
             AND md_l.up_module = :up_module");
         
         $query->setParameters(array(
-            'idd' => $request->get('id_module'),
-            'up_tree' => $request->get('id_node'),
-            'up_module' => $request->get('id_module')
+            'idd' => $this->request->get('id_module'),
+            'up_tree' => $this->request->get('id_node'),
+            'up_module' => $this->request->get('id_module')
         ));
 
         $module = $query->getResult();
@@ -275,7 +278,7 @@ class RightsModel
                 DialogsBundle:users us, 
                 DialogsBundle:groups gr
             WHERE us.groups = gr.id
-            AND us.id = :id")->setParameter('id', $request->get('id_user'));
+            AND us.id = :id")->setParameter('id', $this->request->get('id_user'));
 
         $user_result = $query->getSingleResult();
 
@@ -291,9 +294,9 @@ class RightsModel
             AND acl.up_user = :up_user");
         
         $query->setParameters(array(
-            'up_tree' => $request->get('id_node'),
-            'up_module' => $request->get('id_module'),
-            'up_user' => $request->get('id_user')
+            'up_tree' => $this->request->get('id_node'),
+            'up_module' => $this->request->get('id_module'),
+            'up_user' => $this->request->get('id_user')
         ));
 
         $notrights_result = $query->getResult();
@@ -302,7 +305,7 @@ class RightsModel
         $users = array ();
 
         $object_module = new module();
-        $object_module->setId($request->get('id_module'));
+        $object_module->setId($this->request->get('id_module'));
 
         $identy_group = new RoleSecurityIdentity('group_'.$user_result['groupid']);
 
@@ -350,7 +353,7 @@ class RightsModel
         );
     }
 
-    public function editUserRights($request)
+    public function editUserRights()
     {
         // Удаляем старую запись из acl_nodes_not_rights     
         $query = $this->em->createQuery("
@@ -366,9 +369,9 @@ class RightsModel
                 AND md_l.up_module = :up_module)");
         
         $query->setParameters(array(
-            'up_user' => $request->get('id_user'),
-            'up_tree' => $request->get('id_node'),
-            'up_module' => $request->get('id_module')
+            'up_user' => $this->request->get('id_user'),
+            'up_tree' => $this->request->get('id_node'),
+            'up_module' => $this->request->get('id_module')
         ));
 
         $query->getResult();
@@ -376,20 +379,20 @@ class RightsModel
         // Получаем число в котором включённый бит означает выключенное право
         $builder = new MaskBuilder();
 
-        foreach ($request->get('rights') as $key => $val) {
+        foreach ($this->request->get('rights') as $key => $val) {
             if ($val == '0') $builder->add($this->acl->getValueMask($key));
         }
 
         if ($builder->get() != 0) {
             // Вставляем запись в acl_nodes_not_rights
             $modules_link = $this->em->getRepository('DialogsBundle:moduleslink')->findOneBy(array (
-                'up_tree' => $request->get('id_node'),
-                'up_module' => $request->get('id_module')
+                'up_tree' => $this->request->get('id_node'),
+                'up_module' => $this->request->get('id_module')
                 ));
 
             $aclnodesrights = new aclnodesrights();
             $aclnodesrights->setUpModulesLink($modules_link->getId());
-            $aclnodesrights->setUpUser($request->get('id_user'));
+            $aclnodesrights->setUpUser($this->request->get('id_user'));
             $aclnodesrights->setNotRights($builder->get());
             $this->em->persist($aclnodesrights);
             $this->em->flush();

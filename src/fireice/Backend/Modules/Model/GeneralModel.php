@@ -5,6 +5,7 @@ namespace fireice\Backend\Modules\Model;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\Yaml\Yaml;
 use fireice\Backend\Dialogs\Entity\module;
+use Symfony\Component\HttpFoundation\Request;
 
 class GeneralModel
 {
@@ -17,11 +18,11 @@ class GeneralModel
     protected $request;
     protected $module_name = 'text';
 
-    public function __construct($container, $em, $request)
+    public function __construct($container, $em)
     {
         $this->container = $container;
         $this->em = $em;
-        $this->request = $request;
+        $this->request = Request::createFromGlobals();
         $this->module_name = $this->getModuleName();
     }
 

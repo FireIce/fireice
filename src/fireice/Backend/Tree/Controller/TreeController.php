@@ -168,7 +168,7 @@ class TreeController extends Controller
             $container = $this->container;
             $tree_model = new TreeModel($em, $sess, $container);
 
-            $answer = $tree_model->create($this->get('request'), $this->get('security.context'));
+            $answer = $tree_model->create($this->get('security.context'));
 
             $this->get('cache')->updateSiteTreeStructure();
             $this->get('cache')->updateSiteTreeAccessAll();
@@ -358,7 +358,7 @@ class TreeController extends Controller
         $container = $this->container;
         $tree_model = new TreeModel($em, $sess, $container);
 
-        $answer = $tree_model->proveEditor($this->get('request'), $this->get('security.context'));
+        $answer = $tree_model->proveEditor($this->get('security.context'));
 
         $response = new Response(json_encode($answer));
         $response->headers->set('Content-Type', 'application/json');
@@ -373,7 +373,7 @@ class TreeController extends Controller
         $container = $this->container;
         $tree_model = new TreeModel($em, $sess, $container);
 
-        $answer = $tree_model->proveMainEditor($this->get('request'), $this->get('security.context'));
+        $answer = $tree_model->proveMainEditor($this->get('security.context'));
 
         $response = new Response(json_encode($answer));
         $response->headers->set('Content-Type', 'application/json');
@@ -388,7 +388,7 @@ class TreeController extends Controller
         $container = $this->container;
         $tree_model = new TreeModel($em, $sess, $container);
 
-        $answer = $tree_model->sendToProveEditor($this->get('request'), $this->get('security.context'), $this->get('acl'));
+        $answer = $tree_model->sendToProveEditor($this->get('security.context'), $this->get('acl'));
 
         $response = new Response(json_encode($answer));
         $response->headers->set('Content-Type', 'application/json');
@@ -403,7 +403,7 @@ class TreeController extends Controller
         $container = $this->container;
         $tree_model = new TreeModel($em, $sess, $container);
 
-        $answer = $tree_model->sendToProveMainEditor($this->get('request'), $this->get('security.context'), $this->get('acl'));
+        $answer = $tree_model->sendToProveMainEditor($this->get('security.context'), $this->get('acl'));
 
         $response = new Response(json_encode($answer));
         $response->headers->set('Content-Type', 'application/json');
@@ -418,7 +418,7 @@ class TreeController extends Controller
         $container = $this->container;
         $tree_model = new TreeModel($em, $sess, $container);
 
-        $answer = $tree_model->returnWriter($this->get('request'), $this->get('security.context'));
+        $answer = $tree_model->returnWriter($this->get('security.context'));
 
         $response = new Response(json_encode($answer));
         $response->headers->set('Content-Type', 'application/json');
@@ -433,7 +433,7 @@ class TreeController extends Controller
         $container = $this->container;
         $tree_model = new TreeModel($em, $sess, $container);
 
-        $answer = $tree_model->returnEditor($this->get('request'), $this->get('security.context'));
+        $answer = $tree_model->returnEditor($this->get('security.context'));
 
         $response = new Response(json_encode($answer));
         $response->headers->set('Content-Type', 'application/json');

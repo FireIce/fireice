@@ -49,7 +49,7 @@ class RightsController extends Controller
         if ($acl->checkUserTreePermissions(false, $acl->getValueMask('editnodesrights'))) {
             $rights_model = new RightsModel($em, $acl, $container);
 
-            $answer = $rights_model->getUsers($this->get('request'));
+            $answer = $rights_model->getUsers();
         } else {
             $answer = 'no_rights';
         }
@@ -68,7 +68,7 @@ class RightsController extends Controller
         if ($acl->checkUserTreePermissions(false, $acl->getValueMask('editnodesrights'))) {
             $rights_model = new RightsModel($em, $acl, $container);
 
-            $answer = $rights_model->getUser($this->get('request'));
+            $answer = $rights_model->getUser();
         } else {
             $answer = 'no_rights';
         }
@@ -86,7 +86,7 @@ class RightsController extends Controller
 
         if ($acl->checkUserTreePermissions(false, $acl->getValueMask('editnodesrights'))) {
             $rights_model = new RightsModel($em, $acl, $container);
-            $rights_model->editUserRights($this->get('request'));
+            $rights_model->editUserRights();
 
             $this->get('cache')->updateSiteTreeAccessUser($rights_model->getUserObject($this->get('request')->get('id_user')));
 

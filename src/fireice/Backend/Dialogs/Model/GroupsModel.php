@@ -7,6 +7,7 @@ use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
 use fireice\Backend\Dialogs\Entity\groups;
 use fireice\Backend\Dialogs\Entity\module;
 use fireice\Backend\Tree\Controller\TreeController;
+use Symfony\Component\HttpFoundation\Request;
 
 class GroupsModel
 {
@@ -142,8 +143,9 @@ class GroupsModel
         return $data;
     }
 
-    public function editGroup($request)
+    public function editGroup()
     {
+        $request = Request::createFromGlobals();
         $group = $this->em->getRepository('DialogsBundle:groups')->findOneBy(array ('id' => $request->get('id')));
 
         $this->acl->removeGroupPermissions($this->getModules(), new RoleSecurityIdentity('group_'.$group->getId()));
@@ -171,10 +173,11 @@ class GroupsModel
         $this->acl->createManyPermissions($rights, new RoleSecurityIdentity('group_'.$group->getId()));
     }
 
-    public function addGroup($request)
+    public function addGroup()
     {
+        $request = Request::createFromGlobals();
         $group = new groups();
-
+                
         $group->setName($request->get('name'));
         $group->setTitle($request->get('title'));
 

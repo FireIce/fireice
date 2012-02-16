@@ -99,7 +99,7 @@ class GroupsController extends Controller
 
         if ($acl->checkUserTreePermissions(false, $acl->getValueMask('editgroup'))) {
             $groups_model = new GroupsModel($em, $acl, $container);
-            $groups_model->editGroup($this->get('request'));
+            $groups_model->editGroup();
 
             $this->get('cache')->updateSiteTreeAccessGroup($this->get('request')->get('id'));
 
@@ -120,7 +120,7 @@ class GroupsController extends Controller
 
         if ($acl->checkUserTreePermissions(false, $acl->getValueMask('editgroup'))) {
             $groups_model = new GroupsModel($em, $acl, $container);
-            $groups_model->addGroup($this->get('request'));
+            $groups_model->addGroup();
 
             $response = new Response(json_encode('ok'));
         } else {

@@ -16,8 +16,8 @@ class BackendController extends Controller
 
         return new $this->model(
                 $this->container,
-                $this->get('doctrine.orm.entity_manager'),
-                $this->get('request')
+                $this->get('doctrine.orm.entity_manager')
+                
         );
     }
 

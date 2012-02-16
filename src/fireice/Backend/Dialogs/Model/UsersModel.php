@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Symfony\Component\Security\Acl\Permission\MaskBuilder;
 use fireice\Backend\Dialogs\Entity\users;
 use fireice\Backend\Dialogs\Entity\UserGroups;
+use Symfony\Component\HttpFoundation\Request;
 
 class UsersModel
 {
@@ -91,8 +92,9 @@ class UsersModel
         return $ret;
     }
 
-    public function editUser($request)
+    public function editUser()
     {
+        $request = Request::createFromGlobals();
         if (null !== $m = $this->getPlugins()) {
             $user = $this->em->getRepository('DialogsBundle:users')->findOneBy(array ('id' => $request->get('id')));
 
@@ -108,8 +110,9 @@ class UsersModel
         }
     }
 
-    public function addUser($request)
+    public function addUser()
     {
+        $request = Request::createFromGlobals();
         if (null !== $m = $this->getPlugins()) {
             $user = new users();
 

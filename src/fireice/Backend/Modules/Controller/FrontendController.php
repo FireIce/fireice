@@ -22,7 +22,7 @@ class FrontendController extends Controller
             throw new \RuntimeException('Model must be defined in childs class');
         }
 
-        return new $this->model($this->container, $this->get('doctrine.orm.entity_manager'), $this->get('request'));
+        return new $this->model($this->container, $this->get('doctrine.orm.entity_manager'));
     }
 
     public function load($params=array ())
