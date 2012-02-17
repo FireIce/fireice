@@ -11,10 +11,9 @@ use fireice\Backend\Dialogs\Entity\module;
 
 class TreeController extends Controller
 {
-
     protected $model = null;
 
-    protected function getModel() 
+    protected function getModel()
     {
         if (null === $this->model) {
             $em = $this->get('doctrine.orm.entity_manager');
@@ -24,6 +23,7 @@ class TreeController extends Controller
         }
         return $this->model;
     }
+
     public function backOfficeAction()
     {
         $messages = $this->getModel()->getNewMessages($this->get('security.context'));
@@ -68,7 +68,7 @@ class TreeController extends Controller
 
             foreach ($show_nodes as $val) {
                 $childrens = $this->getModel()->getChildren($val);
-                if (count($childrens) > 0) {
+                if ($childrens !== array ()) {
                     $nodes_list[] = $childrens;
                 }
             }
@@ -98,7 +98,7 @@ class TreeController extends Controller
 
             foreach ($show_nodes as $val) {
                 $childrens = $this->getModel()->getParents($val);
-                if (count($childrens) > 0) {
+                if ($childrens !== array ()) {
                     $nodes_list[] = $childrens;
                 }
             }
@@ -163,7 +163,7 @@ class TreeController extends Controller
     {
         $modules = $this->getModel()->getNodeModules($this->get('request')->get('id'), $this->get('acl'));
 
-        if (count($modules) == 0) {
+        if ($modules === array ()) {
             $answer = 'error';
         } else {
             $node_title = $this->getModel()->getNodeTitle($this->get('request')->get('id'));
@@ -430,7 +430,7 @@ class TreeController extends Controller
         return $response;
     }
 
-    public function getNodeModule($id_node, $id_module=false)
+    public function getNodeModule($id_node, $id_module = false)
     {
         $this->sitetree = $this->container->get('cache')->getSiteTreeStructure();
 
@@ -455,7 +455,7 @@ class TreeController extends Controller
     {
         $modules = $this->getModel()->getNodeModules($this->get('request')->get('id'), $this->get('acl'));
 
-        if (count($modules) > 0) {
+        if ($modules !== array ()) {
             $module_act = '\\project\\Modules\\'.$modules[$this->get('request')->get('id_module')]['directory'].'\\Controller\\BackendController';
             $module_act = new $module_act();
             $module_act->setContainer($this->container);

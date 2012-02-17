@@ -40,11 +40,11 @@ class FrontendController extends Controller
         $path = trim($path, '/');
         $path = explode('/', $path);
 
-        if (count($path) == 1 && $path[0] === '') {
+        if ($path === array ('')) {
             return $this->showPage(1, '');
         }
 
-        if (count($path) > 0) {
+        if ($path !== array ()) {
             for ($i = 0; $i < count($path); $i++) {
                 if ($i == 0) $childs = $frontend_model->getChilds(1);
                 else $childs = $frontend_model->getChilds($path[$i - 1]);
@@ -81,11 +81,11 @@ class FrontendController extends Controller
         return $this->get404Page();
     }
 
-    public function showPage($id_node, $params='')
+    public function showPage($id_node, $params = '')
     {
         $tree = new TreeController;
-        $tree->setContainer($this->container);        
-        
+        $tree->setContainer($this->container);
+
         $frontend_model = $this->getModel();
 
         if ($frontend_model->checkAccess($id_node)) {
@@ -113,11 +113,11 @@ class FrontendController extends Controller
         $current_page = $navigation[count($navigation) - 1];
 
         $content = $this->renderView('FrontendBundle:Frontend:index.html.twig', array (
-                'modules' => $modules_html,
-                'menu' => $menu,
-                'navigation' => $navigation,
-                'current_page' => $current_page,
-                'user' => $frontend_model->getUser()
+            'modules' => $modules_html,
+            'menu' => $menu,
+            'navigation' => $navigation,
+            'current_page' => $current_page,
+            'user' => $frontend_model->getUser()
             ));
         return new Response($this->transformationHtml($content));
     }
@@ -129,7 +129,7 @@ class FrontendController extends Controller
 
         return $response;
     }
-    
+
     protected function transformationHtml($html)
     {
         return preg_replace('|^(\s*?)(\S)|m', "$2", $html);

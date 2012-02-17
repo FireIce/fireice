@@ -621,13 +621,10 @@ function getNodeModules_callback(answer)
     
     $('#dialog_id .form .tab').click(function(){
         
-        var act_tmp = 'node_' + action;
-        if (act_tmp == 'node_create')
-            act_tmp = 'node_create_2';
         
         module_type = $(this).attr('module_type');
        
-        $.history.load('action/' + act_tmp + '/id/' + id_action + '/module/' + $(this).attr('id_module')); 
+        $.history.load('action/' + getNodeAction(action) + '/id/' + id_action + '/module/' + $(this).attr('id_module')); 
     
     });   
     

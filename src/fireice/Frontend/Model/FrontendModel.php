@@ -20,7 +20,7 @@ class FrontendModel
 
         $this->sitetree = $cache->getSiteTreeStructure();
         $this->access = $cache->getSiteTreeAccess();
-      
+
         if ($this->sitetree === false || $this->access === false) {
             $this->server_is_busy = true;
         } else {
@@ -138,7 +138,7 @@ class FrontendModel
 
     public function getMenuHierarchy($navigation)
     {
-        if (count($navigation) > 0) {
+        if ($navigation !== array () && is_array($navigation)) {
 
             $first = $navigation[0];
             $next = (isset($navigation[1])) ? $navigation[1] : false;
@@ -167,4 +167,5 @@ class FrontendModel
     {
         return $this->sitetree['nodes'][$id]['status'];
     }
+
 }

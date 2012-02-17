@@ -52,7 +52,7 @@ class RightsModel
 
         $result = $query->getResult();
 
-        if (count($result) == 0) return false;
+        if ($result === array()) return false;
 
         $result = $result[0];
 
@@ -259,7 +259,7 @@ class RightsModel
 
         $module = $query->getResult();
 
-        if (count($module) == 0) {
+        if ($module === array()) {
             return 'error';
         }
 
@@ -326,7 +326,7 @@ class RightsModel
         foreach ($group_rights as $right) {
             $int_right = $this->acl->getValueMask($right['name']);
 
-            if (count($notrights_result) > 0) $not_rights = intval($notrights_result[0]['not_rights']);
+            if ($notrights_result !== array()) $not_rights = intval($notrights_result[0]['not_rights']);
             else $not_rights = 0;
 
             if (($int_right & (~$not_rights)) === $int_right) {

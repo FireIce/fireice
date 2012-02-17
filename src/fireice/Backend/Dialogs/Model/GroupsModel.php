@@ -91,7 +91,7 @@ class GroupsModel
             FROM 
                 DialogsBundle:groups gr 
     	    WHERE gr.id = :id")->setParameter('id', $id);
-        
+
         $query->setMaxResults(1);
 
         $result = $query->getArrayResult();
@@ -101,7 +101,7 @@ class GroupsModel
         $entity = new groups();
 
         foreach ($entity->getConfig() as $plugin) {
-            if (count($result) > 0) {
+            if ($result !== array ()) {
                 $data[$plugin['name']] = $plugin + array ('value' => $result[0][$plugin['name']]);
             } else {
                 $data[$plugin['name']] = $plugin + array ('value' => '');
@@ -110,7 +110,7 @@ class GroupsModel
 
         $modules = $this->getModules();
 
-        if (count($result) > 0) $group = new RoleSecurityIdentity('group_'.$result[0]['id']);
+        if ($result !== array ()) $group = new RoleSecurityIdentity('group_'.$result[0]['id']);
 
         foreach ($modules as $module) {
             $data[$module['name']] = array (
@@ -124,7 +124,7 @@ class GroupsModel
                 $mod = new module();
                 $mod->setId($module['id']);
 
-                if (count($result) > 0 && $this->acl->checkGroupPermissions($mod, $group, $this->acl->getValueMask($right['name']))) {
+                if ($result !== array () && $this->acl->checkGroupPermissions($mod, $group, $this->acl->getValueMask($right['name']))) {
                     $data[$module['name']]['value'][$right['name']] = array (
                         'label' => $right['title'],
                         'value' => 1
@@ -177,7 +177,7 @@ class GroupsModel
     {
         $request = Request::createFromGlobals();
         $group = new groups();
-                
+
         $group->setName($request->get('name'));
         $group->setTitle($request->get('title'));
 

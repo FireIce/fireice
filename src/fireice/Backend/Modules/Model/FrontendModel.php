@@ -20,7 +20,7 @@ class FrontendModel extends GeneralModel
         foreach ($this->getPlugins() as $plugin) {
             $type = $plugin->getValue('type');
 
-            if (count($values[$type]) > 0) {
+            if (isset($values[$type]) && $values[$type] !== array() ) {
                 foreach ($values[$type] as $val) {
                     if ($val['plugin_name'] == $plugin->getValue('name')) {
 

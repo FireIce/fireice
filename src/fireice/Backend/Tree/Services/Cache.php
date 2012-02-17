@@ -308,7 +308,7 @@ class Cache
         foreach ($nodes as $key => $val) {
             $childs = $this->getChilds($key);
 
-            $hierarchy[$key] = count($childs) > 0 ? $childs : null;
+            $hierarchy[$key] = $childs !==array() ? $childs : null;
         }
 
         return array (

@@ -61,7 +61,7 @@ class UsersModel
         $module = new users();
 
         foreach ($module->getConfig() as $plugin) {
-            if (count($result) > 0) {
+            if ($result !== array()) {
                 if ($plugin['name'] != 'groups') $data[$plugin['name']] = $plugin + array ('value' => $result[0][$plugin['name']]);
                 else $data[$plugin['name']] = $plugin + array ('value' => $this->getGroups($result[0]['groups']));
             }

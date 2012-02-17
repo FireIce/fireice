@@ -25,7 +25,7 @@ class BackendModel extends GeneralModel
         foreach ($this->getPlugins() as $plugin) {
             $type = $plugin->getValue('type');
 
-            if (count($values[$type]) > 0) {
+            if (isset($values[$type]) && $values[$type] !== array ()) {
                 foreach ($values[$type] as $val) {
                     if ($val['plugin_name'] == $plugin->getValue('name')) {
                         $data[$plugin->getValue('name')] = $plugin->getValues() + array ('value' => $val['plugin_value']);
@@ -122,8 +122,8 @@ class BackendModel extends GeneralModel
                     AND md.final = 'Y'
                     AND md.plugin_name = :plugin_name
                     AND md.plugin_type = :plugin_type");
-                
-                $query->setParameters(array(
+
+                $query->setParameters(array (
                     'up_tree' => $this->request->get('id'),
                     'up_module' => $this->request->get('id_module'),
                     'plugin_name' => $plugin->getValue('name'),
@@ -132,7 +132,7 @@ class BackendModel extends GeneralModel
 
                 $result = $query->getResult();
 
-                if (count($result) > 0) {
+                if ($result !== array ()) {
                     $result = $result[0];
 
                     $plugin_id = $plugin->setDataInDb($this->request->get($plugin->getValue('name')));
@@ -154,12 +154,12 @@ class BackendModel extends GeneralModel
                         WHERE md.idd = :idd 
                         AND md.final = 'Y' 
                         AND md.eid IS NULL");
-                    
-                    $query->setParameters(array(
+
+                    $query->setParameters(array (
                         'eid' => $hid,
                         'idd' => $result['idd']
                     ));
-                    
+
                     $query->getResult();
 
                     $new_module_record = $this->getModuleEntity();
@@ -237,8 +237,8 @@ class BackendModel extends GeneralModel
                         AND md.final != 'N'
                         AND md.plugin_name = :plugin_name
                         AND md.plugin_type = :plugin_type");
-                    
-                    $query->setParameters(array(
+
+                    $query->setParameters(array (
                         'up_tree' => $this->request->get('id'),
                         'up_module' => $this->request->get('id_module'),
                         'plugin_name' => $plugin->getValue('name'),
@@ -247,7 +247,7 @@ class BackendModel extends GeneralModel
 
                     $result = $query->getResult();
 
-                    if (count($result) > 0) {
+                    if ($result !== array ()) {
                         $result = $result[0];
 
                         $plugin_id = $plugin->setDataInDb($this->request->get($plugin->getValue('name')));
@@ -333,8 +333,8 @@ class BackendModel extends GeneralModel
                         AND mp_l.up_plugin = md.idd
                         AND md.plugin_name = :plugin_name
                         AND md.plugin_type = :plugin_type");
-                    
-                    $query->setParameters(array(
+
+                    $query->setParameters(array (
                         'up_tree' => $this->request->get('id'),
                         'up_module' => $this->request->get('id_module'),
                         'plugin_name' => $plugin->getValue('name'),
@@ -343,7 +343,7 @@ class BackendModel extends GeneralModel
 
                     $result = $query->getResult();
 
-                    if (count($result) > 0) {
+                    if ($result !== array ()) {
                         $result = $result[0];
 
                         $plugin_id = $plugin->setDataInDb($this->request->get($plugin->getValue('name')));
@@ -435,11 +435,11 @@ class BackendModel extends GeneralModel
             AND m_l.id = mp_l.up_link
             AND mp_l.up_plugin = md.idd");
 
-        $query->setParameters(array(
+        $query->setParameters(array (
             'up_tree' => $this->request->get('id'),
             'up_module' => $this->request->get('id_module')
         ));
-        
+
         $result = $query->getResult();
         // --- Главный запрос, получающий список записей в таблице модуля
         // +++ Обрабатываем результат и забиваем в массивы
@@ -549,7 +549,7 @@ class BackendModel extends GeneralModel
                 'values' => $history_values,
             );
         }
-        
+
         return $history;
     }
 
@@ -596,7 +596,7 @@ class BackendModel extends GeneralModel
         return true;
     }
 
-    public function ajaxLoadList($data, $id_item='')
+    public function ajaxLoadList($data, $id_item = '')
     {
         if ($data['id_node'] == 0) {
             return array (0 => array (
@@ -618,7 +618,7 @@ class BackendModel extends GeneralModel
             AND md_l.up_module = md.idd
             AND tr.final = 'Y'
             AND tr.idd = :idd
-            AND md.type = 'user'")->setParameter('idd', $data['id_node']);       
+            AND md.type = 'user'")->setParameter('idd', $data['id_node']);
 
         $result = $query->getSingleResult();
 
@@ -671,8 +671,8 @@ class BackendModel extends GeneralModel
 
             AND md.plugin_id = plg.id
             AND md.plugin_name = :plugin_name");
-        
-        $query->setParameters(array(
+
+        $query->setParameters(array (
             'up_tree' => $data['id_node'],
             'up_module' => $node_modules['id_module'],
             'plugin_name' => $data['title']

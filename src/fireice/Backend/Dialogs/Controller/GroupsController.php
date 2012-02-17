@@ -156,7 +156,7 @@ class GroupsController extends Controller
 
         $groups = $em->getRepository('DialogsBundle:groups')->findAll();
 
-        if (count($groups) == 0) {
+        if ($groups === array()) {
             // Создаём группы
             $god_group = new groups();
             $god_group->setName('God');
