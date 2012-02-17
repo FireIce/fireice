@@ -19,7 +19,8 @@ use fireice\Backend\Plugins\Text\Entity\plugintext;
 use fireice\Backend\Dialogs\Entity\moduleslink;
 use fireice\Backend\Dialogs\Entity\modulespluginslink;
 
-class GroupsController extends Controller {
+class GroupsController extends Controller 
+{
 
     protected $model = null;
 
@@ -39,11 +40,9 @@ class GroupsController extends Controller {
         $acl = $this->get('acl');
 
         if ($acl->checkUserTreePermissions(false, $acl->getValueMask('viewgroups'))) {
-            $groups_model = $this->getModel();
-
-            $modules = $groups_model->getModules();
-
-            $groups = $groups_model->findAll();
+            
+            $modules = $this->getModel()->getModules();
+            $groups = $this->getModel()->findAll();
 
             // Для каждой группы узнаем установленные права
             foreach ($groups as &$group) {
@@ -88,8 +87,7 @@ class GroupsController extends Controller {
         $acl = $this->get('acl');
 
         if ($acl->checkUserTreePermissions(false, $acl->getValueMask('editgroup'))) {
-            $groups_model = $this->getModel();
-            $answer = $groups_model->getGroupData($this->get('request')->get('id'));
+            $answer = $this->getModel()->getGroupData($this->get('request')->get('id'));
         } else {
             $answer = 'no_rights';
         }
@@ -104,8 +102,7 @@ class GroupsController extends Controller {
 
 
         if ($acl->checkUserTreePermissions(false, $acl->getValueMask('editgroup'))) {
-            $groups_model = $this->getModel();
-            $groups_model->editGroup();
+            $this->getModel()->editGroup();
 
             $this->get('cache')->updateSiteTreeAccessGroup($this->get('request')->get('id'));
 
@@ -124,8 +121,7 @@ class GroupsController extends Controller {
 
 
         if ($acl->checkUserTreePermissions(false, $acl->getValueMask('editgroup'))) {
-            $groups_model = $this->getModel();
-            $groups_model->addGroup();
+            $this->getModel()->addGroup();
 
             $response = new Response(json_encode('ok'));
         } else {
@@ -141,8 +137,7 @@ class GroupsController extends Controller {
         $acl = $this->get('acl');
 
         if ($acl->checkUserTreePermissions(false, $acl->getValueMask('deletegroup'))) {
-            $groups_model = $this->getModel();
-            $groups_model->deleteGroup($this->get('request')->get('id'), $this->get('cache'));
+            $this->getModel()->deleteGroup($this->get('request')->get('id'), $this->get('cache'));
 
             $response = new Response(json_encode('ok'));
         } else {
@@ -188,9 +183,7 @@ class GroupsController extends Controller {
             $em->flush();
 
             // Присваиваем права каждому узлу                                                                                       
-            $groups_model = $this->getModel();
-
-            $modules = $groups_model->getModules();
+            $modules = $this->getModel()->getModules();
 
             foreach ($modules as $key => $module) {
                 $object = new module();

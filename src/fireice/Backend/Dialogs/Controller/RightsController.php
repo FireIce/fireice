@@ -25,13 +25,12 @@ class RightsController extends Controller
     public function getModulesAction()
     {
         $acl = $this->get('acl');
-        $rights_model = $this->getModel();
 
-        $node_title = $rights_model->getNodeTitle($this->get('request')->get('id'));
+        $node_title = $this->getModel()->getNodeTitle($this->get('request')->get('id'));
 
         if ($node_title !== false) {
             if ($acl->checkUserTreePermissions(false, $acl->getValueMask('editnodesrights'))) {
-                $modules = $rights_model->getModules($this->get('request')->get('id'));
+                $modules = $this->getModel()->getModules($this->get('request')->get('id'));
 
                 $answer = array (
                     'node_title' => $node_title,
@@ -55,9 +54,8 @@ class RightsController extends Controller
         $acl = $this->get('acl');
 
         if ($acl->checkUserTreePermissions(false, $acl->getValueMask('editnodesrights'))) {
-            $rights_model = $this->getModel();
 
-            $answer = $rights_model->getUsers();
+            $answer = $this->getModel()->getUsers();
         } else {
             $answer = 'no_rights';
         }
@@ -72,9 +70,8 @@ class RightsController extends Controller
         $acl = $this->get('acl');
 
         if ($acl->checkUserTreePermissions(false, $acl->getValueMask('editnodesrights'))) {
-            $rights_model = $this->getModel();
 
-            $answer = $rights_model->getUser();
+            $answer = $this->getModel()->getUser();
         } else {
             $answer = 'no_rights';
         }
@@ -89,10 +86,9 @@ class RightsController extends Controller
         $acl = $this->get('acl');
 
         if ($acl->checkUserTreePermissions(false, $acl->getValueMask('editnodesrights'))) {
-            $rights_model = $this->getModel();
-            $rights_model->editUserRights();
+            $this->getModel()->editUserRights();
 
-            $this->get('cache')->updateSiteTreeAccessUser($rights_model->getUserObject($this->get('request')->get('id_user')));
+            $this->get('cache')->updateSiteTreeAccessUser($this->getModel()->getUserObject($this->get('request')->get('id_user')));
 
             $response = new Response(json_encode('ok'));
         } else {

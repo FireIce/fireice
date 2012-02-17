@@ -181,7 +181,11 @@ function getHistory(id_mod)
             act_tmp = 'node_create_2';        
         $.history.load('action/' + act_tmp + '/id/' + id_action + '/module/' + id_module);                              
     
-    });   
+    }); 
+    
+    $('#dialog_id .cancel_button').click(function(){
+    $.history.load('');
+    });
     
     $.ajax({
         url: options.url + 'get_history?id=' + id_action + '&id_module=' + id_module,

@@ -27,7 +27,7 @@ class UsersController extends Controller
 
         if ($acl->checkUserTreePermissions(false, $acl->getValueMask('viewusers'))) {
             $users_model =  $this->getModel();
-            $users = $users_model->getUsers();
+            $users = $this->getModel()->getUsers();
             
             $answer = array(
                 'list' => $users,
@@ -51,7 +51,7 @@ class UsersController extends Controller
 
         if ($acl->checkUserTreePermissions(false, $acl->getValueMask('edituser'))) {
             $users_model = $this->getModel();
-            $answer = $users_model->getUserData($this->get('request')->get('id'));
+            $answer = $this->getModel()->getUserData($this->get('request')->get('id'));
         } else {
             $answer = 'no_rights';
         }
@@ -67,8 +67,7 @@ class UsersController extends Controller
         $acl = $this->get('acl');
 
         if ($acl->checkUserTreePermissions(false, $acl->getValueMask('edituser'))) {
-            $users_model = $this->getModel();
-            $user = $users_model->editUser();
+            $user = $this->getModel()->editUser();
             
             $this->get('cache')->updateSiteTreeAccessUser($user);
 
@@ -86,8 +85,7 @@ class UsersController extends Controller
         $acl = $this->get('acl');
 
         if ($acl->checkUserTreePermissions(false, $acl->getValueMask('edituser'))) {
-            $users_model = $this->getModel();
-            $user = $users_model->addUser();
+            $user = $this->getModel()->addUser();
 
             $this->get('cache')->updateSiteTreeAccessUser($user);
 
@@ -106,8 +104,7 @@ class UsersController extends Controller
         $acl = $this->get('acl');
 
         if ($acl->checkUserTreePermissions(false, $acl->getValueMask('deleteuser'))) {
-            $users_model = $this->getModel();
-            $users_model->deleteUser($this->get('request')->get('id'));
+            $this->getModel()->deleteUser($this->get('request')->get('id'));
             $this->get('cache')->deleteSiteTreeAccessUser($this->get('request')->get('id'));
 
             $response = new Response(json_encode('ok'));

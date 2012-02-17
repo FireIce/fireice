@@ -26,9 +26,7 @@ class TreeController extends Controller
     }
     public function backOfficeAction()
     {
-        $tree_model = $this->getModel();
-
-        $messages = $tree_model->getNewMessages($this->get('security.context'));
+        $messages = $this->getModel()->getNewMessages($this->get('security.context'));
 
         $response = $this->render('TreeBundle:Tree:backoffice.html.twig', array (
             'messages' => $messages,
@@ -40,14 +38,12 @@ class TreeController extends Controller
 
     public function getParentsAction($id)
     {
-        $tree_model = $this->getModel();
-
         $securityContext = $this->container->get('security.context');
         $userCurrent = $securityContext->getToken()->getUser();
 
         if (is_object($userCurrent)) {
             $parents = array (
-                'list' => $tree_model->getChildren($id),
+                'list' => $this->getModel()->getChildren($id),
                 'user' => $userCurrent->getLogin()
             );
         } else {
@@ -62,17 +58,16 @@ class TreeController extends Controller
 
     public function getShowNodesAction()
     {
-        $tree_model = $this->getModel();
 
         $securityContext = $this->container->get('security.context');
         $userCurrent = $securityContext->getToken()->getUser();
 
         if (is_object($userCurrent)) {
-            $show_nodes = $tree_model->getShowNodes();
+            $show_nodes = $this->getModel()->getShowNodes();
             $nodes_list = array ();
 
             foreach ($show_nodes as $val) {
-                $childrens = $tree_model->getChildren($val);
+                $childrens = $this->getModel()->getChildren($val);
                 if (count($childrens) > 0) {
                     $nodes_list[] = $childrens;
                 }
@@ -94,17 +89,15 @@ class TreeController extends Controller
 
     public function getNewNodesAction($id)
     {
-        $tree_model = $this->getModel();
-
         $securityContext = $this->container->get('security.context');
         $userCurrent = $securityContext->getToken()->getUser();
 
         if (is_object($userCurrent)) {
-            $show_nodes = $tree_model->showNodes($id);
+            $show_nodes = $this->getModel()->showNodes($id);
             $nodes_list = array ();
 
             foreach ($show_nodes as $val) {
-                $childrens = $tree_model->getParents($val);
+                $childrens = $this->getModel()->getParents($val);
                 if (count($childrens) > 0) {
                     $nodes_list[] = $childrens;
                 }
@@ -126,12 +119,7 @@ class TreeController extends Controller
 
     public function contextMenuAction($id)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
-        $sess = $this->get('session');
-        $container = $this->container;
-        $tree_model = $this->getModel();
-
-        $context_menu = $tree_model->contextMenu($id, $this->get('acl'));
+        $context_menu = $this->getModel()->contextMenu($id, $this->get('acl'));
 
         $response = new Response(json_encode($context_menu));
         $response->headers->set('Content-Type', 'application/json');
@@ -142,11 +130,9 @@ class TreeController extends Controller
     public function getModulesAction($id)
     {
         if ($this->get('acl')->checkUserTreePermissions(false, $this->get('acl')->getValueMask('create'))) {
-            $tree_model = $this->getModel();
-
             $answer = array (
-                'option' => $tree_model->getModules($id),
-                'node_title' => $tree_model->getNodeTitle($id)
+                'option' => $this->getModel()->getModules($id),
+                'node_title' => $this->getModel()->getNodeTitle($id)
             );
         } else {
             $answer = 'no_rights';
@@ -160,9 +146,7 @@ class TreeController extends Controller
     public function nodeCreateAction()
     {
         if ($this->get('acl')->checkUserTreePermissions(false, $this->get('acl')->getValueMask('create'))) {
-            $tree_model = $this->getModel();
-
-            $answer = $tree_model->create($this->get('security.context'));
+            $answer = $this->getModel()->create($this->get('security.context'));
 
             $this->get('cache')->updateSiteTreeStructure();
             $this->get('cache')->updateSiteTreeAccessAll();
@@ -177,14 +161,12 @@ class TreeController extends Controller
 
     public function getNodeModulesAction()
     {
-        $tree_model = $this->getModel();
-
-        $modules = $tree_model->getNodeModules($this->get('request')->get('id'), $this->get('acl'));
+        $modules = $this->getModel()->getNodeModules($this->get('request')->get('id'), $this->get('acl'));
 
         if (count($modules) == 0) {
             $answer = 'error';
         } else {
-            $node_title = $tree_model->getNodeTitle($this->get('request')->get('id'));
+            $node_title = $this->getModel()->getNodeTitle($this->get('request')->get('id'));
 
             $answer = array (
                 'node_title' => $node_title,
@@ -206,11 +188,9 @@ class TreeController extends Controller
         $request = $this->get('request');
 
 
-        $tree_model = $this->getModel();
-
         if ($request->get('act') == 'show') {
 
-            $modules = $tree_model->getNodeModules($request->get('id'), $acl);
+            $modules = $this->getModel()->getNodeModules($request->get('id'), $acl);
 
             if (isset($modules[$request->get('id_module')])) {
                 $module_act = '\\project\\Modules\\'.$modules[$request->get('id_module')]['directory'].'\\Controller\\BackendController';
@@ -302,9 +282,7 @@ class TreeController extends Controller
     {
         if ($this->get('acl')->checkUserTreePermissions(false, MaskBuilder::MASK_DELETE)) {
 
-            $tree_model = $this->getModel();
-
-            $tree_model->removeAll($this->get('request')->get('id'), $this->get('security.context'));
+            $this->getModel()->removeAll($this->get('request')->get('id'), $this->get('security.context'));
 
             $this->get('cache')->updateSiteTreeStructure();
             $this->get('cache')->updateSiteTreeAccessAll();
@@ -321,8 +299,6 @@ class TreeController extends Controller
     public function getHistoryAction()
     {
         $em = $this->get('doctrine.orm.entity_manager');
- 
-        $tree_model = $this->getModel();
 
         $module = $em->getRepository('DialogsBundle:modules')->findOneBy(array ('id' => $this->get('request')->get('id_module')));
 
@@ -342,9 +318,7 @@ class TreeController extends Controller
     public function proveEditorAction()
     {
 
-        $tree_model = $this->getModel();
-
-        $answer = $tree_model->proveEditor($this->get('security.context'));
+        $answer = $this->getModel()->proveEditor($this->get('security.context'));
 
         $response = new Response(json_encode($answer));
         $response->headers->set('Content-Type', 'application/json');
@@ -355,9 +329,7 @@ class TreeController extends Controller
     public function proveMainEditorAction()
     {
 
-        $tree_model = $this->getModel();
-
-        $answer = $tree_model->proveMainEditor($this->get('security.context'));
+        $answer = $this->getModel()->proveMainEditor($this->get('security.context'));
 
         $response = new Response(json_encode($answer));
         $response->headers->set('Content-Type', 'application/json');
@@ -368,9 +340,7 @@ class TreeController extends Controller
     public function sendToProveEditorAction()
     {
 
-        $tree_model = $this->getModel();
-
-        $answer = $tree_model->sendToProveEditor($this->get('security.context'), $this->get('acl'));
+        $answer = $this->getModel()->sendToProveEditor($this->get('security.context'), $this->get('acl'));
 
         $response = new Response(json_encode($answer));
         $response->headers->set('Content-Type', 'application/json');
@@ -381,9 +351,7 @@ class TreeController extends Controller
     public function sendToProveMainEditorAction()
     {
 
-        $tree_model = $this->getModel();
-
-        $answer = $tree_model->sendToProveMainEditor($this->get('security.context'), $this->get('acl'));
+        $answer = $this->getModel()->sendToProveMainEditor($this->get('security.context'), $this->get('acl'));
 
         $response = new Response(json_encode($answer));
         $response->headers->set('Content-Type', 'application/json');
@@ -394,9 +362,7 @@ class TreeController extends Controller
     public function returnWriterAction()
     {
 
-        $tree_model = $this->getModel();
-
-        $answer = $tree_model->returnWriter($this->get('security.context'));
+        $answer = $this->getModel()->returnWriter($this->get('security.context'));
 
         $response = new Response(json_encode($answer));
         $response->headers->set('Content-Type', 'application/json');
@@ -406,10 +372,7 @@ class TreeController extends Controller
 
     public function returnEditorAction()
     {
-
-        $tree_model = $this->getModel();
-
-        $answer = $tree_model->returnEditor($this->get('security.context'));
+        $answer = $this->getModel()->returnEditor($this->get('security.context'));
 
         $response = new Response(json_encode($answer));
         $response->headers->set('Content-Type', 'application/json');
@@ -419,10 +382,7 @@ class TreeController extends Controller
 
     public function getNewMessagesAction()
     {
-
-        $tree_model = $this->getModel();
-
-        $answer = $tree_model->getNewMessages($this->get('security.context'));
+        $answer = $this->getModel()->getNewMessages($this->get('security.context'));
 
         $response = new Response(json_encode($answer));
         $response->headers->set('Content-Type', 'application/json');
@@ -434,10 +394,8 @@ class TreeController extends Controller
     {
         if ($this->get('acl')->checkUserTreePermissions(false, $this->get('acl')->getValueMask('hidenodes'))) {
 
-            $tree_model = $this->getModel();
-
             if ($id != '1') {
-                $tree_model->hideNode($id, $this->get('security.context'));
+                $this->getModel()->hideNode($id, $this->get('security.context'));
 
                 $this->get('cache')->updateSiteTreeAccessAll();
                 $this->get('cache')->updateSiteTreeStructure();
@@ -457,9 +415,8 @@ class TreeController extends Controller
     {
         if ($this->get('acl')->checkUserTreePermissions(false, $this->get('acl')->getValueMask('shownodes'))) {
 
-            $tree_model = $this->getModel();
 
-            $tree_model->showNode($id, $this->get('security.context'));
+            $this->getModel()->showNode($id, $this->get('security.context'));
 
             $this->get('cache')->updateSiteTreeAccessAll();
             $this->get('cache')->updateSiteTreeStructure();
@@ -496,10 +453,7 @@ class TreeController extends Controller
 
     public function ajaxLoadAction()
     {
-
-        $tree_model = $this->getModel();
-
-        $modules = $tree_model->getNodeModules($this->get('request')->get('id'), $this->get('acl'));
+        $modules = $this->getModel()->getNodeModules($this->get('request')->get('id'), $this->get('acl'));
 
         if (count($modules) > 0) {
             $module_act = '\\project\\Modules\\'.$modules[$this->get('request')->get('id_module')]['directory'].'\\Controller\\BackendController';

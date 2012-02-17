@@ -21,9 +21,7 @@ class MessagesController extends Controller
     
     public function getMessagesAction()
     {
-        $rights_model = $this->getModel();
-
-        $messages = $rights_model->getMessages($this->get('security.context'));
+        $messages = $this->getModel()->getMessages($this->get('security.context'));
 
         $response = new Response(json_encode($messages));
         $response->headers->set('Content-Type', 'application/json');
@@ -33,11 +31,7 @@ class MessagesController extends Controller
 
     public function getMessageAction()
     {
-        $rights_model = $this->getModel();
-
-        $message = $rights_model->getMessage($this->get('request')->get('id'), $this->get('security.context'));
-
-        //print_r($message); exit;
+        $message = $this->getModel()->getMessage($this->get('request')->get('id'), $this->get('security.context'));
 
         $response = new Response(json_encode($message));
         $response->headers->set('Content-Type', 'application/json');
@@ -47,9 +41,7 @@ class MessagesController extends Controller
 
     public function deleteMessageAction()
     {
-        $rights_model =  $this->getModel();
-
-        $answer = $rights_model->deleteMessage($this->get('request')->get('id'), $this->get('security.context'));
+        $answer = $this->getModel()->deleteMessage($this->get('request')->get('id'), $this->get('security.context'));
 
         $response = new Response(json_encode($answer));
         $response->headers->set('Content-Type', 'application/json');
