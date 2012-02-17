@@ -366,3 +366,13 @@ function setTitle(text)
     else
         $('document title').html(title);
 }
+
+//Возвращает строку для .history.load()
+function getNodeAction(action)
+{
+    var act_tmp = 'node_' + action;
+    if (act_tmp == 'node_create')
+        act_tmp = 'node_create_2';
+
+    return act_tmp;
+}

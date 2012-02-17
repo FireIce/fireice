@@ -39,17 +39,11 @@ function showListInner(data)
     $( list_temp ).tmpl( arr ).appendTo( '#dialog_id .inner' );      
 
     $('#dialog_id .inner .edit_button').click(function(){
-        var act_tmp = 'node_' + action;
-        if (act_tmp == 'node_create')
-            act_tmp = 'node_create_2';
-        $.history.load('action/' + act_tmp + '/id/' + id_action + '/module/' + id_module + '/edit_row/' + $(this).attr('row_id'));
+        $.history.load('action/' + getNodeAction(action) + '/id/' + id_action + '/module/' + id_module + '/edit_row/' + $(this).attr('row_id'));
     });
     
     $('#dialog_id .inner .add_button').click(function(){
-        var act_tmp = 'node_' + action;
-        if (act_tmp == 'node_create')
-            act_tmp = 'node_create_2';
-        $.history.load('action/' + act_tmp + '/id/' + id_action + '/module/' + id_module + '/add_row/true');
+        $.history.load('action/' + getNodeAction(action) + '/id/' + id_action + '/module/' + id_module + '/add_row/true');
     });   
     
     $('#dialog_id .inner .delete_button').click(function(){
@@ -109,10 +103,7 @@ function editCreateRow_callback(data, row_id, act)
     });
     
     $('#dialog_id .inner .cancel_button').click(function(){
-        var act_tmp = 'node_' + action;
-        if (act_tmp == 'node_create')
-            act_tmp = 'node_create_2';
-        $.history.load('action/' + act_tmp + '/id/' + id_action + '/module/' + id_module);
+        $.history.load('action/' + getNodeAction(action) + '/id/' + id_action + '/module/' + id_module);
     });      
 }
 
@@ -172,11 +163,8 @@ function editCreateRowSubmit_callback(answer)
     {   
         showMessage('Сохранено!', '#38bc50');
 
-        var act_tmp = 'node_' + action;
-        if (act_tmp == 'node_create')
-            act_tmp = 'node_create_2';
 
-        $.history.load('action/' + act_tmp + '/id/' + id_action + '/module/' + id_module);
+        $.history.load('action/' + getNodeAction(action) + '/id/' + id_action + '/module/' + id_module);
         
     } else {
         showMessage('Ошибка!', '#ff0000');

@@ -65,11 +65,8 @@ function showItemInner(data)
                     
         $('#dialog_id .history_button').click(function(){ 
         
-            var act_tmp = 'node_' + action;
-            if (act_tmp == 'node_create')
-                act_tmp = 'node_create_2';     
-        
-            $.history.load('action/' + act_tmp + '/id/' + id_action + '/module/' + id_module + '/history/true'); 
+       
+            $.history.load('action/' + getNodeAction(action) + '/id/' + id_action + '/module/' + id_module + '/history/true'); 
         });
         $('#dialog_id .submit_button').click(function(){
             editSubmit();
@@ -176,15 +173,13 @@ function getHistory(id_mod)
         $('#dialog_id .back_button').hide(); 
         $('#dialog_id .history_button').show(); 
 
-        var act_tmp = 'node_' + action;
-        if (act_tmp == 'node_create')
-            act_tmp = 'node_create_2';        
-        $.history.load('action/' + act_tmp + '/id/' + id_action + '/module/' + id_module);                              
+      
+        $.history.load('action/' + getNodeAction(action) + '/id/' + id_action + '/module/' + id_module);                              
     
     }); 
     
     $('#dialog_id .cancel_button').click(function(){
-    $.history.load('');
+        $.history.load('');
     });
     
     $.ajax({
