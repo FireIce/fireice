@@ -126,10 +126,10 @@ Class TreeModel
 
         $config = $this->getModuleConfig($module->getName());
 
-        $sub_modules = array ();
+        $subModules = array ();
 
         foreach ($config['parameters']['modules'] as $val) {
-            $sub_modules[] = "'".$val."'";
+            $subModules[] = "'".$val."'";
         }
 
         $query = $this->em->createQuery("
@@ -139,7 +139,7 @@ Class TreeModel
                 DialogsBundle:modules md
             WHERE md.final = 'Y'
             AND md.status = 'active'
-            AND md.name IN(".implode(',', $sub_modules).")");
+            AND md.name IN(".implode(',', $subModules).")");
 
         $modules_id = $query->getResult();
 
@@ -181,36 +181,36 @@ Class TreeModel
         // Удаляем узел и всех его потомков
         $all = array_merge(array ($id), $this->getAllChilds($id));
 
-        $id_user = $security->getToken()->getUser()->getId();
+        $idUser = $security->getToken()->getUser()->getId();
 
         foreach ($all as $node) {
-            $this->removeNode($node, $id_user);
+            $this->removeNode($node, $idUser);
         }
 
         // Чистим куки открытых узлов если нужно
-        $show_nodes = $this->sess->get('show_nodes', false);
+        $showNodes = $this->sess->get('show_nodes', false);
 
-        $in_array = array_search($id, $show_nodes);
+        $in_array = array_search($id, $showNodes);
 
         if ($in_array !== false) {
-            if (count($this->treeChilds[$show_nodes[$in_array - 1]]) - 1 > 0) {
-                $show_nodes = array_slice($show_nodes, 0, $in_array);
+            if (count($this->treeChilds[$showNodes[$in_array - 1]]) - 1 > 0) {
+                $showNodes = array_slice($showNodes, 0, $in_array);
             } else {
-                $show_nodes = array_slice($show_nodes, 0, $in_array - 1);
+                $showNodes = array_slice($showNodes, 0, $in_array - 1);
             }
 
-            $this->sess->set('show_nodes', $show_nodes);
+            $this->sess->set('show_nodes', $showNodes);
         } else {
-            if (in_array($id, $this->treeChilds[$show_nodes[count($show_nodes) - 1]])) {
-                if (count($this->treeChilds[$show_nodes[count($show_nodes) - 1]]) - 1 <= 0) $show_nodes = array_slice($show_nodes, 0, -1);
+            if (in_array($id, $this->treeChilds[$showNodes[count($showNodes) - 1]])) {
+                if (count($this->treeChilds[$showNodes[count($showNodes) - 1]]) - 1 <= 0) $showNodes = array_slice($showNodes, 0, -1);
 
-                $this->sess->set('show_nodes', $show_nodes);
+                $this->sess->set('show_nodes', $showNodes);
             }
         }
     }
 
     // Удаление узла
-    public function removeNode($id, $id_user)
+    public function removeNode($id, $idUser)
     {
         $node = new modulesitetree();
         $node->setFinal('Y');
@@ -220,7 +220,7 @@ Class TreeModel
         $this->em->flush();
 
         $history = new history();
-        $history->setUpUser($id_user);
+        $history->setUpUser($idUser);
         $history->setUp($node->getId());
         $history->setUpTypeCode('sitetree');
         $history->setActionCode('delete_node');
@@ -237,11 +237,11 @@ Class TreeModel
             AND tr.eid IS NULL
             AND tr.idd = :id")->setParameter('id', $id);
 
-        $old_node = $query->getOneOrNullResult();
+        $oldNode = $query->getOneOrNullResult();
 
-        $old_node->setFinal('N');
-        $old_node->setEid($history->getId());
-        $this->em->persist($old_node);
+        $oldNode->setFinal('N');
+        $oldNode->setEid($history->getId());
+        $this->em->persist($oldNode);
         $this->em->flush();
 
         $query = $this->em->createQuery("
@@ -253,7 +253,7 @@ Class TreeModel
             AND st.eid IS NULL
             AND st.status = 'deleted'")->setParameters(array (
             'cid' => $history->getId(),
-            'up_parent' => $old_node->getUpParent(),
+            'up_parent' => $oldNode->getUpParent(),
             'id' => $id
             ));
 
@@ -265,9 +265,9 @@ Class TreeModel
     {
         $return = array ();
 
-        $childs_node = $this->treeChilds[$id];
+        $childsNode = $this->treeChilds[$id];
 
-        foreach ($childs_node as $child) {
+        foreach ($childsNode as $child) {
             $return[] = $child;
 
             $return = array_merge($return, $this->getAllChilds($child));
@@ -372,10 +372,10 @@ Class TreeModel
         $result = $query->getResult();
 
         if (count($result) > 0) {
-            $childs_node = array ();
+            $childsNode = array ();
 
             foreach ($result as $val) {
-                $childs_node[$val['sitetree_id']] = array (
+                $childsNode[$val['sitetree_id']] = array (
                     'sitetree_id' => $val['sitetree_id'],
                     'parent_id' => $val['parent_id'],
                     'hidden' => ($val['status'] == 'hidden' ? '1' : '0'),
@@ -384,19 +384,19 @@ Class TreeModel
             }
 
             // +++ Теперь нужно выдернуть Имя для каждого узла        
-            $node_types = array ();
+            $nodeTypes = array ();
 
             foreach ($result as $child) {
-                if (!isset($node_types[$child['table']])) $node_types[$child['table']] = array (
+                if (!isset($nodeTypes[$child['table']])) $nodeTypes[$child['table']] = array (
                         'id' => $child['id'],
                         'bundle' => $child['bundle'],
                         'ids' => array ()
                     );
 
-                $node_types[$child['table']]['ids'][] = $child['sitetree_id'];
+                $nodeTypes[$child['table']]['ids'][] = $child['sitetree_id'];
             }
 
-            foreach ($node_types as $key => $type) {
+            foreach ($nodeTypes as $key => $type) {
                 $query = $this->em->createQuery("
                     SELECT 
                         m_l.up_tree AS up_tree,
@@ -419,14 +419,14 @@ Class TreeModel
                     AND md.plugin_type = 'text'")->setParameter('up_module', $type['id']);
 
                 foreach ($query->getResult() as $val) {
-                    $childs_node[$val['up_tree']]['name'] = $val['title'];
+                    $childsNode[$val['up_tree']]['name'] = $val['title'];
                 }
             }
             // --- Теперь нужно выдернуть Имя для каждого узла                        
 
             $tmp = array ();
 
-            foreach ($childs_node as $child) {
+            foreach ($childsNode as $child) {
                 $tmp[] = $child['sitetree_id'];
             }
 
@@ -462,7 +462,7 @@ Class TreeModel
                 $tmp[$val['parent_id']] = $val['number_of'];
             }
 
-            foreach ($childs_node as $child) {
+            foreach ($childsNode as $child) {
                 $return[] = array (
                     'i' => $child['sitetree_id'],
                     'p' => $child['parent_id'],
@@ -499,11 +499,11 @@ Class TreeModel
     // Возвращает открытые узлы                           
     public function getShowNodes()
     {
-        $show_nodes = $this->sess->get('show_nodes', false);
+        $showNodes = $this->sess->get('show_nodes', false);
 
-        if ($show_nodes === false) $show_nodes = array ();
+        if ($showNodes === false) $showNodes = array ();
 
-        return $show_nodes;
+        return $showNodes;
     }
 
     public function contextMenu($id, $acl)
@@ -572,7 +572,7 @@ Class TreeModel
     // Возвращает массив модулей которые можно привязать к потомку данного узла
     public function getModules($node_id)
     {
-        $return_modules = array ();
+        $returnModules = array ();
 
         $query = $this->em->createQuery("
             SELECT 
@@ -591,12 +591,12 @@ Class TreeModel
             AND md.type = 'user'
             ORDER BY md.type")->setParameter('id', $node_id);
 
-        $node_modules = array ();
+        $nodeModules = array ();
 
         foreach ($query->getResult() as $val) {
             $config = $this->getModuleConfig($val['name']);
 
-            $node_modules[] = array (
+            $nodeModules[] = array (
                 'name' => $config['parameters']['name']
             );
         }
@@ -613,16 +613,16 @@ Class TreeModel
 
         $user_modules = $query->getResult();
 
-        $name_title = array ();
+        $nameTitle = array ();
 
-        foreach ($node_modules as $key => $node_module) {
-            $return_modules[$key] = array ();
+        foreach ($nodeModules as $key => $node_module) {
+            $returnModules[$key] = array ();
 
             foreach ($user_modules as $user_module) {
                 $config = $this->getModuleConfig($user_module['name']);
 
-                if (!isset($name_title[$config['parameters']['name']])) {
-                    $name_title[$config['parameters']['name']] = array (
+                if (!isset($nameTitle[$config['parameters']['name']])) {
+                    $nameTitle[$config['parameters']['name']] = array (
                         'id' => $user_module['id'],
                         'title' => $config['parameters']['title']
                     );
@@ -668,11 +668,11 @@ Class TreeModel
                             'idd' => $user_module['id']
                             ));
 
-                        $count_per_parent = $query->getSingleResult();
-                        $count_per_parent = $count['cnt'];
+                        $countPerParent = $query->getSingleResult();
+                        $countPerParent = $count['cnt'];
 
-                        if ($count < $config['parameters']['count'] && $count_per_parent < $config['parameters']['count-per-parent']) {
-                            $return_modules[$key][] = $config['parameters']['name'];
+                        if ($count < $config['parameters']['count'] && $countPerParent < $config['parameters']['count-per-parent']) {
+                            $returnModules[$key][] = $config['parameters']['name'];
                         }
                     }
                 }
@@ -680,20 +680,20 @@ Class TreeModel
         }
 
         // Считаем пересечение (потом можно переделать)
-        $count = count($return_modules);
+        $count = count($returnModules);
 
         if ($count === 1) {
-            $result = $return_modules[0];
+            $result = $returnModules[0];
         } elseif ($count === 2) {
-            $result = array_intersect($return_modules[0], $return_modules[1]);
+            $result = array_intersect($returnModules[0], $returnModules[1]);
         } elseif ($count === 3) {
-            $result = array_intersect($return_modules[0], $return_modules[1], $return_modules[2]);
+            $result = array_intersect($returnModules[0], $returnModules[1], $returnModules[2]);
         }
 
         $return = array ();
 
         foreach ($result as $val) {
-            $return[$name_title[$val]['id']] = $name_title[$val]['title'];
+            $return[$nameTitle[$val]['id']] = $nameTitle[$val]['title'];
         }
 
         //print_r($return); exit;
@@ -715,10 +715,10 @@ Class TreeModel
 
         $module = $query->getSingleResult();
 
-        $module_obj = '\\project\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
-        $module_obj = new $module_obj();
+        $moduleObj = '\\project\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
+        $moduleObj = new $moduleObj();
 
-        foreach ($module_obj->getConfig() as $plugin) {
+        foreach ($moduleObj->getConfig() as $plugin) {
             // Находим старую запись 
             $query = $this->em->createQuery("
                 SELECT 
@@ -780,16 +780,16 @@ Class TreeModel
 
                 $query->getResult();
 
-                $new_module_record = '\\project\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
-                $new_module_record = new $new_module_record();
-                $new_module_record->setIdd($result['idd']);
-                $new_module_record->setCid($hid);
-                $new_module_record->setFinal('W');
-                $new_module_record->setPluginId($plugin_id);
-                $new_module_record->setPluginType($plugin['type']);
-                $new_module_record->setPluginName($plugin['name']);
-                $new_module_record->setStatus('proveeditor');
-                $this->em->persist($new_module_record);
+                $newModuleRecord = '\\project\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
+                $newModuleRecord = new $newModuleRecord();
+                $newModuleRecord->setIdd($result['idd']);
+                $newModuleRecord->setCid($hid);
+                $newModuleRecord->setFinal('W');
+                $newModuleRecord->setPluginId($plugin_id);
+                $newModuleRecord->setPluginType($plugin['type']);
+                $newModuleRecord->setPluginName($plugin['name']);
+                $newModuleRecord->setStatus('proveeditor');
+                $this->em->persist($newModuleRecord);
                 $this->em->flush();
             } else return 'no_send';
         }
@@ -797,12 +797,12 @@ Class TreeModel
         // Отправляем письмо тому, кто отправлял на утверждение        
         $history_record = $this->em->getRepository('TreeBundle:history')->findOneBy(array ('id' => $old_cid));
 
-        $current_user = $security->getToken()->getUser();
+        $currentUser = $security->getToken()->getUser();
 
         $subject = 'Материал утверждён.';
-        $message = 'Пользователем '.$current_user->getLogin().' утверждён материал, отправленный вами ему на утверждение. Ссылка на материал: http://localhost/app_dev.php/backoffice/#action/node_edit/id/'.$this->request->get('id').'/type/'.$this->request->get('id_module');
+        $message = 'Пользователем '.$currentUser->getLogin().' утверждён материал, отправленный вами ему на утверждение. Ссылка на материал: http://localhost/app_dev.php/backoffice/#action/node_edit/id/'.$this->request->get('id').'/type/'.$this->request->get('id_module');
 
-        $this->sendMessage($current_user->getId(), $history_record->getUpUser(), $subject, $message);
+        $this->sendMessage($currentUser->getId(), $history_record->getUpUser(), $subject, $message);
 
         return 'ok';
     }
@@ -821,10 +821,10 @@ Class TreeModel
 
         $module = $query->getSingleResult();
 
-        $module_obj = '\\project\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
-        $module_obj = new $module_obj();
+        $moduleObj = '\\project\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
+        $moduleObj = new $moduleObj();
 
-        foreach ($module_obj->getConfig() as $plugin) {
+        foreach ($moduleObj->getConfig() as $plugin) {
             // Находим старую запись 
             $query = $this->em->createQuery("
                 SELECT 
@@ -894,16 +894,16 @@ Class TreeModel
                     AND md.final = 'Y'")->setParameter('idd', $result['idd']);
                 $query->getResult();
 
-                $new_module_record = '\\project\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
-                $new_module_record = new $new_module_record();
-                $new_module_record->setIdd($result['idd']);
-                $new_module_record->setCid($hid);
-                $new_module_record->setFinal('Y');
-                $new_module_record->setPluginId($plugin_id);
-                $new_module_record->setPluginType($plugin['type']);
-                $new_module_record->setPluginName($plugin['name']);
-                $new_module_record->setStatus('active');
-                $this->em->persist($new_module_record);
+                $newModuleRecord = '\\project\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
+                $newModuleRecord = new $newModuleRecord();
+                $newModuleRecord->setIdd($result['idd']);
+                $newModuleRecord->setCid($hid);
+                $newModuleRecord->setFinal('Y');
+                $newModuleRecord->setPluginId($plugin_id);
+                $newModuleRecord->setPluginType($plugin['type']);
+                $newModuleRecord->setPluginName($plugin['name']);
+                $newModuleRecord->setStatus('active');
+                $this->em->persist($newModuleRecord);
                 $this->em->flush();
             } else return 'no_send';
         }
@@ -911,12 +911,12 @@ Class TreeModel
         // Отправляем письмо тому редактору, кто отправлял на утверждение        
         $history_record = $this->em->getRepository('TreeBundle:history')->findOneBy(array ('id' => $old_cid));
 
-        $current_user = $security->getToken()->getUser();
+        $currentUser = $security->getToken()->getUser();
 
         $subject = 'Материал утверждён.';
-        $message = 'Пользователем '.$current_user->getLogin().' утверждён материал, отправленный вами ему на утверждение. Ссылка на материал: http://localhost/app_dev.php/backoffice/#action/node_edit/id/'.$this->request->get('id').'/type/'.$this->request->get('id_module');
+        $message = 'Пользователем '.$currentUser->getLogin().' утверждён материал, отправленный вами ему на утверждение. Ссылка на материал: http://localhost/app_dev.php/backoffice/#action/node_edit/id/'.$this->request->get('id').'/type/'.$this->request->get('id_module');
 
-        $this->sendMessage($current_user->getId(), $history_record->getUpUser(), $subject, $message);
+        $this->sendMessage($currentUser->getId(), $history_record->getUpUser(), $subject, $message);
 
         return 'ok';
     }
@@ -935,10 +935,10 @@ Class TreeModel
 
         $module = $query->getSingleResult();
 
-        $module_obj = '\\project\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
-        $module_obj = new $module_obj();
+        $moduleObj = '\\project\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
+        $moduleObj = new $moduleObj();
 
-        foreach ($module_obj->getConfig() as $plugin) {
+        foreach ($moduleObj->getConfig() as $plugin) {
             // Находим старую запись 
             $query = $this->em->createQuery("
                 SELECT 
@@ -997,16 +997,16 @@ Class TreeModel
 
                 $query->getResult();
 
-                $new_module_record = '\\project\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
-                $new_module_record = new $new_module_record();
-                $new_module_record->setIdd($result['idd']);
-                $new_module_record->setCid($hid);
-                $new_module_record->setFinal('W');
-                $new_module_record->setPluginId($plugin_id);
-                $new_module_record->setPluginType($plugin['type']);
-                $new_module_record->setPluginName($plugin['name']);
-                $new_module_record->setStatus('sendtoproveeditor');
-                $this->em->persist($new_module_record);
+                $newModuleRecord = '\\project\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
+                $newModuleRecord = new $newModuleRecord();
+                $newModuleRecord->setIdd($result['idd']);
+                $newModuleRecord->setCid($hid);
+                $newModuleRecord->setFinal('W');
+                $newModuleRecord->setPluginId($plugin_id);
+                $newModuleRecord->setPluginType($plugin['type']);
+                $newModuleRecord->setPluginName($plugin['name']);
+                $newModuleRecord->setStatus('sendtoproveeditor');
+                $this->em->persist($newModuleRecord);
                 $this->em->flush();
             } else return 'no_save';
         }
@@ -1019,7 +1019,7 @@ Class TreeModel
 
         $module = $this->em->getRepository('DialogsBundle:modules')->findOneBy(array ('idd' => $this->request->get('id_module'), 'final' => 'Y'));
         $users = $this->em->getRepository('DialogsBundle:users')->findAll();
-        $current_user = $security->getToken()->getUser();
+        $currentUser = $security->getToken()->getUser();
 
         $service_module = new module();
         $service_module->setId($module->getId());
@@ -1031,9 +1031,9 @@ Class TreeModel
 
             if ($acl->checkGroupPermissions($service_module, $group, $acl->getValueMask('proveeditor'))) {
                 $subject = 'Отправлен материал на утверждение.';
-                $message = 'Пользователем '.$current_user->getLogin().' отправлен материал на утверждение. Ссылка на материал: http://localhost/app_dev.php/backoffice/#action/node_edit/id/'.$this->request->get('id').'/type/'.$this->request->get('id_module');
+                $message = 'Пользователем '.$currentUser->getLogin().' отправлен материал на утверждение. Ссылка на материал: http://localhost/app_dev.php/backoffice/#action/node_edit/id/'.$this->request->get('id').'/type/'.$this->request->get('id_module');
 
-                $this->sendMessage($current_user->getId(), $user->getId(), $subject, $message);
+                $this->sendMessage($currentUser->getId(), $user->getId(), $subject, $message);
             }
         }
 
@@ -1054,10 +1054,10 @@ Class TreeModel
 
         $module = $query->getSingleResult();
 
-        $module_obj = '\\project\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
-        $module_obj = new $module_obj();
+        $moduleObj = '\\project\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
+        $moduleObj = new $moduleObj();
 
-        foreach ($module_obj->getConfig() as $plugin) {
+        foreach ($moduleObj->getConfig() as $plugin) {
             // Находим старую запись 
             $query = $this->em->createQuery("
                 SELECT 
@@ -1116,16 +1116,16 @@ Class TreeModel
 
                 $query->getResult();
 
-                $new_module_record = '\\project\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
-                $new_module_record = new $new_module_record();
-                $new_module_record->setIdd($result['idd']);
-                $new_module_record->setCid($hid);
-                $new_module_record->setFinal('W');
-                $new_module_record->setPluginId($plugin_id);
-                $new_module_record->setPluginType($plugin['type']);
-                $new_module_record->setPluginName($plugin['name']);
-                $new_module_record->setStatus('sendtoprovemaineditor');
-                $this->em->persist($new_module_record);
+                $newModuleRecord = '\\project\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
+                $newModuleRecord = new $newModuleRecord();
+                $newModuleRecord->setIdd($result['idd']);
+                $newModuleRecord->setCid($hid);
+                $newModuleRecord->setFinal('W');
+                $newModuleRecord->setPluginId($plugin_id);
+                $newModuleRecord->setPluginType($plugin['type']);
+                $newModuleRecord->setPluginName($plugin['name']);
+                $newModuleRecord->setStatus('sendtoprovemaineditor');
+                $this->em->persist($newModuleRecord);
                 $this->em->flush();
             } else return 'no_save';
         }
@@ -1138,7 +1138,7 @@ Class TreeModel
 
         $module = $this->em->getRepository('DialogsBundle:modules')->findOneBy(array ('idd' => $this->request->get('id_module'), 'final' => 'Y'));
         $users = $this->em->getRepository('DialogsBundle:users')->findAll();
-        $current_user = $security->getToken()->getUser();
+        $currentUser = $security->getToken()->getUser();
 
         $service_module = new module();
         $service_module->setId($module->getId());
@@ -1150,9 +1150,9 @@ Class TreeModel
 
             if ($acl->checkGroupPermissions($service_module, $group, $acl->getValueMask('provemaineditor'))) {
                 $subject = 'Отправлен материал на утверждение.';
-                $message = 'Пользователем '.$current_user->getLogin().' отправлен материал на утверждение. Ссылка на материал: http://localhost/app_dev.php/backoffice/#action/node_edit/id/'.$this->request->get('id').'/type/'.$this->request->get('id_module');
+                $message = 'Пользователем '.$currentUser->getLogin().' отправлен материал на утверждение. Ссылка на материал: http://localhost/app_dev.php/backoffice/#action/node_edit/id/'.$this->request->get('id').'/type/'.$this->request->get('id_module');
 
-                $this->sendMessage($current_user->getId(), $user->getId(), $subject, $message);
+                $this->sendMessage($currentUser->getId(), $user->getId(), $subject, $message);
             }
         }
 
@@ -1173,10 +1173,10 @@ Class TreeModel
 
         $module = $query->getSingleResult();
 
-        $module_obj = '\\project\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
-        $module_obj = new $module_obj();
+        $moduleObj = '\\project\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
+        $moduleObj = new $moduleObj();
 
-        foreach ($module_obj->getConfig() as $plugin) {
+        foreach ($moduleObj->getConfig() as $plugin) {
             // Находим старую запись 
             $query = $this->em->createQuery("
                 SELECT 
@@ -1238,16 +1238,16 @@ Class TreeModel
 
                 $query->getResult();
 
-                $new_module_record = '\\project\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
-                $new_module_record = new $new_module_record();
-                $new_module_record->setIdd($result['idd']);
-                $new_module_record->setCid($hid);
-                $new_module_record->setFinal('W');
-                $new_module_record->setPluginId($plugin_id);
-                $new_module_record->setPluginType($plugin['type']);
-                $new_module_record->setPluginName($plugin['name']);
-                $new_module_record->setStatus('returnwriter');
-                $this->em->persist($new_module_record);
+                $newModuleRecord = '\\project\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
+                $newModuleRecord = new $newModuleRecord();
+                $newModuleRecord->setIdd($result['idd']);
+                $newModuleRecord->setCid($hid);
+                $newModuleRecord->setFinal('W');
+                $newModuleRecord->setPluginId($plugin_id);
+                $newModuleRecord->setPluginType($plugin['type']);
+                $newModuleRecord->setPluginName($plugin['name']);
+                $newModuleRecord->setStatus('returnwriter');
+                $this->em->persist($newModuleRecord);
                 $this->em->flush();
             } else return 'no_send';
         }
@@ -1255,15 +1255,15 @@ Class TreeModel
         // Отправляем письмо тому, кто отправлял на утверждение        
         $history_record = $this->em->getRepository('TreeBundle:history')->findOneBy(array ('id' => $old_cid));
 
-        $current_user = $security->getToken()->getUser();
+        $currentUser = $security->getToken()->getUser();
 
         $subject = 'Материал возвращён на доработку.';
-        $message = 'Пользователем '.$current_user->getLogin().' возвращён на доработку материал, 
+        $message = 'Пользователем '.$currentUser->getLogin().' возвращён на доработку материал, 
                     отправленный вами ему на утверждение. 
                     Ссылка на материал: http://localhost/app_dev.php/backoffice/#action/node_edit/id/'.$this->request->get('id').'/type/'.$this->request->get('id_module').'
                     Причина возврата: '.$this->request->get('comment');
 
-        $this->sendMessage($current_user->getId(), $history_record->getUpUser(), $subject, $message);
+        $this->sendMessage($currentUser->getId(), $history_record->getUpUser(), $subject, $message);
 
         return 'ok';
     }
@@ -1282,10 +1282,10 @@ Class TreeModel
 
         $module = $query->getSingleResult();
 
-        $module_obj = '\\project\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
-        $module_obj = new $module_obj();
+        $moduleObj = '\\project\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
+        $moduleObj = new $moduleObj();
 
-        foreach ($module_obj->getConfig() as $plugin) {
+        foreach ($moduleObj->getConfig() as $plugin) {
             // Находим старую запись 
             $query = $this->em->createQuery("
                 SELECT 
@@ -1347,16 +1347,16 @@ Class TreeModel
 
                 $query->getResult();
 
-                $new_module_record = '\\project\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
-                $new_module_record = new $new_module_record();
-                $new_module_record->setIdd($result['idd']);
-                $new_module_record->setCid($hid);
-                $new_module_record->setFinal('W');
-                $new_module_record->setPluginId($plugin_id);
-                $new_module_record->setPluginType($plugin['type']);
-                $new_module_record->setPluginName($plugin['name']);
-                $new_module_record->setStatus('returneditor');
-                $this->em->persist($new_module_record);
+                $newModuleRecord = '\\project\\Modules\\'.$module->getName().'\\Entity\\'.$module->getTableName();
+                $newModuleRecord = new $newModuleRecord();
+                $newModuleRecord->setIdd($result['idd']);
+                $newModuleRecord->setCid($hid);
+                $newModuleRecord->setFinal('W');
+                $newModuleRecord->setPluginId($plugin_id);
+                $newModuleRecord->setPluginType($plugin['type']);
+                $newModuleRecord->setPluginName($plugin['name']);
+                $newModuleRecord->setStatus('returneditor');
+                $this->em->persist($newModuleRecord);
                 $this->em->flush();
             } else return 'no_send';
         }
@@ -1364,15 +1364,15 @@ Class TreeModel
         // Отправляем письмо тому, кто отправлял на утверждение        
         $history_record = $this->em->getRepository('TreeBundle:history')->findOneBy(array ('id' => $old_cid));
 
-        $current_user = $security->getToken()->getUser();
+        $currentUser = $security->getToken()->getUser();
 
         $subject = 'Материал возвращён на доработку.';
-        $message = 'Пользователем '.$current_user->getLogin().' возвращён на доработку материал, 
+        $message = 'Пользователем '.$currentUser->getLogin().' возвращён на доработку материал, 
                     отправленный вами ему на утверждение. 
                     Ссылка на материал: http://localhost/app_dev.php/backoffice/#action/node_edit/id/'.$this->request->get('id').'/type/'.$this->request->get('id_module').'
                     Причина возврата: '.$this->request->get('comment');
 
-        $this->sendMessage($current_user->getId(), $history_record->getUpUser(), $subject, $message);
+        $this->sendMessage($currentUser->getId(), $history_record->getUpUser(), $subject, $message);
 
         return 'ok';
     }
@@ -1480,16 +1480,16 @@ Class TreeModel
         $this->em->persist($history);
         $this->em->flush();
 
-        $old_node = $this->em->getRepository('TreeBundle:modulesitetree')->findOneBy(array (
+        $oldNode = $this->em->getRepository('TreeBundle:modulesitetree')->findOneBy(array (
             'idd' => $id,
             'final' => 'Y',
             'status' => 'active',
             'eid' => null
             ));
 
-        $old_node->setFinal('N');
-        $old_node->setEid($history->getId());
-        $this->em->persist($old_node);
+        $oldNode->setFinal('N');
+        $oldNode->setEid($history->getId());
+        $this->em->persist($oldNode);
         $this->em->flush();
 
         $query = $this->em->createQuery("
@@ -1504,7 +1504,7 @@ Class TreeModel
         $query->setParameters(array(
             'idd' => $id,
             'cid' => $history->getId(),
-            'up_parent' => $old_node->getUpParent()
+            'up_parent' => $oldNode->getUpParent()
         ));
         
         $query->getResult();
@@ -1527,16 +1527,16 @@ Class TreeModel
         $this->em->persist($history);
         $this->em->flush();
 
-        $old_node = $this->em->getRepository('TreeBundle:modulesitetree')->findOneBy(array (
+        $oldNode = $this->em->getRepository('TreeBundle:modulesitetree')->findOneBy(array (
             'idd' => $id,
             'final' => 'Y',
             'status' => 'hidden',
             'eid' => null
             ));
 
-        $old_node->setFinal('N');
-        $old_node->setEid($history->getId());
-        $this->em->persist($old_node);
+        $oldNode->setFinal('N');
+        $oldNode->setEid($history->getId());
+        $this->em->persist($oldNode);
         $this->em->flush();
 
         $query = $this->em->createQuery("
@@ -1551,7 +1551,7 @@ Class TreeModel
         $query->setParameters(array(
             'idd' => $id,
             'cid' => $history->getId(),
-            'up_parent' => $old_node->getUpParent()
+            'up_parent' => $oldNode->getUpParent()
         ));        
         
         $query->getResult();
