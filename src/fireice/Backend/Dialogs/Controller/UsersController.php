@@ -26,7 +26,7 @@ class UsersController extends Controller
         $acl = $this->get('acl');
 
         if ($acl->checkUserTreePermissions(false, $acl->getValueMask('viewusers'))) {
-            $users_model =  $this->getModel();
+            $usersModel =  $this->getModel();
             $users = $this->getModel()->getUsers();
             
             $answer = array(
@@ -50,7 +50,7 @@ class UsersController extends Controller
         $acl = $this->get('acl');
 
         if ($acl->checkUserTreePermissions(false, $acl->getValueMask('edituser'))) {
-            $users_model = $this->getModel();
+            $usersModel = $this->getModel();
             $answer = $this->getModel()->getUserData($this->get('request')->get('id'));
         } else {
             $answer = 'no_rights';

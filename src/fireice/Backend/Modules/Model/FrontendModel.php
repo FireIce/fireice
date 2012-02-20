@@ -5,13 +5,13 @@ namespace fireice\Backend\Modules\Model;
 class FrontendModel extends GeneralModel
 {
 
-    public function getFrontendData($sitetree_id, $module_id, $params = array ())
+    public function getFrontendData($sitetreeId, $moduleId, $params = array ())
     {
         $values = array ();
 
         foreach ($this->getPlugins() as $plugin) {
             if (!isset($values[$plugin->getValue('type')])) {
-                $values[$plugin->getValue('type')] = $plugin->getData($sitetree_id, $this->getBundleName().':'.$this->getEntityName(), $module_id, self::TYPE_ITEM);
+                $values[$plugin->getValue('type')] = $plugin->getData($sitetreeId, $this->getBundleName().':'.$this->getEntityName(), $moduleId, self::TYPE_ITEM);
             }
         }
 

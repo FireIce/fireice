@@ -46,24 +46,24 @@ class GroupsController extends Controller
 
             // Для каждой группы узнаем установленные права
             foreach ($groups as &$group) {
-                $groups_rights = array();
+                $groupsRrights = array();
 
-                $identy_group = new RoleSecurityIdentity('group_' . $group['gr_id']);
+                $identyGroup = new RoleSecurityIdentity('group_' . $group['gr_id']);
 
                 foreach ($modules as $key => $module) {
-                    $object_module = new module();
-                    $object_module->setId($module['id']);
+                    $objectModule = new module();
+                    $objectModule->setId($module['id']);
 
-                    $groups_rights[$module['name']] = array();
+                    $groupsRrights[$module['name']] = array();
 
                     foreach ($module['module_object']->getRights() as $right) {
-                        if ($acl->checkGroupPermissions($object_module, $identy_group, $acl->getValueMask($right['name']))) {
-                            $groups_rights[$module['name']][] = $right['name'];
+                        if ($acl->checkGroupPermissions($objectModule, $identyGroup, $acl->getValueMask($right['name']))) {
+                            $groupsRrights[$module['name']][] = $right['name'];
                         }
                     }
                 }
 
-                $group['gr_rights'] = $groups_rights;
+                $group['gr_rights'] = $groupsRrights;
             }
             unset($group);
 
@@ -158,28 +158,28 @@ class GroupsController extends Controller
 
         if ($groups === array()) {
             // Создаём группы
-            $god_group = new groups();
-            $god_group->setName('God');
-            $god_group->setTitle('Суперпользователь');
-            $em->persist($god_group);
+            $godGroup = new groups();
+            $godGroup->setName('God');
+            $godGroup->setTitle('Суперпользователь');
+            $em->persist($godGroup);
             $em->flush();
 
-            $admins_group = new groups();
-            $admins_group->setName('Administrators');
-            $admins_group->setTitle('Администраторы');
-            $em->persist($admins_group);
+            $adminsGroup = new groups();
+            $adminsGroup->setName('Administrators');
+            $adminsGroup->setTitle('Администраторы');
+            $em->persist($adminsGroup);
             $em->flush();
 
-            $users_group = new groups();
-            $users_group->setName('Users');
-            $users_group->setTitle('Пользователи');
-            $em->persist($users_group);
+            $usersGroup = new groups();
+            $usersGroup->setName('Users');
+            $usersGroup->setTitle('Пользователи');
+            $em->persist($usersGroup);
             $em->flush();
 
-            $anonim_group = new groups();
-            $anonim_group->setName('Anonymous');
-            $anonim_group->setTitle('Анонимные посетители');
-            $em->persist($anonim_group);
+            $anonimGroup = new groups();
+            $anonimGroup->setName('Anonymous');
+            $anonimGroup->setTitle('Анонимные посетители');
+            $em->persist($anonimGroup);
             $em->flush();
 
             // Присваиваем права каждому узлу                                                                                       
@@ -189,59 +189,59 @@ class GroupsController extends Controller
                 $object = new module();
                 $object->setId($module['id']);
 
-                $module_object = $module['module_object'];
+                $moduleObject = $module['module_object'];
 
-                $group = new \Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity('group_' . $god_group->getId());
+                $group = new \Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity('group_' . $godGroup->getId());
                 $builder = new MaskBuilder();
-                foreach ($module_object->getDefaultRights('God') as $right) {
+                foreach ($moduleObject->getDefaultRights('God') as $right) {
                     $builder->add($acl->getValueMask($right));
                 }
                 $acl->createPermissionsForGroup($object, $group, $builder->get());
 
-                $group = new \Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity('group_' . $admins_group->getId());
+                $group = new \Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity('group_' . $adminsGroup->getId());
                 $builder = new MaskBuilder();
-                foreach ($module_object->getDefaultRights('Administrators') as $right) {
+                foreach ($moduleObject->getDefaultRights('Administrators') as $right) {
                     $builder->add($acl->getValueMask($right));
                 }
                 $acl->createPermissionsForGroup($object, $group, $builder->get());
 
-                $group = new \Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity('group_' . $users_group->getId());
+                $group = new \Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity('group_' . $usersGroup->getId());
                 $builder = new MaskBuilder();
-                foreach ($module_object->getDefaultRights('Users') as $right) {
+                foreach ($moduleObject->getDefaultRights('Users') as $right) {
                     $builder->add($acl->getValueMask($right));
                 }
                 $acl->createPermissionsForGroup($object, $group, $builder->get());
 
-                $group = new \Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity('group_' . $anonim_group->getId());
+                $group = new \Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity('group_' . $anonimGroup->getId());
                 $builder = new MaskBuilder();
-                foreach ($module_object->getDefaultRights('Anonymous') as $right) {
+                foreach ($moduleObject->getDefaultRights('Anonymous') as $right) {
                     $builder->add($acl->getValueMask($right));
                 }
                 $acl->createPermissionsForGroup($object, $group, $builder->get());
             }
 
             // Создаём супер-пользователя
-            $super_user = new users();
-            $super_user->setLogin('god');
-            $super_user->setPassword('god');
-            $super_user->setType('no');
-            $super_user->setFname('Суперпользователь');
-            $super_user->setSname('Суперпользователь');
-            $super_user->setEmail('');
-            $super_user->setGroups($god_group->getId());
-            $em->persist($super_user);
+            $superUser = new users();
+            $superUser->setLogin('god');
+            $superUser->setPassword('god');
+            $superUser->setType('no');
+            $superUser->setFname('Суперпользователь');
+            $superUser->setSname('Суперпользователь');
+            $superUser->setEmail('');
+            $superUser->setGroups($godGroup->getId());
+            $em->persist($superUser);
             $em->flush();
 
             // Создаём анонимного пользователя
-            $anonim_user = new users();
-            $anonim_user->setLogin('anonim');
-            $anonim_user->setPassword('anonim');
-            $anonim_user->setType('anonymous');
-            $anonim_user->setFname('Аноним');
-            $anonim_user->setSname('Аноним');
-            $anonim_user->setEmail('');
-            $anonim_user->setGroups($anonim_group->getId());
-            $em->persist($anonim_user);
+            $anonimUser = new users();
+            $anonimUser->setLogin('anonim');
+            $anonimUser->setPassword('anonim');
+            $anonimUser->setType('anonymous');
+            $anonimUser->setFname('Аноним');
+            $anonimUser->setSname('Аноним');
+            $anonimUser->setEmail('');
+            $anonimUser->setGroups($anonimGroup->getId());
+            $em->persist($anonimUser);
             $em->flush();
 
             $message = 'Был зарегистрирован первый пользователь! Логин: god, пароль: god.';

@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 Class TreeModel
 {
     protected $em, $sess;
-    protected $tree_childs = array ();
+    protected $treeChilds = array ();
     protected $request;
      
     public function __construct(EntityManager $em, $sess, $container)
@@ -170,11 +170,11 @@ Class TreeModel
 
         // Строим массив иерархии
         foreach ($nodes as $node) {
-            $this->tree_childs[$node->getIdd()] = array ();
+            $this->treeChilds[$node->getIdd()] = array ();
         }
         foreach ($nodes as $node) {
             if ($node->getUpParent() !== null) {
-                $this->tree_childs[$node->getUpParent()][] = $node->getIdd();
+                $this->treeChilds[$node->getUpParent()][] = $node->getIdd();
             }
         }
 
@@ -193,7 +193,7 @@ Class TreeModel
         $in_array = array_search($id, $show_nodes);
 
         if ($in_array !== false) {
-            if (count($this->tree_childs[$show_nodes[$in_array - 1]]) - 1 > 0) {
+            if (count($this->treeChilds[$show_nodes[$in_array - 1]]) - 1 > 0) {
                 $show_nodes = array_slice($show_nodes, 0, $in_array);
             } else {
                 $show_nodes = array_slice($show_nodes, 0, $in_array - 1);
@@ -201,8 +201,8 @@ Class TreeModel
 
             $this->sess->set('show_nodes', $show_nodes);
         } else {
-            if (in_array($id, $this->tree_childs[$show_nodes[count($show_nodes) - 1]])) {
-                if (count($this->tree_childs[$show_nodes[count($show_nodes) - 1]]) - 1 <= 0) $show_nodes = array_slice($show_nodes, 0, -1);
+            if (in_array($id, $this->treeChilds[$show_nodes[count($show_nodes) - 1]])) {
+                if (count($this->treeChilds[$show_nodes[count($show_nodes) - 1]]) - 1 <= 0) $show_nodes = array_slice($show_nodes, 0, -1);
 
                 $this->sess->set('show_nodes', $show_nodes);
             }
@@ -265,7 +265,7 @@ Class TreeModel
     {
         $return = array ();
 
-        $childs_node = $this->tree_childs[$id];
+        $childs_node = $this->treeChilds[$id];
 
         foreach ($childs_node as $child) {
             $return[] = $child;

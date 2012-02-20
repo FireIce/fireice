@@ -7,13 +7,13 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 class FrontendController extends Controller
 {
     protected $model = null;
-    protected $id_node;
-    protected $id_module;
+    protected $idNode;
+    protected $idModule;
 
-    public function __construct($id_node, $id_module)
+    public function __construct($idNode, $idModule)
     {
-        $this->id_node = $id_node;
-        $this->id_module = $id_module;
+        $this->idNode = $idNode;
+        $this->idModule = $idModule;
     }
 
     public function getModel()
@@ -27,7 +27,7 @@ class FrontendController extends Controller
 
     public function load($params=array ())
     {
-        return $this->getModel()->getFrontendData($this->id_node, $this->id_module, $params);
+        return $this->getModel()->getFrontendData($this->idNode, $this->idModule, $params);
     }
 
     public function frontend($params, $data=array())

@@ -10,13 +10,13 @@ use Symfony\Component\Yaml\Yaml;
 class BackendModel extends GeneralModel
 {
 
-    public function getBackendData($sitetree_id, $acl, $module_id)
+    public function getBackendData($sitetreeId, $acl, $moduleId)
     {
         $values = array ();
 
         foreach ($this->getPlugins() as $plugin) {
             if (!isset($values[$plugin->getValue('type')])) {
-                $values[$plugin->getValue('type')] = $plugin->getData($sitetree_id, $this->getBundleName().':'.$this->getEntityName(), $module_id, self::TYPE_ITEM);
+                $values[$plugin->getValue('type')] = $plugin->getData($sitetreeId, $this->getBundleName().':'.$this->getEntityName(), $moduleId, self::TYPE_ITEM);
             }
         }
 
@@ -46,17 +46,17 @@ class BackendModel extends GeneralModel
             );
         }
 
-        $module = $this->em->getRepository('DialogsBundle:modules')->findOneBy(array ('name' => $this->module_name, 'final' => 'Y'));
+        $module = $this->em->getRepository('DialogsBundle:modules')->findOneBy(array ('name' => $this->moduleName, 'final' => 'Y'));
 
-        $service_module = new module();
-        $service_module->setId($module->getId());
+        $serviceModule = new module();
+        $serviceModule->setId($module->getId());
 
-        $proveeditor = ($acl->checkUserPermissions($sitetree_id, $service_module, false, $acl->getValueMask('proveeditor'))) ? 'show' : 'hide';
-        $provemaineditor = ($acl->checkUserPermissions($sitetree_id, $service_module, false, $acl->getValueMask('provemaineditor'))) ? 'show' : 'hide';
-        $sendtoproveeditor = ($acl->checkUserPermissions($sitetree_id, $service_module, false, $acl->getValueMask('sendtoproveeditor'))) ? 'show' : 'hide';
-        $sendtoprovemaineditor = ($acl->checkUserPermissions($sitetree_id, $service_module, false, $acl->getValueMask('sendtoprovemaineditor'))) ? 'show' : 'hide';
-        $returnwriter = ($acl->checkUserPermissions($sitetree_id, $service_module, false, $acl->getValueMask('returnwriter'))) ? 'show' : 'hide';
-        $returneditor = ($acl->checkUserPermissions($sitetree_id, $service_module, false, $acl->getValueMask('returneditor'))) ? 'show' : 'hide';
+        $proveeditor = ($acl->checkUserPermissions($sitetreeId, $serviceModule, false, $acl->getValueMask('proveeditor'))) ? 'show' : 'hide';
+        $provemaineditor = ($acl->checkUserPermissions($sitetreeId, $serviceModule, false, $acl->getValueMask('provemaineditor'))) ? 'show' : 'hide';
+        $sendtoproveeditor = ($acl->checkUserPermissions($sitetreeId, $serviceModule, false, $acl->getValueMask('sendtoproveeditor'))) ? 'show' : 'hide';
+        $sendtoprovemaineditor = ($acl->checkUserPermissions($sitetreeId, $serviceModule, false, $acl->getValueMask('sendtoprovemaineditor'))) ? 'show' : 'hide';
+        $returnwriter = ($acl->checkUserPermissions($sitetreeId, $serviceModule, false, $acl->getValueMask('returnwriter'))) ? 'show' : 'hide';
+        $returneditor = ($acl->checkUserPermissions($sitetreeId, $serviceModule, false, $acl->getValueMask('returneditor'))) ? 'show' : 'hide';
 
         // Определение статуса
         $status = null;
@@ -135,7 +135,7 @@ class BackendModel extends GeneralModel
                 if ($result !== array ()) {
                     $result = $result[0];
 
-                    $plugin_id = $plugin->setDataInDb($this->request->get($plugin->getValue('name')));
+                    $pluginId = $plugin->setDataInDb($this->request->get($plugin->getValue('name')));
 
                     $history = new history();
                     $history->setUpUser($security->getToken()->getUser()->getId());
@@ -162,41 +162,41 @@ class BackendModel extends GeneralModel
 
                     $query->getResult();
 
-                    $new_module_record = $this->getModuleEntity();
-                    $new_module_record->setIdd($result['idd']);
-                    $new_module_record->setCid($hid);
-                    $new_module_record->setFinal('Y');
-                    $new_module_record->setPluginId($plugin_id);
-                    $new_module_record->setPluginType($plugin->getValue('type'));
-                    $new_module_record->setPluginName($plugin->getValue('name'));
-                    $new_module_record->setStatus('active');
-                    $this->em->persist($new_module_record);
+                    $newModuleRecord = $this->getModuleEntity();
+                    $newModuleRecord->setIdd($result['idd']);
+                    $newModuleRecord->setCid($hid);
+                    $newModuleRecord->setFinal('Y');
+                    $newModuleRecord->setPluginId($pluginId);
+                    $newModuleRecord->setPluginType($plugin->getValue('type'));
+                    $newModuleRecord->setPluginName($plugin->getValue('name'));
+                    $newModuleRecord->setStatus('active');
+                    $this->em->persist($newModuleRecord);
                     $this->em->flush();
                 } else {
-                    $plugin_id = $plugin->setDataInDb($this->request->get($plugin->getValue('name')));
+                    $pluginId = $plugin->setDataInDb($this->request->get($plugin->getValue('name')));
 
-                    $new_module_record = $this->getModuleEntity();
-                    $new_module_record->setFinal('T');
-                    $new_module_record->setPluginId($plugin_id);
-                    $new_module_record->setPluginType($plugin->getValue('type'));
-                    $new_module_record->setPluginName($plugin->getValue('name'));
-                    $new_module_record->setStatus('inserting');
-                    $this->em->persist($new_module_record);
+                    $newModuleRecord = $this->getModuleEntity();
+                    $newModuleRecord->setFinal('T');
+                    $newModuleRecord->setPluginId($pluginId);
+                    $newModuleRecord->setPluginType($plugin->getValue('type'));
+                    $newModuleRecord->setPluginName($plugin->getValue('name'));
+                    $newModuleRecord->setStatus('inserting');
+                    $this->em->persist($newModuleRecord);
                     $this->em->flush();
 
                     $history = new history();
                     $history->setUpUser($security->getToken()->getUser()->getId());
-                    $history->setUp($new_module_record->getId());
+                    $history->setUp($newModuleRecord->getId());
                     $history->setUpTypeCode($this->getEntityName());
                     $history->setActionCode('add_record');
                     $this->em->persist($history);
                     $this->em->flush();
 
-                    $new_module_record->setIdd($new_module_record->getId());
-                    $new_module_record->setCid($history->getId());
-                    $new_module_record->setFinal('Y');
-                    $new_module_record->setStatus('active');
-                    $this->em->persist($new_module_record);
+                    $newModuleRecord->setIdd($newModuleRecord->getId());
+                    $newModuleRecord->setCid($history->getId());
+                    $newModuleRecord->setFinal('Y');
+                    $newModuleRecord->setStatus('active');
+                    $this->em->persist($newModuleRecord);
                     $this->em->flush();
 
                     $modulelink = $this->em->getRepository('DialogsBundle:moduleslink')->findOneBy(array (
@@ -204,22 +204,22 @@ class BackendModel extends GeneralModel
                         'up_module' => $this->request->get('id_module')
                         ));
 
-                    $module_plugin_link = new modulespluginslink();
-                    $module_plugin_link->setUpLink($modulelink->getId());
-                    $module_plugin_link->setUpPlugin($new_module_record->getId());
-                    $this->em->persist($module_plugin_link);
+                    $modulePluginLink = new modulespluginslink();
+                    $modulePluginLink->setUpLink($modulelink->getId());
+                    $modulePluginLink->setUpPlugin($newModuleRecord->getId());
+                    $this->em->persist($modulePluginLink);
                     $this->em->flush();
                 }
             }
         } else {
             // Если пользовательский модуль
-            $module = $this->em->getRepository('DialogsBundle:modules')->findOneBy(array ('name' => $this->module_name));
+            $module = $this->em->getRepository('DialogsBundle:modules')->findOneBy(array ('name' => $this->moduleName));
 
-            $service_module = new module();
-            $service_module->setId($module->getId());
+            $serviceModule = new module();
+            $serviceModule->setId($module->getId());
 
             // Смотрим есть ли у пользователя право утверждать статьи на уровне главного редактора        
-            if ($acl->checkUserPermissions($this->request->get('id'), $service_module, false, $acl->getValueMask('provemaineditor'))) {
+            if ($acl->checkUserPermissions($this->request->get('id'), $serviceModule, false, $acl->getValueMask('provemaineditor'))) {
                 // Если есть    
                 foreach ($this->getPlugins() as $plugin) {
                     $query = $this->em->createQuery("
@@ -250,7 +250,7 @@ class BackendModel extends GeneralModel
                     if ($result !== array ()) {
                         $result = $result[0];
 
-                        $plugin_id = $plugin->setDataInDb($this->request->get($plugin->getValue('name')));
+                        $pluginId = $plugin->setDataInDb($this->request->get($plugin->getValue('name')));
 
                         $history = new history();
                         $history->setUpUser($security->getToken()->getUser()->getId());
@@ -265,41 +265,41 @@ class BackendModel extends GeneralModel
                         $query = $this->em->createQuery("UPDATE ".$this->getBundleName().':'.$this->getEntityName()." md SET md.final='N', md.eid = ".$hid." WHERE md.idd = ".$result['idd']." AND md.final != 'N'");
                         $query->getResult();
 
-                        $new_module_record = $this->getModuleEntity();
-                        $new_module_record->setIdd($result['idd']);
-                        $new_module_record->setCid($hid);
-                        $new_module_record->setFinal('Y');
-                        $new_module_record->setPluginId($plugin_id);
-                        $new_module_record->setPluginType($plugin->getValue('type'));
-                        $new_module_record->setPluginName($plugin->getValue('name'));
-                        $new_module_record->setStatus('active');
-                        $this->em->persist($new_module_record);
+                        $newModuleRecord = $this->getModuleEntity();
+                        $newModuleRecord->setIdd($result['idd']);
+                        $newModuleRecord->setCid($hid);
+                        $newModuleRecord->setFinal('Y');
+                        $newModuleRecord->setPluginId($pluginId);
+                        $newModuleRecord->setPluginType($plugin->getValue('type'));
+                        $newModuleRecord->setPluginName($plugin->getValue('name'));
+                        $newModuleRecord->setStatus('active');
+                        $this->em->persist($newModuleRecord);
                         $this->em->flush();
                     } else {
-                        $plugin_id = $plugin->setDataInDb($this->request->get($plugin->getValue('name')));
+                        $pluginId = $plugin->setDataInDb($this->request->get($plugin->getValue('name')));
 
-                        $new_module_record = $this->getModuleEntity();
-                        $new_module_record->setFinal('T');
-                        $new_module_record->setPluginId($plugin_id);
-                        $new_module_record->setPluginType($plugin->getValue('type'));
-                        $new_module_record->setPluginName($plugin->getValue('name'));
-                        $new_module_record->setStatus('inserting');
-                        $this->em->persist($new_module_record);
+                        $newModuleRecord = $this->getModuleEntity();
+                        $newModuleRecord->setFinal('T');
+                        $newModuleRecord->setPluginId($pluginId);
+                        $newModuleRecord->setPluginType($plugin->getValue('type'));
+                        $newModuleRecord->setPluginName($plugin->getValue('name'));
+                        $newModuleRecord->setStatus('inserting');
+                        $this->em->persist($newModuleRecord);
                         $this->em->flush();
 
                         $history = new history();
                         $history->setUpUser($security->getToken()->getUser()->getId());
-                        $history->setUp($new_module_record->getId());
+                        $history->setUp($newModuleRecord->getId());
                         $history->setUpTypeCode($this->getEntityName());
                         $history->setActionCode('add_record');
                         $this->em->persist($history);
                         $this->em->flush();
 
-                        $new_module_record->setIdd($new_module_record->getId());
-                        $new_module_record->setCid($history->getId());
-                        $new_module_record->setFinal('Y');
-                        $new_module_record->setStatus('active');
-                        $this->em->persist($new_module_record);
+                        $newModuleRecord->setIdd($newModuleRecord->getId());
+                        $newModuleRecord->setCid($history->getId());
+                        $newModuleRecord->setFinal('Y');
+                        $newModuleRecord->setStatus('active');
+                        $this->em->persist($newModuleRecord);
                         $this->em->flush();
 
                         $modulelink = $this->em->getRepository('DialogsBundle:moduleslink')->findOneBy(array (
@@ -307,10 +307,10 @@ class BackendModel extends GeneralModel
                             'up_module' => $this->request->get('id_module')
                             ));
 
-                        $module_plugin_link = new modulespluginslink();
-                        $module_plugin_link->setUpLink($modulelink->getId());
-                        $module_plugin_link->setUpPlugin($new_module_record->getId());
-                        $this->em->persist($module_plugin_link);
+                        $modulePluginLink = new modulespluginslink();
+                        $modulePluginLink->setUpLink($modulelink->getId());
+                        $modulePluginLink->setUpPlugin($newModuleRecord->getId());
+                        $this->em->persist($modulePluginLink);
                         $this->em->flush();
                     }
                 }
@@ -346,7 +346,7 @@ class BackendModel extends GeneralModel
                     if ($result !== array ()) {
                         $result = $result[0];
 
-                        $plugin_id = $plugin->setDataInDb($this->request->get($plugin->getValue('name')));
+                        $pluginId = $plugin->setDataInDb($this->request->get($plugin->getValue('name')));
 
                         $history = new history();
                         $history->setUpUser($security->getToken()->getUser()->getId());
@@ -362,42 +362,42 @@ class BackendModel extends GeneralModel
                         elseif ($result['final'] == 'Y') $query = $this->em->createQuery("UPDATE ".$this->getBundleName().':'.$this->getEntityName()." md SET md.eid = ".$hid." WHERE md.idd = ".$result['idd']." AND (md.final = 'Y' OR md.final = 'W') AND md.eid IS NULL");
                         $query->getResult();
 
-                        $new_module_record = $this->getModuleEntity();
-                        $new_module_record->setIdd($result['idd']);
-                        $new_module_record->setCid($hid);
-                        $new_module_record->setFinal('W');
-                        $new_module_record->setPluginId($plugin_id);
-                        $new_module_record->setPluginType($plugin->getValue('type'));
-                        $new_module_record->setPluginName($plugin->getValue('name'));
-                        $new_module_record->setStatus('edit');
-                        $this->em->persist($new_module_record);
+                        $newModuleRecord = $this->getModuleEntity();
+                        $newModuleRecord->setIdd($result['idd']);
+                        $newModuleRecord->setCid($hid);
+                        $newModuleRecord->setFinal('W');
+                        $newModuleRecord->setPluginId($pluginId);
+                        $newModuleRecord->setPluginType($plugin->getValue('type'));
+                        $newModuleRecord->setPluginName($plugin->getValue('name'));
+                        $newModuleRecord->setStatus('edit');
+                        $this->em->persist($newModuleRecord);
                         $this->em->flush();
                     }
                     else {
-                        $plugin_id = $plugin->setDataInDb($this->request->get($plugin->getValue('name')));
+                        $pluginId = $plugin->setDataInDb($this->request->get($plugin->getValue('name')));
 
-                        $new_module_record = $this->getModuleEntity();
-                        $new_module_record->setFinal('T');
-                        $new_module_record->setPluginId($plugin_id);
-                        $new_module_record->setPluginType($plugin->getValue('type'));
-                        $new_module_record->setPluginName($plugin->getValue('name'));
-                        $new_module_record->setStatus('inserting');
-                        $this->em->persist($new_module_record);
+                        $newModuleRecord = $this->getModuleEntity();
+                        $newModuleRecord->setFinal('T');
+                        $newModuleRecord->setPluginId($pluginId);
+                        $newModuleRecord->setPluginType($plugin->getValue('type'));
+                        $newModuleRecord->setPluginName($plugin->getValue('name'));
+                        $newModuleRecord->setStatus('inserting');
+                        $this->em->persist($newModuleRecord);
                         $this->em->flush();
 
                         $history = new history();
                         $history->setUpUser($security->getToken()->getUser()->getId());
-                        $history->setUp($new_module_record->getId());
+                        $history->setUp($newModuleRecord->getId());
                         $history->setUpTypeCode($this->getEntityName());
                         $history->setActionCode('edit_record');
                         $this->em->persist($history);
                         $this->em->flush();
 
-                        $new_module_record->setIdd($new_module_record->getId());
-                        $new_module_record->setCid($history->getId());
-                        $new_module_record->setFinal('W');
-                        $new_module_record->setStatus('edit');
-                        $this->em->persist($new_module_record);
+                        $newModuleRecord->setIdd($newModuleRecord->getId());
+                        $newModuleRecord->setCid($history->getId());
+                        $newModuleRecord->setFinal('W');
+                        $newModuleRecord->setStatus('edit');
+                        $this->em->persist($newModuleRecord);
                         $this->em->flush();
 
                         $modulelink = $this->em->getRepository('DialogsBundle:moduleslink')->findOneBy(array (
@@ -405,10 +405,10 @@ class BackendModel extends GeneralModel
                             'up_module' => $this->request->get('id_module')
                             ));
 
-                        $module_plugin_link = new modulespluginslink();
-                        $module_plugin_link->setUpLink($modulelink->getId());
-                        $module_plugin_link->setUpPlugin($new_module_record->getId());
-                        $this->em->persist($module_plugin_link);
+                        $modulePluginLink = new modulespluginslink();
+                        $modulePluginLink->setUpLink($modulelink->getId());
+                        $modulePluginLink->setUpPlugin($newModuleRecord->getId());
+                        $this->em->persist($modulePluginLink);
                         $this->em->flush();
                     }
                 }
@@ -444,15 +444,15 @@ class BackendModel extends GeneralModel
         // --- Главный запрос, получающий список записей в таблице модуля
         // +++ Обрабатываем результат и забиваем в массивы
         $tmp = array ();         // Ид плагинов по группам (группы - типы плагинов)
-        $tmp_cid = array ();     // Параметр cid по группам
+        $tmpCid = array ();     // Параметр cid по группам
         $cids = array ();        // Общий массив параметров cid   
 
         foreach ($result as $val) {
             if (!isset($tmp[$val['plugin_type']])) $tmp[$val['plugin_type']] = array ();
             $tmp[$val['plugin_type']][] = $val['plugin_id'];
 
-            if (!isset($tmp_cid[$val['plugin_type']])) $tmp_cid[$val['plugin_type']] = array ();
-            $tmp_cid[$val['plugin_type']][] = $val['cid'];
+            if (!isset($tmpCid[$val['plugin_type']])) $tmpCid[$val['plugin_type']] = array ();
+            $tmpCid[$val['plugin_type']][] = $val['cid'];
 
             $cids[] = $val['cid'];
         }
@@ -482,12 +482,12 @@ class BackendModel extends GeneralModel
                 TreeBundle:history ht
             WHERE ht.id IN (".implode(',', $cids).")");
 
-        $result_cides = $query->getResult();
+        $resultCides = $query->getResult();
 
         $cids = array ();
         $users = array ();
 
-        foreach ($result_cides as $val) {
+        foreach ($resultCides as $val) {
             $cids[$val['id']] = $val;
 
             if (!in_array($val['up_user'], $users)) $users[] = $val['up_user'];
@@ -517,15 +517,15 @@ class BackendModel extends GeneralModel
         $history = array ();
 
         for ($i = 1; $i <= intval(count($result) / count($plugins)); $i++) {
-            $history_values = array ();
+            $historyValues = array ();
 
             foreach ($plugins as $plugin) {
                 $value = array_pop($values[$plugin->getValue('type')]);
-                $cid = array_pop($tmp_cid[$plugin->getValue('type')]);
+                $cid = array_pop($tmpCid[$plugin->getValue('type')]);
 
                 //$plugin_method = 'get'.ucfirst($plugin->getValue('type'));
 
-                $history_values[] = array (
+                $historyValues[] = array (
                     'title' => $plugin->getValue('title'),
                     'value' => isset($value) ? $value->getValue() : '---',
                 );
@@ -546,7 +546,7 @@ class BackendModel extends GeneralModel
                 'data' => $data,
                 'user' => $user,
                 'action_code' => $action_code,
-                'values' => $history_values,
+                'values' => $historyValues,
             );
         }
 
@@ -554,7 +554,7 @@ class BackendModel extends GeneralModel
     }
 
     // Была ли страница модуля привязанного к узлу отправлена на подтверждение
-    public function checkSendProve($sitetree_id)
+    public function checkSendProve($sitetreeId)
     { /*
       $module = $this->em->getRepository('RightsBundle:modules')->findOneBy(array('name' => $this->bundle_name));
 
@@ -564,7 +564,7 @@ class BackendModel extends GeneralModel
       WHERE ht.id_module='.$module->getId().'
       AND ht.id_action='.$action->getId().'
       AND ht.id_module_content=mt.id
-      AND mt.id_group='.$sitetree_id.'
+      AND mt.id_group='.$sitetreeId.'
       ORDER BY ht.id DESC');
 
       $query->setMaxResults(1);
@@ -577,7 +577,7 @@ class BackendModel extends GeneralModel
       WHERE ht.id_module='.$module->getId().'
       AND ht.id>'.$result[0]['ht_id'].'
       AND ht.id_module_content=mt.id
-      AND mt.id_group='.$sitetree_id.'
+      AND mt.id_group='.$sitetreeId.'
       ORDER BY ht.id DESC');
       $query->setMaxResults(1);
 
@@ -650,14 +650,14 @@ class BackendModel extends GeneralModel
             AND md.type='user'
             ORDER BY md.type")->setParameter('idd', $data['id_node']);
 
-        $node_modules = $query->getOneOrNullResult();
+        $nodeModules = $query->getOneOrNullResult();
 
         $query = $this->em->createQuery("
             SELECT 
                 md.row_id,
                 plg.value AS plugin_value
             FROM 
-                Module".$node_modules['name'].'Bundle:'.$node_modules['entity']." md, 
+                Module".$nodeModules['name'].'Bundle:'.$nodeModules['entity']." md, 
                 FireicePlugins".ucfirst($data['plugin_type'])."Bundle:plugin".$data['plugin_type']." plg,
                 DialogsBundle:moduleslink m_l,
                 DialogsBundle:modulespluginslink mp_l
@@ -674,7 +674,7 @@ class BackendModel extends GeneralModel
 
         $query->setParameters(array (
             'up_tree' => $data['id_node'],
-            'up_module' => $node_modules['id_module'],
+            'up_module' => $nodeModules['id_module'],
             'plugin_name' => $data['title']
         ));
 

@@ -26,14 +26,14 @@ class RightsController extends Controller
     {
         $acl = $this->get('acl');
 
-        $node_title = $this->getModel()->getNodeTitle($this->get('request')->get('id'));
+        $nodeTitle = $this->getModel()->getNodeTitle($this->get('request')->get('id'));
 
-        if ($node_title !== false) {
+        if ($nodeTitle !== false) {
             if ($acl->checkUserTreePermissions(false, $acl->getValueMask('editnodesrights'))) {
                 $modules = $this->getModel()->getModules($this->get('request')->get('id'));
 
                 $answer = array (
-                    'node_title' => $node_title,
+                    'node_title' => $nodeTitle,
                     'modules' => $modules
                 );
             } else {

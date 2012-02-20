@@ -21,9 +21,9 @@ class BackendController extends Controller
         );
     }
 
-    public function getData($sitetree_id)
+    public function getData($sitetreeId)
     {
-        return $this->getModel()->getBackendData($sitetree_id, $this->get('acl'), $this->get('request')->get('id_module'));
+        return $this->getModel()->getBackendData($sitetreeId, $this->get('acl'), $this->get('request')->get('id_module'));
     }
 
     public function createEdit()

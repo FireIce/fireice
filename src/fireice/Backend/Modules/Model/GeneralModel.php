@@ -16,14 +16,14 @@ class GeneralModel
     protected $container;
     protected $em;
     protected $request;
-    protected $module_name = 'text';
+    protected $moduleName = 'text';
 
     public function __construct($container, $em)
     {
         $this->container = $container;
         $this->em = $em;
         $this->request = Request::createFromGlobals();
-        $this->module_name = $this->getModuleName();
+        $this->moduleName = $this->getModuleName();
     }
 
     public function getModuleName()
@@ -40,17 +40,17 @@ class GeneralModel
 
     public function getModuleDir()
     {
-        return ucfirst($this->module_name);
+        return ucfirst($this->moduleName);
     }
 
     public function getEntityName()
     {
-        return 'module'.strtolower($this->module_name);
+        return 'module'.strtolower($this->moduleName);
     }
 
     public function getBundleName()
     {
-        return 'Module'.ucfirst($this->module_name).'Bundle';
+        return 'Module'.ucfirst($this->moduleName).'Bundle';
     }
 
     public function getModuleEntity()

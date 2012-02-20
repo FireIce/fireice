@@ -40,14 +40,14 @@ class GroupsModel
 
     public function getModules()
     {
-        $tree_controller = new TreeController();
+        $treeController = new TreeController();
 
-        $return_modules[0] = array (
+        $returnModules[0] = array (
             'id' => -1,
             'title' => 'Дерево сайта',
             'name' => 'sitetree',
-            'rights' => $tree_controller->getRights(),
-            'module_object' => $tree_controller,
+            'rights' => $treeController->getRights(),
+            'module_object' => $treeController,
         );
 
         $query = $this->em->createQuery("
@@ -64,23 +64,23 @@ class GroupsModel
         foreach ($modules as $module) {
             $config = \Symfony\Component\Yaml\Yaml::parse($this->container->getParameter('project_modules_directory').'//'.$module->getName().'//Resources//config//config.yml');
 
-            $module_controller = '\\project\\Modules\\'.ucfirst($config['parameters']['name']).'\\Controller\\BackendController';
+            $moduleController = '\\project\\Modules\\'.ucfirst($config['parameters']['name']).'\\Controller\\BackendController';
 
-            $module_controller = new $module_controller();
+            $moduleController = new $moduleController();
 
-            $module_object = '\\project\\Modules\\'.$module->getName().'\\Controller\\BackendController';
-            $module_object = new $module_object();
+            $moduleObject = '\\project\\Modules\\'.$module->getName().'\\Controller\\BackendController';
+            $moduleObject = new $moduleObject();
 
-            $return_modules[] = array (
+            $returnModules[] = array (
                 'id' => $module->getIdd(),
                 'title' => $config['parameters']['title'],
                 'name' => $config['parameters']['name'],
-                'rights' => $module_controller->getRights(),
-                'module_object' => $module_object,
+                'rights' => $moduleController->getRights(),
+                'module_object' => $moduleObject,
             );
         }
 
-        return $return_modules;
+        return $returnModules;
     }
 
     public function getGroupData($id)
@@ -160,12 +160,12 @@ class GroupsModel
 
         $rights = array ();
 
-        $request_array = $request->request->all();
+        $requestArray = $request->request->all();
 
         foreach ($modules as $module) {
             $rights[$module['id']] = array ();
 
-            foreach ($request_array[$module['name']] as $key => $val) {
+            foreach ($requestArray[$module['name']] as $key => $val) {
                 if ($val == '1') $rights[$module['id']][] = $key;
             }
         }
@@ -188,12 +188,12 @@ class GroupsModel
 
         $rights = array ();
 
-        $request_array = $request->request->all();
+        $requestArray = $request->request->all();
 
         foreach ($modules as $module) {
             $rights[$module['id']] = array ();
 
-            foreach ($request_array[$module['name']] as $key => $val) {
+            foreach ($requestArray[$module['name']] as $key => $val) {
                 if ($val == '1') $rights[$module['id']][] = $key;
             }
         }

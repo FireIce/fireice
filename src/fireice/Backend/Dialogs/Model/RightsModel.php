@@ -141,11 +141,11 @@ class RightsModel
                 DialogsBundle:groups gr
             WHERE us.groups = gr.id");
 
-        $users_result = $query->getResult();
+        $usersResult = $query->getResult();
 
         $users = array ();
 
-        foreach ($users_result as $val) {
+        foreach ($usersResult as $val) {
             $users[] = $val['id'];
         }
 
@@ -169,10 +169,10 @@ class RightsModel
 
         $result = $query->getResult();
 
-        $users_not_rights = array ();
+        $usersNotRights = array ();
 
         foreach ($result as $val) {
-            $users_not_rights[$val['id']] = $val['not_rights'];
+            $usersNotRights[$val['id']] = $val['not_rights'];
         }
 
         // Вытаскиваем инфу о модуле        
@@ -187,41 +187,41 @@ class RightsModel
 
         $module = $query->getSingleResult();
 
-        $module_object = '\\project\\Modules\\'.$module['name'].'\\Controller\\BackendController';
-        $module_object = new $module_object();
+        $moduleObject = '\\project\\Modules\\'.$module['name'].'\\Controller\\BackendController';
+        $moduleObject = new $moduleObject();
 
-        $groups_rights = array ();
+        $groupsRights = array ();
         $users = array ();
 
-        $object_module = new module();
-        $object_module->setId($this->request->get('id_module'));
+        $objectModule = new module();
+        $objectModule->setId($this->request->get('id_module'));
 
         // Собираем все вместе
-        foreach ($users_result as $val) {
+        foreach ($usersResult as $val) {
             // Узнаём права группы
-            if (!isset($groups_rights['group_'.$val['groupid']])) {
-                $identy_group = new RoleSecurityIdentity('group_'.$val['groupid']);
+            if (!isset($groupsRights['group_'.$val['groupid']])) {
+                $identyGroup = new RoleSecurityIdentity('group_'.$val['groupid']);
 
-                $groups_rights['group_'.$val['groupid']] = array ();
+                $groupsRights['group_'.$val['groupid']] = array ();
 
-                foreach ($module_object->getRights() as $right) {
-                    if ($this->acl->checkGroupPermissions($object_module, $identy_group, $this->acl->getValueMask($right['name']))) {
-                        $groups_rights['group_'.$val['groupid']][] = $right['name'];
+                foreach ($moduleObject->getRights() as $right) {
+                    if ($this->acl->checkGroupPermissions($objectModule, $identyGroup, $this->acl->getValueMask($right['name']))) {
+                        $groupsRights['group_'.$val['groupid']][] = $right['name'];
                     }
                 }
             }
 
-            $user_rights = array ();
+            $userRights = array ();
 
             // Проходимся по правам группы и смотрим не выключено ли какое-то право для этого юзера
-            foreach ($groups_rights['group_'.$val['groupid']] as $right) {
-                $int_right = $this->acl->getValueMask($right);
+            foreach ($groupsRights['group_'.$val['groupid']] as $right) {
+                $intRight = $this->acl->getValueMask($right);
 
-                if (isset($users_not_rights[$val['id']])) $not_rights = intval($users_not_rights[$val['id']]);
+                if (isset($usersNotRights[$val['id']])) $not_rights = intval($usersNotRights[$val['id']]);
                 else $not_rights = 0;
 
-                if (($int_right & (~$not_rights)) === $int_right) {
-                    $user_rights[] = $right;
+                if (($intRight & (~$not_rights)) === $intRight) {
+                    $userRights[] = $right;
                 }
             }
 
@@ -229,7 +229,7 @@ class RightsModel
                 'id' => $val['id'],
                 'user' => $val['username'],
                 'group' => $val['grouptitle'],
-                'rights' => $user_rights
+                'rights' => $userRights
             );
         }
 
@@ -265,8 +265,8 @@ class RightsModel
 
         $module = $module[0];
 
-        $module_object = '\\project\\Modules\\'.$module['name'].'\\Controller\\BackendController';
-        $module_object = new $module_object();
+        $moduleObject = '\\project\\Modules\\'.$module['name'].'\\Controller\\BackendController';
+        $moduleObject = new $moduleObject();
 
         $query = $this->em->createQuery("
             SELECT 
@@ -280,7 +280,7 @@ class RightsModel
             WHERE us.groups = gr.id
             AND us.id = :id")->setParameter('id', $this->request->get('id_user'));
 
-        $user_result = $query->getSingleResult();
+        $userResult = $query->getSingleResult();
 
         $query = $this->em->createQuery("
             SELECT 
@@ -299,56 +299,56 @@ class RightsModel
             'up_user' => $this->request->get('id_user')
         ));
 
-        $notrights_result = $query->getResult();
+        $notrightsResult = $query->getResult();
 
-        $groups_rights = array ();
+        $groupsRights = array ();
         $users = array ();
 
-        $object_module = new module();
-        $object_module->setId($this->request->get('id_module'));
+        $objectModule = new module();
+        $objectModule->setId($this->request->get('id_module'));
 
-        $identy_group = new RoleSecurityIdentity('group_'.$user_result['groupid']);
+        $identyGroup = new RoleSecurityIdentity('group_'.$userResult['groupid']);
 
-        $group_rights = array ();
+        $groupRights = array ();
 
-        foreach ($module_object->getRights() as $right) {
-            if ($this->acl->checkGroupPermissions($object_module, $identy_group, $this->acl->getValueMask($right['name']))) {
-                $group_rights[] = array (
+        foreach ($moduleObject->getRights() as $right) {
+            if ($this->acl->checkGroupPermissions($objectModule, $identyGroup, $this->acl->getValueMask($right['name']))) {
+                $groupRights[] = array (
                     'name' => $right['name'],
                     'title' => $right['title']
                 );
             }
         }
 
-        $user_rights = array ();
+        $userRights = array ();
 
         // Проходимся по правам группы и смотрим не выключено ли какое-то право для этого юзера
-        foreach ($group_rights as $right) {
-            $int_right = $this->acl->getValueMask($right['name']);
+        foreach ($groupRights as $right) {
+            $intRight = $this->acl->getValueMask($right['name']);
 
-            if ($notrights_result !== array()) $not_rights = intval($notrights_result[0]['not_rights']);
+            if ($notrightsResult !== array()) $not_rights = intval($notrightsResult[0]['not_rights']);
             else $not_rights = 0;
 
-            if (($int_right & (~$not_rights)) === $int_right) {
+            if (($intRight & (~$not_rights)) === $intRight) {
                 $checked = '1';
             } else {
                 $checked = '0';
             }
 
-            $user_rights[$right['name']] = array (
+            $userRights[$right['name']] = array (
                 'label' => $right['title'],
                 'value' => $checked
             );
         }
 
         return array (
-            'user' => $user_result['username'],
-            'group' => $user_result['grouptitle'],
+            'user' => $userResult['username'],
+            'group' => $userResult['grouptitle'],
             'rights' => array (
                 'type' => 'checkbox',
                 'name' => 'rights',
                 'title' => 'Права пользователя',
-                'value' => $user_rights
+                'value' => $userRights
             )
         );
     }
