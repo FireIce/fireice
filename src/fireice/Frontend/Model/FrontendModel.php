@@ -84,7 +84,7 @@ class FrontendModel
 
     public function inChilds($node, $childs)
     {
-        $is_int = preg_match("|^[\d]+$|", $node) === 1;
+        $isInt = preg_match("|^[\d]+$|", $node) === 1;
 
         if (preg_match("|^[\d]+$|", $node) === 1) {
             if (in_array($node, $childs)) return $node;

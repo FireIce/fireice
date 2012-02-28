@@ -132,5 +132,5 @@ class GeneralModel
 
         return ($reindex) ? array_values($array):$array;
     }
-
+    
 }

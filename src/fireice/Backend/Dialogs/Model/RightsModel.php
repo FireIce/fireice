@@ -217,10 +217,10 @@ class RightsModel
             foreach ($groupsRights['group_'.$val['groupid']] as $right) {
                 $intRight = $this->acl->getValueMask($right);
 
-                if (isset($usersNotRights[$val['id']])) $not_rights = intval($usersNotRights[$val['id']]);
-                else $not_rights = 0;
+                if (isset($usersNotRights[$val['id']])) $notRights = intval($usersNotRights[$val['id']]);
+                else $notRights = 0;
 
-                if (($intRight & (~$not_rights)) === $intRight) {
+                if (($intRight & (~$notRights)) === $intRight) {
                     $userRights[] = $right;
                 }
             }
@@ -326,10 +326,10 @@ class RightsModel
         foreach ($groupRights as $right) {
             $intRight = $this->acl->getValueMask($right['name']);
 
-            if ($notrightsResult !== array()) $not_rights = intval($notrightsResult[0]['not_rights']);
-            else $not_rights = 0;
+            if ($notrightsResult !== array()) $notRights = intval($notrightsResult[0]['not_rights']);
+            else $notRights = 0;
 
-            if (($intRight & (~$not_rights)) === $intRight) {
+            if (($intRight & (~$notRights)) === $intRight) {
                 $checked = '1';
             } else {
                 $checked = '0';
@@ -385,13 +385,13 @@ class RightsModel
 
         if ($builder->get() != 0) {
             // Вставляем запись в acl_nodes_not_rights
-            $modules_link = $this->em->getRepository('DialogsBundle:moduleslink')->findOneBy(array (
+            $modulesLink = $this->em->getRepository('DialogsBundle:moduleslink')->findOneBy(array (
                 'up_tree' => $this->request->get('id_node'),
                 'up_module' => $this->request->get('id_module')
                 ));
 
             $aclnodesrights = new aclnodesrights();
-            $aclnodesrights->setUpModulesLink($modules_link->getId());
+            $aclnodesrights->setUpModulesLink($modulesLink->getId());
             $aclnodesrights->setUpUser($this->request->get('id_user'));
             $aclnodesrights->setNotRights($builder->get());
             $this->em->persist($aclnodesrights);

@@ -119,9 +119,9 @@ class TreeController extends Controller
 
     public function contextMenuAction($id)
     {
-        $context_menu = $this->getModel()->contextMenu($id, $this->get('acl'));
+        $contextMenu = $this->getModel()->contextMenu($id, $this->get('acl'));
 
-        $response = new Response(json_encode($context_menu));
+        $response = new Response(json_encode($contextMenu));
         $response->headers->set('Content-Type', 'application/json');
 
         return $response;

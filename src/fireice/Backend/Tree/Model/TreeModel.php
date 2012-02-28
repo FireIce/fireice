@@ -190,13 +190,13 @@ Class TreeModel
         // Чистим куки открытых узлов если нужно
         $showNodes = $this->sess->get('show_nodes', false);
 
-        $in_array = array_search($id, $showNodes);
+        $inArray = array_search($id, $showNodes);
 
-        if ($in_array !== false) {
-            if (count($this->treeChilds[$showNodes[$in_array - 1]]) - 1 > 0) {
-                $showNodes = array_slice($showNodes, 0, $in_array);
+        if ($inArray !== false) {
+            if (count($this->treeChilds[$showNodes[$inArray - 1]]) - 1 > 0) {
+                $showNodes = array_slice($showNodes, 0, $inArray);
             } else {
-                $showNodes = array_slice($showNodes, 0, $in_array - 1);
+                $showNodes = array_slice($showNodes, 0, $inArray - 1);
             }
 
             $this->sess->set('show_nodes', $showNodes);
@@ -795,14 +795,14 @@ Class TreeModel
         }
 
         // Отправляем письмо тому, кто отправлял на утверждение        
-        $history_record = $this->em->getRepository('TreeBundle:history')->findOneBy(array ('id' => $old_cid));
+        $historyRecord = $this->em->getRepository('TreeBundle:history')->findOneBy(array ('id' => $old_cid));
 
         $currentUser = $security->getToken()->getUser();
 
         $subject = 'Материал утверждён.';
         $message = 'Пользователем '.$currentUser->getLogin().' утверждён материал, отправленный вами ему на утверждение. Ссылка на материал: http://localhost/app_dev.php/backoffice/#action/node_edit/id/'.$this->request->get('id').'/type/'.$this->request->get('id_module');
 
-        $this->sendMessage($currentUser->getId(), $history_record->getUpUser(), $subject, $message);
+        $this->sendMessage($currentUser->getId(), $historyRecord->getUpUser(), $subject, $message);
 
         return 'ok';
     }
@@ -909,14 +909,14 @@ Class TreeModel
         }
 
         // Отправляем письмо тому редактору, кто отправлял на утверждение        
-        $history_record = $this->em->getRepository('TreeBundle:history')->findOneBy(array ('id' => $old_cid));
+        $historyRecord = $this->em->getRepository('TreeBundle:history')->findOneBy(array ('id' => $old_cid));
 
         $currentUser = $security->getToken()->getUser();
 
         $subject = 'Материал утверждён.';
         $message = 'Пользователем '.$currentUser->getLogin().' утверждён материал, отправленный вами ему на утверждение. Ссылка на материал: http://localhost/app_dev.php/backoffice/#action/node_edit/id/'.$this->request->get('id').'/type/'.$this->request->get('id_module');
 
-        $this->sendMessage($currentUser->getId(), $history_record->getUpUser(), $subject, $message);
+        $this->sendMessage($currentUser->getId(), $historyRecord->getUpUser(), $subject, $message);
 
         return 'ok';
     }
@@ -1253,7 +1253,7 @@ Class TreeModel
         }
 
         // Отправляем письмо тому, кто отправлял на утверждение        
-        $history_record = $this->em->getRepository('TreeBundle:history')->findOneBy(array ('id' => $old_cid));
+        $historyRecord = $this->em->getRepository('TreeBundle:history')->findOneBy(array ('id' => $old_cid));
 
         $currentUser = $security->getToken()->getUser();
 
@@ -1263,7 +1263,7 @@ Class TreeModel
                     Ссылка на материал: http://localhost/app_dev.php/backoffice/#action/node_edit/id/'.$this->request->get('id').'/type/'.$this->request->get('id_module').'
                     Причина возврата: '.$this->request->get('comment');
 
-        $this->sendMessage($currentUser->getId(), $history_record->getUpUser(), $subject, $message);
+        $this->sendMessage($currentUser->getId(), $historyRecord->getUpUser(), $subject, $message);
 
         return 'ok';
     }
@@ -1362,7 +1362,7 @@ Class TreeModel
         }
 
         // Отправляем письмо тому, кто отправлял на утверждение        
-        $history_record = $this->em->getRepository('TreeBundle:history')->findOneBy(array ('id' => $old_cid));
+        $historyRecord = $this->em->getRepository('TreeBundle:history')->findOneBy(array ('id' => $old_cid));
 
         $currentUser = $security->getToken()->getUser();
 
@@ -1372,7 +1372,7 @@ Class TreeModel
                     Ссылка на материал: http://localhost/app_dev.php/backoffice/#action/node_edit/id/'.$this->request->get('id').'/type/'.$this->request->get('id_module').'
                     Причина возврата: '.$this->request->get('comment');
 
-        $this->sendMessage($currentUser->getId(), $history_record->getUpUser(), $subject, $message);
+        $this->sendMessage($currentUser->getId(), $historyRecord->getUpUser(), $subject, $message);
 
         return 'ok';
     }

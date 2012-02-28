@@ -47,10 +47,10 @@ class UsersModel
         return true === empty($config) ? null : $module->getConfig();
     }
 
-    public function getUserData($user_id)
+    public function getUserData($userId)
     {
         $query = $this->em->createQuery("SELECT user FROM DialogsBundle:users user 
-    	                                 WHERE user.id = :id")->setParameter('id', $user_id);
+    	                                 WHERE user.id = :id")->setParameter('id', $userId);
 
         $query->setMaxResults(1);
 
@@ -99,8 +99,8 @@ class UsersModel
             $user = $this->em->getRepository('DialogsBundle:users')->findOneBy(array ('id' => $request->get('id')));
 
             foreach ($m as $o) {
-                $set_method = 'set'.ucfirst($o['name']);
-                $user->$set_method($request->get($o['name']));
+                $setMethod = 'set'.ucfirst($o['name']);
+                $user->$setMethod($request->get($o['name']));
             }
 
             $this->em->persist($user);
@@ -117,8 +117,8 @@ class UsersModel
             $user = new users();
 
             foreach ($m as $o) {
-                $set_method = 'set'.ucfirst($o['name']);
-                $user->$set_method($request->get($o['name']));
+                $setMethod = 'set'.ucfirst($o['name']);
+                $user->$setMethod($request->get($o['name']));
             }
 
             $this->em->persist($user);
@@ -128,9 +128,9 @@ class UsersModel
         }
     }
 
-    public function deleteUser($id_user)
+    public function deleteUser($idUser)
     {
-        $user = $this->em->getRepository('DialogsBundle:users')->findOneBy(array ('id' => $id_user));
+        $user = $this->em->getRepository('DialogsBundle:users')->findOneBy(array ('id' => $idUser));
 
         $this->em->remove($user);
         $this->em->flush();

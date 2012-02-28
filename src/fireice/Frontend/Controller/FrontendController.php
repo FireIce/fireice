@@ -27,9 +27,9 @@ class FrontendController extends Controller
 
     public function indexAction()
     {
-        $frontend_model = $this->getModel();
+        $frontendModel = $this->getModel();
 
-        if ($frontend_model->checkServerBusy()) {
+        if ($frontendModel->checkServerBusy()) {
             $response = new Response('Сервер занят', 502);
             $response->headers->set('Content-Type', 'text/html');
 
@@ -46,10 +46,10 @@ class FrontendController extends Controller
 
         if ($path !== array ()) {
             for ($i = 0; $i < count($path); $i++) {
-                if ($i == 0) $childs = $frontend_model->getChilds(1);
-                else $childs = $frontend_model->getChilds($path[$i - 1]);
+                if ($i == 0) $childs = $frontendModel->getChilds(1);
+                else $childs = $frontendModel->getChilds($path[$i - 1]);
 
-                $in_childs = $frontend_model->inChilds($path[$i], $childs);
+                $in_childs = $frontendModel->inChilds($path[$i], $childs);
 
                 if ($in_childs === false) {
                     // Если остаток соответствует регулярному выражению модуля предыдущего узла,
@@ -66,7 +66,7 @@ class FrontendController extends Controller
                     // Страницы не существует...
                     return $this->get404Page();
                 }
-                else if (!$frontend_model->checkAccess($in_childs)) {
+                else if (!$frontendModel->checkAccess($in_childs)) {
                     // Страницы не существует...
                     return $this->get404Page();
                 } else {
@@ -86,38 +86,38 @@ class FrontendController extends Controller
         $tree = new TreeController;
         $tree->setContainer($this->container);
 
-        $frontend_model = $this->getModel();
+        $frontendModel = $this->getModel();
 
-        if ($frontend_model->checkAccess($id_node)) {
-            $node_modules = $frontend_model->getNodeUsersModules($id_node);
+        if ($frontendModel->checkAccess($id_node)) {
+            $nodeModules = $frontendModel->getNodeUsersModules($id_node);
 
-            foreach ($node_modules as $key => $val) {
+            foreach ($nodeModules as $key => $val) {
 
                 $frontend = $tree->getNodeModule($id_node, $key)->frontend($params);
 
                 if ($frontend->isRedirect()) return $frontend;
 
-                $modules_html[] = $frontend->getContent();
+                $modulesHtml[] = $frontend->getContent();
             }
         } else {
-            $modules_html['main'] = 'Ошибка!<br>Вы не имеете доступа к этой странице!';
+            $modulesHtml['main'] = 'Ошибка!<br>Вы не имеете доступа к этой странице!';
         }
 
         $menu = array (
-            'right' => $frontend_model->getMenu(1),
-            'sub' => $frontend_model->getMenu($id_node),
+            'right' => $frontendModel->getMenu(1),
+            'sub' => $frontendModel->getMenu($id_node),
         );
 
-        $navigation = $frontend_model->getNavigation($id_node);
+        $navigation = $frontendModel->getNavigation($id_node);
 
-        $current_page = $navigation[count($navigation) - 1];
+        $currentPage = $navigation[count($navigation) - 1];
 
         $content = $this->renderView('FrontendBundle:Frontend:index.html.twig', array (
-            'modules' => $modules_html,
+            'modules' => $modulesHtml,
             'menu' => $menu,
             'navigation' => $navigation,
-            'current_page' => $current_page,
-            'user' => $frontend_model->getUser()
+            'current_page' => $currentPage,
+            'user' => $frontendModel->getUser()
             ));
         return new Response($this->transformationHtml($content));
     }
