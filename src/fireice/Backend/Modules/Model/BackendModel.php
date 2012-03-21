@@ -10,13 +10,13 @@ use Symfony\Component\Yaml\Yaml;
 class BackendModel extends GeneralModel
 {
 
-    public function getBackendData($sitetreeId, $acl, $moduleId,$language='ru') // добавить пармаетр язык
+    public function getBackendData($sitetreeId, $acl, $moduleId, $language = 'ru') // добавить пармаетр язык
     {
         $values = array ();
 
         foreach ($this->getPlugins() as $plugin) {
-            if (!isset($values[$plugin->getValue('type')])) {
-                $values[$plugin->getValue('type')] = $plugin->getData($sitetreeId, $this->getBundleName().':'.$this->getEntityName(), $moduleId, self::TYPE_ITEM,false,$language); //Передавать язык
+            if (!isset($values[$plugin->getValue('type')])) { 
+                $values[$plugin->getValue('type')] = $plugin->getData($sitetreeId, $moduleId, $language, $this->getBundleName().':'.$this->getEntityName(), self::TYPE_ITEM); //Передавать язык
             }
         }
 

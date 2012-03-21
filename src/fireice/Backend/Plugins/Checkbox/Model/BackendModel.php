@@ -5,7 +5,7 @@ namespace fireice\Backend\Plugins\Checkbox\Model;
 class BackendModel extends \fireice\Backend\Plugins\BasicPlugin\Model\BackendModel
 {
 
-    public function getData($sitetree_id, $module, $module_id, $module_type, $rows,$language)
+    public function getData($sitetree_id, $module_id, $language, $moduleEntyty, $module_type, $rows=false)
     {
         $query = $this->em->createQuery("
             SELECT 
@@ -16,7 +16,7 @@ class BackendModel extends \fireice\Backend\Plugins\BasicPlugin\Model\BackendMod
                 plg.value AS plugin_value,
                 md.status
             FROM 
-                ".$module." md, 
+                ".$moduleEntyty." md, 
                 FireicePlugins".ucfirst($this->controller->getValue('type'))."Bundle:plugin".$this->controller->getValue('type')." plg,
                 DialogsBundle:moduleslink m_l,
                 DialogsBundle:modulespluginslink mp_l
@@ -39,7 +39,7 @@ class BackendModel extends \fireice\Backend\Plugins\BasicPlugin\Model\BackendMod
 
         $result = $query->getScalarResult();
 
-        $tmp = explode(':', $module);
+        $tmp = explode(':', $moduleEntyty);
 
         $entity = '\\project\\Modules\\'.substr($tmp[0], 6, -6).'\\Entity\\'.$tmp[1];
         $entity = new $entity();

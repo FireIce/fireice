@@ -47,9 +47,9 @@ class BackendController extends Controller
         return $this->getValue('name');
     }
     
-    public function getData($sitetree_id, $module, $module_id, $module_type, $rows, $language)
+    public function getData($sitetree_id, $module_id, $language, $moduleEntyty, $module_type, $rows=false)
     {
-        return $this->getModel()->getData($sitetree_id, $module, $module_id, $module_type, $rows, $language);
+        return $this->getModel()->getData($sitetree_id, $module_id, $language, $moduleEntyty, $module_type, $rows);
     }
 
     public function getNull()

@@ -13,8 +13,8 @@ class BackendModel
         $this->controller = $controller;
         $this->container = $container;
     }
-    
-    public function getData($sitetree_id, $module, $module_id, $module_type, $rows,$language) //Добавить параметр язык
+
+    public function getData($sitetree_id, $module_id, $language, $moduleEntyty, $module_type, $rows=false) //Добавить параметр язык
     {
         $query = $this->em->createQuery("
             SELECT 
@@ -24,7 +24,7 @@ class BackendModel
                 plg.value AS plugin_value,
                 md.status
             FROM 
-                ".$module." md, 
+                ".$moduleEntyty." md, 
                 FireicePlugins".ucfirst($this->controller->getValue('type'))."Bundle:plugin".$this->controller->getValue('type')." plg,
                 DialogsBundle:moduleslink m_l,
                 DialogsBundle:modulespluginslink mp_l
