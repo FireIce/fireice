@@ -147,6 +147,7 @@ Class TreeModel
             $modulelink = new moduleslink();
             $modulelink->setUpTree($node->getIdd());
             $modulelink->setUpModule($val['idd']);
+            $modulelink->setLanguage('ru');
             $this->em->persist($modulelink);
             $this->em->flush();
         }

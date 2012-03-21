@@ -5,7 +5,7 @@ namespace fireice\Backend\Plugins\Clipart\Model;
 class BackendModel extends \fireice\Backend\Plugins\Uploadimage\Model\BackendModel
 {
 
-    public function getData($sitetree_id, $module, $module_id, $module_type, $rows=false)
+    public function getData($sitetree_id, $module, $module_id, $module_type, $rows,$language) //было $rows=false
     {
         $query = $this->em->createQuery("
             SELECT 

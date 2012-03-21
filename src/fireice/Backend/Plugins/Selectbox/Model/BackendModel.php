@@ -6,7 +6,7 @@ class BackendModel extends \fireice\Backend\Plugins\BasicPlugin\Model\BackendMod
 {
     protected $plugin_name = 'selectbox';
 
-    public function getData($sitetree_id, $module, $module_id, $module_type, $rows=false)
+    public function getData($sitetree_id, $module, $module_id, $module_type, $rows, $language)
     {
         $query = $this->em->createQuery("
             SELECT 

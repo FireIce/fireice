@@ -26,6 +26,10 @@ class moduleslink
      * @ORM\Column(type="integer") 
      */
     protected $up_module;
+    /**
+     * @ORM\Column(type="string", length=5) 
+     */
+    protected $language;
 
     public function setId($id)
     {
@@ -55,6 +59,16 @@ class moduleslink
     public function getUpModule()
     {
         return $this->up_module;
+    }
+
+    public function setLanguage($language)
+    {
+        $this->language = $language;
+    }
+
+    public function getLanguage()
+    {
+        return $this->language;
     }
 
 }

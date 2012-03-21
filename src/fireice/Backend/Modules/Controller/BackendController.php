@@ -21,9 +21,9 @@ class BackendController extends Controller
         );
     }
 
-    public function getData($sitetreeId)
+    public function getData($sitetreeId) //Добавить параметр язык
     {
-        return $this->getModel()->getBackendData($sitetreeId, $this->get('acl'), $this->get('request')->get('id_module'));
+        return $this->getModel()->getBackendData($sitetreeId, $this->get('acl'), $this->get('request')->get('id_module')); //Передавать язык
     }
 
     public function createEdit()

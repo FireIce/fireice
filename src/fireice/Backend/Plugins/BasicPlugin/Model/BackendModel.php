@@ -14,7 +14,7 @@ class BackendModel
         $this->container = $container;
     }
     
-    public function getData($sitetree_id, $module, $module_id, $module_type, $rows=false)
+    public function getData($sitetree_id, $module, $module_id, $module_type, $rows,$language) //Добавить параметр язык
     {
         $query = $this->em->createQuery("
             SELECT 
@@ -38,7 +38,7 @@ class BackendModel
 
             AND md.plugin_id = plg.id
             AND md.plugin_type = :plugin_type");
-        
+        //Добавить условие язык
         $query->setParameters(array(
             'up_tree' => $sitetree_id,
             'up_module' => $module_id,
