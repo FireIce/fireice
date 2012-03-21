@@ -33,14 +33,16 @@ class BackendModel extends \fireice\Backend\Plugins\Uploadimage\Model\BackendMod
             AND m_l.up_module = :up_module
             AND m_l.id = mp_l.up_link
             AND mp_l.up_plugin = md.idd
-
+            
             AND md.plugin_id = plg.id_group
-            AND md.plugin_type = :plugin_type");
+            AND md.plugin_type = :plugin_type
+            AND m_l.language = :language");
         
         $query->setParameters(array(
             'up_tree' => $sitetree_id,
             'up_module' => $module_id,
-            'plugin_type' => $this->controller->getValue('type')
+            'plugin_type' => $this->controller->getValue('type'),
+            'language' => $language,
         ));
 
         $result = $query->getScalarResult();

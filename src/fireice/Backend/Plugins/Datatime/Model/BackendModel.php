@@ -4,8 +4,8 @@ namespace fireice\Backend\Plugins\Datatime\Model;
 
 class BackendModel extends \fireice\Backend\Plugins\BasicPlugin\Model\BackendModel
 {
-    
-    public function getData($sitetree_id, $module_id, $language, $moduleEntyty, $module_type, $rows=false)
+
+    public function getData($sitetree_id, $module_id, $language, $moduleEntyty, $module_type, $rows = false)
     {
         $query = $this->em->createQuery("
             SELECT 
@@ -28,14 +28,16 @@ class BackendModel extends \fireice\Backend\Plugins\BasicPlugin\Model\BackendMod
 
             AND md.eid IS NULL
             AND md.plugin_id = plg.id
-            AND md.plugin_type = :plugin_type");
+            AND md.plugin_type = :plugin_type
+            AND m_l.language = :language");
 
-        $query->setParameters(array(
+        $query->setParameters(array (
             'up_tree' => $sitetree_id,
             'up_module' => $module_id,
-            'plugin_type' => $this->controller->getValue('type')
-        ));        
-        
+            'plugin_type' => $this->controller->getValue('type'),
+            'language' => $language,
+        ));
+
         $result = $query->getScalarResult();
 
         foreach ($result as &$val) {

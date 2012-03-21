@@ -5,7 +5,7 @@ namespace fireice\Backend\Plugins\Uploadimage\Model;
 class BackendModel extends \fireice\Backend\Plugins\BasicPlugin\Model\BackendModel
 {
 
-    public function getData($sitetree_id, $module_id, $language, $moduleEntyty, $module_type, $rows=false)
+    public function getData($sitetree_id, $module_id, $language, $moduleEntyty, $module_type, $rows = false)
     {
         $query = $this->em->createQuery("
             SELECT 
@@ -30,13 +30,15 @@ class BackendModel extends \fireice\Backend\Plugins\BasicPlugin\Model\BackendMod
             AND mp_l.up_plugin = md.idd
 
             AND md.plugin_id = plg.id_group
-            AND md.plugin_type = :plugin_type");
-        
-        $query->setParameters(array(
+            AND md.plugin_type = :plugin_type
+            AND m_l.language = :language");
+
+        $query->setParameters(array (
             'up_tree' => $sitetree_id,
             'up_module' => $module_id,
-            'plugin_type' => $this->controller->getValue('type')
-        ));         
+            'plugin_type' => $this->controller->getValue('type'),
+            'language' => $language,
+        ));
 
         $result = $query->getScalarResult();
 
@@ -328,15 +330,16 @@ class BackendModel extends \fireice\Backend\Plugins\BasicPlugin\Model\BackendMod
     {
         return $this->container->getParameter('project_web_directory').$filename;
     }
-    
+
     // Возвращает путь до директории images
     protected function getImagesDir()
     {
         return rtrim($this->container->getParameter('upload_images_directory'), '/\\');
     }
-    
+
     protected function getImagesUrlPart()
     {
         return $this->container->getParameter('images_url_part');
     }
+
 }

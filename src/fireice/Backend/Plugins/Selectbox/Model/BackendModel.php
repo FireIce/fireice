@@ -6,7 +6,7 @@ class BackendModel extends \fireice\Backend\Plugins\BasicPlugin\Model\BackendMod
 {
     protected $plugin_name = 'selectbox';
 
-    public function getData($sitetree_id, $module_id, $language, $moduleEntyty, $module_type, $rows=false)
+    public function getData($sitetree_id, $module_id, $language, $moduleEntyty, $module_type, $rows = false)
     {
         $query = $this->em->createQuery("
             SELECT 
@@ -29,13 +29,15 @@ class BackendModel extends \fireice\Backend\Plugins\BasicPlugin\Model\BackendMod
             AND mp_l.up_plugin = md.idd
 
             AND md.plugin_id = plg.id
-            AND md.plugin_type = :plugin_type");
-        
-        $query->setParameters(array(
+            AND md.plugin_type = :plugin_type
+            AND m_l.language = :language");
+
+        $query->setParameters(array (
             'up_tree' => $sitetree_id,
             'up_module' => $module_id,
-            'plugin_type' => $this->controller->getValue('type')
-        ));         
+            'plugin_type' => $this->controller->getValue('type'),
+            'language' => $language,
+        ));
 
         $result = $query->getScalarResult();
 
@@ -71,7 +73,7 @@ class BackendModel extends \fireice\Backend\Plugins\BasicPlugin\Model\BackendMod
         }
 
         // Если нет записей в БД, нужно всё равно вернуть записи с label
-        if ($return === array() && $rows !== false) {
+        if ($return === array () && $rows !== false) {
             foreach ($entity->getConfig() as $plugin) {
                 $сhoices = $this->getChoices($entity, $plugin['name']);
 

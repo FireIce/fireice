@@ -14,7 +14,7 @@ class BackendModel
         $this->container = $container;
     }
 
-    public function getData($sitetree_id, $module_id, $language, $moduleEntyty, $module_type, $rows=false) //Добавить параметр язык
+    public function getData($sitetree_id, $module_id, $language, $moduleEntyty, $module_type, $rows = false)
     {
         $query = $this->em->createQuery("
             SELECT 
@@ -35,14 +35,16 @@ class BackendModel
             AND m_l.up_module = :up_module
             AND m_l.id = mp_l.up_link
             AND mp_l.up_plugin = md.idd
-
+            
             AND md.plugin_id = plg.id
-            AND md.plugin_type = :plugin_type");
+            AND md.plugin_type = :plugin_type
+            AND m_l.language = :language");
         //Добавить условие язык
-        $query->setParameters(array(
+        $query->setParameters(array (
             'up_tree' => $sitetree_id,
             'up_module' => $module_id,
-            'plugin_type' => $this->controller->getValue('type')
+            'plugin_type' => $this->controller->getValue('type'),
+            'language' => $language,
         ));
 
         return $query->getScalarResult();
@@ -62,7 +64,7 @@ class BackendModel
     }
 
     // Сканирует конфиг и выдаёт пункты для плагинов: чекбокс, селектбокс и радиобаттон
-    protected function getChoices($entity, $plugin_name, array $options=array ())
+    protected function getChoices($entity, $plugin_name, array $options = array ())
     {
         $metod = 'config'.ucfirst($plugin_name);
 
@@ -89,8 +91,8 @@ class BackendModel
                 AND m_l.up_module = mds.idd
                 AND mds.final = 'Y'
                 AND mds.status = 'active'");
-            
-            $query->setParameters(array(
+
+            $query->setParameters(array (
                 'up_tree' => $config['data']['id_node'],
                 'up_module' => $config['data']['id_module']
             ));
@@ -122,8 +124,8 @@ class BackendModel
 
                 AND md.plugin_id = plg.id
                 AND md.plugin_name = :plugin_name");
-            
-            $query->setParameters(array(
+
+            $query->setParameters(array (
                 'up_tree' => $config['data']['id_node'],
                 'up_module' => $config['data']['id_module'],
                 'plugin_name' => $plugin_for_title['name']
