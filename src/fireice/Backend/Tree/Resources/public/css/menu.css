@@ -324,7 +324,8 @@ input[type=button].del_group {color:#b03025;}
 	color:#4e4e4e;
 }
 .edit_add input[type=text],
-.images input[type=text] {
+.images input[type=text] ,
+.edit_add input[type=password]{
 	width:85%;
 	float:left;
 	margin:5px 0;
@@ -352,3 +353,47 @@ input[type=button].del_group {color:#b03025;}
 	padding-top:18px;
 }
 .check input[type=checkbox] {position:relative; top:1px}
+
+.enter_admin {
+	background-color:#e9e9e9;
+	position:relative;
+	width:100%; height:100%;
+}
+.enter_admin .wrapper {
+	width:500px; height:200px;
+	position:absolute;
+	top:50%; left:50%;
+	margin:-150px 0 0 -250px;
+}
+.enter_admin .wrapper label {
+	float:left;
+	margin:15px 0px 0 0;
+	width:140px;
+}
+.enter_admin .wrapper .add_button {
+	margin-left:139px;
+}
+.enter_admin .wrapper .edit_add input[type="text"],
+.enter_admin .wrapper .edit_add input[type="password"] {
+	width:337px;
+	margin:5px 0;
+}
+.enter_admin .wrapper .error {color:#d30c1f;margin:-2px 0 0 139px;}
+.enter_admin .footer {
+	background-color: #ccc;
+	bottom: 0;
+	left: 0;
+	position: fixed;
+	right: 0;
+	width: 100%; height:50px;
+}
+.enter_admin .footer div {
+	margin:16px 20px;
+	font-size:13px;
+ }
+.enter_admin .footer div a{color:#268499;}
+.enter_admin .footer div img {
+	position:relative;
+	top: -6px; left:-30px;
+ }
+.enter_admin .wrapper .edit_add input[type="submit"] {background: url("../images/icons.png") repeat-x 0 0;}
