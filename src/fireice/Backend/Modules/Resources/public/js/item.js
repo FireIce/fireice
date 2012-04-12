@@ -145,7 +145,7 @@ function editSubmit()
     });        
 }    
 
-function getHistory(id_mod)
+function getHistory(id_mod, language)
 {           
     id_module = id_mod;
     
@@ -174,7 +174,7 @@ function getHistory(id_mod)
         $('#dialog_id .history_button').show(); 
 
       
-        $.history.load('action/' + getNodeAction(action) + '/id/' + id_action + '/module/' + id_module);                              
+        $.history.load('action/' + getNodeAction(action) + '/id/' + id_action + '/module/' + id_module +'/language/'+language);                              
     
     }); 
     
@@ -183,7 +183,7 @@ function getHistory(id_mod)
     });
     
     $.ajax({
-        url: options.url + 'get_history?id=' + id_action + '&id_module=' + id_module,
+        url: options.url + 'get_history?id=' + id_action + '&id_module=' + id_module + '&language=' + language,
         data: '',
         type: 'get',
         async: true,

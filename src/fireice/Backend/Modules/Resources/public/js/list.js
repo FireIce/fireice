@@ -59,13 +59,13 @@ function showListInner(data)
     });      
 }
 
-function editCreateRow(row_id, act)
+function editCreateRow(row_id, act, lang)
 {
     $('#dialog_id .inner').html(options.progress_block_html);
     
     $.ajax({
         url: options.url + 'dialog_create_edit',
-        data: 'act=get_row&id=' + id_action + '&id_module=' + id_module + '&row_id=' + row_id,
+        data: 'act=get_row&id=' + id_action + '&id_module=' + id_module + '&language='+ lang + '&row_id=' + row_id,
         async: true,
         dataType : "json",   
         cache: false,                             

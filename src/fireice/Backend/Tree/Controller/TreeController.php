@@ -232,7 +232,7 @@ class TreeController extends Controller
                 $moduleAct = new $moduleAct();
                 $moduleAct->setContainer($this->container);
 
-                $fields = $moduleAct->getRowData($request->get('id'), $request->get('id_module'), $request->get('row_id'));
+                $fields = $moduleAct->getRowData($request->get('id'), $request->get('id_module'), $request->get('language'), $request->get('row_id'));
             } else $fields = 'no_rights';
         } elseif ($request->get('act') == 'delete_row') {
             if ($acl->checkUserPermissions($request->get('id'), new module($request->get('id_module')), false, $acl->getValueMask('deleteitem'))) {

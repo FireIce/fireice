@@ -51,7 +51,7 @@ var id_module;
 var module_type;
 var create_module_id;
 var first_tab;
-
+var first_language;
 var template, history_template;
 
 
@@ -607,7 +607,7 @@ function getNodeModules_callback(answer)
      
     first_tab = answer.modules[0]['id'];
     module_type = answer.modules[0]['module_type'];
-    language = answer.modules[0]['language']; 
+    first_language = answer.modules[0]['language'];
     if (action == 'edit')
         answer.dialog_caption = 'Редактирование';
     else if (action == 'create')
@@ -623,7 +623,7 @@ function getNodeModules_callback(answer)
         
         
         module_type = $(this).attr('module_type');
-        language = $(this).attr('language');
+        first_language = $(this).attr('language');
         $.history.load('action/' + getNodeAction(action) + '/id/' + id_action + '/module/' + $(this).attr('id_module')+'/language/'+$(this).attr('language')); 
     
     });   
@@ -631,7 +631,7 @@ function getNodeModules_callback(answer)
     $('#progress_id').hide();	
     $('#dialog_id').show();	      
 } 
-function showTab(id_mod, is_show_row)
+function showTab(id_mod, lang, is_show_row )
 { 
     if (id_mod !== undefined) {
         ckeditorInstancesDestroy();
@@ -653,7 +653,7 @@ function showTab(id_mod, is_show_row)
         {
             $.ajax({
                 url: options.url + 'dialog_create_edit',
-                data: 'act=show&id=' + id_action + '&id_module=' + id_module + '&language=' + language, 
+                data: 'act=show&id=' + id_action + '&id_module=' + id_module + '&language=' + lang, 
                 async: true,
                 dataType : "json",   
                 cache: false,                             
