@@ -232,7 +232,7 @@ function showOpenDialog(hash)
             params[tmp[i]] = tmp[i+1];
         }
     }
-    
+     
     if (params['action'] == 'node_create_1')
     {
         showSelectModule(params['id'], 'create_1');
@@ -254,8 +254,8 @@ function showOpenDialog(hash)
                 editCreateRow(params['edit_row'], 'edit');
         
             if (params['add_row'] == 'true')
-                editCreateRow(-1, 'add');    
-        }
+                editCreateRow(-1, 'add');  
+         }
         else
         {
             getHistory(params['module']);    

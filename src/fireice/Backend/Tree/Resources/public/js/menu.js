@@ -460,14 +460,14 @@ function showContextMenu_callback(answer)
     items = '';  
     
     for (i=0; i<answer.length; i++)                                      
-    {                 
+    {              
         if (answer[i].action == 'edit')
         {
-            on_click = 'ckeditorInstancesDestroy(); updateUrl(' + "'node_" + answer[i].action + "'" + ', ' + answer[i].id + ')';  
+            on_click = 'ckeditorInstancesDestroy(); updateUrl(' + "'node_" + answer[i].action + "'" + ', ' + answer[i].id + ', ' + answer.language+')';  
         }
         else if (answer[i].action == 'create')
         {
-            on_click = 'updateUrl(' + "'node_create_1'" + ', ' + answer[i].id + ')'; 
+            on_click = 'updateUrl(' + "'node_create_1'" + ', ' + answer[i].id + ', ' + answer.language + ')'; 
         }        
         else if (answer[i].action == 'remove')
         {
@@ -475,7 +475,7 @@ function showContextMenu_callback(answer)
         }
         else if (answer[i].action == 'rights')
         {
-            on_click = "$.history.load('action/rights_list/id/" + answer[i].id + "')";
+            on_click = "$.history.load('action/rights_list/id/" + answer[i].id + ', ' + answer.language + "')";
         }     
         else if (answer[i].action == 'hidenode')
         {
@@ -607,7 +607,7 @@ function getNodeModules_callback(answer)
      
     first_tab = answer.modules[0]['id'];
     module_type = answer.modules[0]['module_type'];
-    
+    language = answer.modules[0]['language']; 
     if (action == 'edit')
         answer.dialog_caption = 'Редактирование';
     else if (action == 'create')
@@ -623,8 +623,8 @@ function getNodeModules_callback(answer)
         
         
         module_type = $(this).attr('module_type');
-       
-        $.history.load('action/' + getNodeAction(action) + '/id/' + id_action + '/module/' + $(this).attr('id_module')); 
+        language = $(this).attr('language');
+        $.history.load('action/' + getNodeAction(action) + '/id/' + id_action + '/module/' + $(this).attr('id_module')+'/language/'+$(this).attr('language')); 
     
     });   
     
@@ -653,7 +653,7 @@ function showTab(id_mod, is_show_row)
         {
             $.ajax({
                 url: options.url + 'dialog_create_edit',
-                data: 'act=show&id=' + id_action + '&id_module=' + id_module,
+                data: 'act=show&id=' + id_action + '&id_module=' + id_module + '&language=' + language, 
                 async: true,
                 dataType : "json",   
                 cache: false,                             

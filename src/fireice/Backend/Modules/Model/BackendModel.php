@@ -98,7 +98,8 @@ class BackendModel extends GeneralModel
             'sendtoproveeditor' => $sendtoproveeditor,
             'sendtoprovemaineditor' => $sendtoprovemaineditor,
             'returnwriter' => $returnwriter,
-            'returneditor' => $returneditor
+            'returneditor' => $returneditor,
+            'language' => $language
         );
     }
 

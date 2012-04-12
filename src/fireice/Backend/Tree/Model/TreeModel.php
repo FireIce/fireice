@@ -1441,7 +1441,8 @@ Class TreeModel
                     'count-per-parent' => $config['parameters']['count-per-parent'],
                     'parent' => $config['parameters']['parent'],
                     'module_type' => $config['parameters']['type'],
-                    'css_tab' => $config['parameters']['css_tab']
+                    'css_tab' => $config['parameters']['css_tab'],
+                    'language'=>'ru',
                 );
             }
         }
