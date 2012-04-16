@@ -1399,7 +1399,8 @@ Class TreeModel
             SELECT 
                 md.idd AS id,
                 md.name AS name,
-                md.type AS type
+                md.type AS type,
+                md_l.language as language
             FROM 
                 TreeBundle:modulesitetree tr, 
                 DialogsBundle:moduleslink md_l, 
@@ -1431,7 +1432,7 @@ Class TreeModel
 
             if ($access) {
                 $config = $this->getModuleConfig($val['name']);
-
+                
                 $modules[$val['id']] = array (
                     'title' => $config['parameters']['title'],
                     'directory' => $val['name'],
@@ -1442,7 +1443,7 @@ Class TreeModel
                     'parent' => $config['parameters']['parent'],
                     'module_type' => $config['parameters']['type'],
                     'css_tab' => $config['parameters']['css_tab'],
-                    'language'=>'ru',
+                    'language'=>$val['language'],
                 );
             }
         }
