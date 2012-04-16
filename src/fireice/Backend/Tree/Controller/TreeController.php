@@ -197,7 +197,7 @@ class TreeController extends Controller
                 $moduleAct = new $moduleAct();
                 $moduleAct->setContainer($this->container);
 
-                $fields = $moduleAct->getData($request->get('id'),$request->get('language')); //??? Добавить язык из реквеста
+                $fields = $moduleAct->getData($request->get('id'),$request->get('id_module'), $request->get('language')); //??? Добавить язык из реквеста
             } else $fields = 'no_rights';
         } elseif ($request->get('act') == 'edit') {
 
