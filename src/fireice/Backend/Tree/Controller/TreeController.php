@@ -144,9 +144,9 @@ class TreeController extends Controller
     }
 
     public function nodeCreateAction()
-    {
-        if ($this->get('acl')->checkUserTreePermissions(false, $this->get('acl')->getValueMask('create'))) {
-            $answer = $this->getModel()->create($this->get('security.context'));
+    {   $languages = $this->container->getParameter('languages');
+         if ($this->get('acl')->checkUserTreePermissions(false, $this->get('acl')->getValueMask('create'))) {
+            $answer = $this->getModel()->create($this->get('security.context'), $languages);
 
             $this->get('cache')->updateSiteTreeStructure();
             $this->get('cache')->updateSiteTreeAccessAll();
@@ -192,12 +192,13 @@ class TreeController extends Controller
 
             $modules = $this->getModel()->getNodeModules($request->get('id'), $acl);
 
-            if (isset($modules[$request->get('id_module')])) {
-                $moduleAct = '\\project\\Modules\\'.$modules[$request->get('id_module')]['directory'].'\\Controller\\BackendController';
+            if (isset($modules[$request->get('id_module')][$request->get('language')])) {
+                $moduleAct = '\\project\\Modules\\'.$modules[$request->get('id_module')][$request->get('language')]['directory'].'\\Controller\\BackendController';
                 $moduleAct = new $moduleAct();
                 $moduleAct->setContainer($this->container);
 
                 $fields = $moduleAct->getData($request->get('id'),$request->get('id_module'), $request->get('language')); //??? Добавить язык из реквеста
+
             } else $fields = 'no_rights';
         } elseif ($request->get('act') == 'edit') {
 

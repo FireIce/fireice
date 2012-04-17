@@ -18,14 +18,14 @@ Class TreeModel
     protected $em, $sess;
     protected $treeChilds = array ();
     protected $request;
-     
+
     public function __construct(EntityManager $em, $sess, $container)
     {
         $this->request = Request::createFromGlobals();
         $this->em = $em;
         $this->sess = $sess;
         $this->container = $container;
-     }
+    }
 
     public function getNodeTitle($id)
     {
@@ -91,8 +91,10 @@ Class TreeModel
         return $result2['value'];
     }
 
-    public function create($security)//*****
-    {
+    public function create($security, $languages)//*****
+    { 
+        $languageDefault = $languages['default'];
+        unset ( $languages['default']);
         $node = new modulesitetree();
         $node->setFinal('Y');
         $node->setUpParent($this->request->get('id'));
@@ -129,10 +131,10 @@ Class TreeModel
         $subModules = array ();
 
         foreach ($config['parameters']['modules'] as $val) {
-            $subModules[] = "'".$val."'";
-        }
+            $subModules=array();
+            $subModules[] = "'".$val['name']."'";
 
-        $query = $this->em->createQuery("
+            $query = $this->em->createQuery("
             SELECT 
                 md.idd              
             FROM 
@@ -141,17 +143,30 @@ Class TreeModel
             AND md.status = 'active'
             AND md.name IN(".implode(',', $subModules).")");
 
-        $modules_id = $query->getResult();
+            $module_id = $query->getSingleResult();
+            
+            if ('yes' == $val['multilanguage']) {
 
-        foreach ($modules_id as $val) {
-            $modulelink = new moduleslink();
-            $modulelink->setUpTree($node->getIdd());
-            $modulelink->setUpModule($val['idd']);
-            $modulelink->setLanguage('ru');
-            $this->em->persist($modulelink);
-            $this->em->flush();
+                foreach ($languages as $lang => $language) {
+                    
+                    $modulelink = new moduleslink();
+                    $modulelink->setUpTree($node->getIdd());
+                    $modulelink->setUpModule($module_id['idd']);
+                    $modulelink->setLanguage($lang);
+                    $this->em->persist($modulelink);
+                    
+                }
+            } else {
+                $modulelink = new moduleslink();
+                $modulelink->setUpTree($node->getIdd());
+                $modulelink->setUpModule($module_id['idd']);
+                $modulelink->setLanguage($languageDefault);
+                $this->em->persist($modulelink);
+                
+
+            }
         }
-
+        $this->em->flush();
         return $node->getIdd();
     }
 
@@ -923,7 +938,7 @@ Class TreeModel
     }
 
     // Отправить на подтверждение редактору   
-    public function sendToProveEditor( $security, $acl) //*****
+    public function sendToProveEditor($security, $acl) //*****
     {
         $query = $this->em->createQuery("
             SELECT 
@@ -1393,7 +1408,7 @@ Class TreeModel
     }
 
     // Возвращает массив модулей, которые привязаны к узлу id
-    public function getNodeModules($id, $acl, $action='edit')
+    public function getNodeModules($id, $acl, $action = 'edit')
     {
         $query = $this->em->createQuery("
             SELECT 
@@ -1433,7 +1448,7 @@ Class TreeModel
             if ($access) {
                 $config = $this->getModuleConfig($val['name']);
                 
-                $modules[$val['id']] = array (
+                $modules[ $val['id']][$val['language']] = array (
                     'title' => $config['parameters']['title'],
                     'directory' => $val['name'],
                     'name' => $config['parameters']['name'],
@@ -1443,7 +1458,7 @@ Class TreeModel
                     'parent' => $config['parameters']['parent'],
                     'module_type' => $config['parameters']['type'],
                     'css_tab' => $config['parameters']['css_tab'],
-                    'language'=>$val['language'],
+                    'language' => $val['language'],
                 );
             }
         }
@@ -1503,13 +1518,13 @@ Class TreeModel
             AND st.final = 'Y' 
             AND st.eid IS NULL
             AND st.status = 'hidden'");
-        
-        $query->setParameters(array(
+
+        $query->setParameters(array (
             'idd' => $id,
             'cid' => $history->getId(),
             'up_parent' => $oldNode->getUpParent()
         ));
-        
+
         $query->getResult();
     }
 
@@ -1550,13 +1565,13 @@ Class TreeModel
             AND st.final = 'Y' 
             AND st.eid IS NULL
             AND st.status = 'active'");
-        
-        $query->setParameters(array(
+
+        $query->setParameters(array (
             'idd' => $id,
             'cid' => $history->getId(),
             'up_parent' => $oldNode->getUpParent()
-        ));        
-        
+        ));
+
         $query->getResult();
     }
 

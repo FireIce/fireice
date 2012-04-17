@@ -7,9 +7,10 @@
     <div class="form"> 
 
         {{each modules}}
+        {{each $value}}
         <div id_module="${$value.id}" module_type="${$value.module_type}" language="${$value.language}" class="tab {{if $index == 0}}current{{/if}} ${$value.css_tab}">${$value.title} * (${$value.language})</div>
         {{/each}}
-
+        {{/each}}
         <div class="clear"></div>
 
         <div class="container">

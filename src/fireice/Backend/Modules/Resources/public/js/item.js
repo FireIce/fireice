@@ -124,7 +124,7 @@ function editSubmit()
     data = data.slice(0, -1); 
 
     $.ajax({
-        url: options.url + 'dialog_create_edit?act=edit&action=' + action + '&id=' + id_action + '&id_module=' + id_module,
+        url: options.url + 'dialog_create_edit?act=edit&action=' + action + '&id=' + id_action + '&id_module=' + id_module+ '&language=' + first_language,
         data: data,
         type: 'post',
         async: true,

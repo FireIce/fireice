@@ -10,12 +10,12 @@ use Symfony\Component\Yaml\Yaml;
 class BackendModel extends GeneralModel
 {
 
-    public function getBackendData($sitetreeId, $acl, $moduleId, $language = 'ru') // добавить пармаетр язык
+    public function getBackendData($sitetreeId, $acl, $moduleId, $language) // добавить пармаетр язык
     {
         $values = array ();
 
         foreach ($this->getPlugins() as $plugin) {
-            if (!isset($values[$plugin->getValue('type')])) { 
+            if (!isset($values[$plugin->getValue('type')])) {
                 $values[$plugin->getValue('type')] = $plugin->getData($sitetreeId, $moduleId, $language, $this->getBundleName().':'.$this->getEntityName(), self::TYPE_ITEM); //Передавать язык
             }
         }
@@ -118,6 +118,7 @@ class BackendModel extends GeneralModel
                     WHERE md.status = 'active'            
                     AND m_l.up_tree = :up_tree
                     AND m_l.up_module = :up_module
+                    AND m_l.language = :language
                     AND m_l.id = mp_l.up_link
                     AND mp_l.up_plugin = md.idd
                     AND md.final = 'Y'
@@ -127,6 +128,7 @@ class BackendModel extends GeneralModel
                 $query->setParameters(array (
                     'up_tree' => $this->request->get('id'),
                     'up_module' => $this->request->get('id_module'),
+                    'language' => $this->request->get('language'),
                     'plugin_name' => $plugin->getValue('name'),
                     'plugin_type' => $plugin->getValue('type')
                 ));
@@ -233,6 +235,7 @@ class BackendModel extends GeneralModel
                         WHERE md.eid IS NULL            
                         AND m_l.up_tree = :up_tree
                         AND m_l.up_module = :up_module
+                        AND m_l.language = :language
                         AND m_l.id = mp_l.up_link
                         AND mp_l.up_plugin = md.idd
                         AND md.final != 'N'
@@ -242,6 +245,7 @@ class BackendModel extends GeneralModel
                     $query->setParameters(array (
                         'up_tree' => $this->request->get('id'),
                         'up_module' => $this->request->get('id_module'),
+                        'language' => $this->request->get('language'),
                         'plugin_name' => $plugin->getValue('name'),
                         'plugin_type' => $plugin->getValue('type')
                     ));
@@ -305,7 +309,8 @@ class BackendModel extends GeneralModel
 
                         $modulelink = $this->em->getRepository('DialogsBundle:moduleslink')->findOneBy(array (
                             'up_tree' => $this->request->get('id'),
-                            'up_module' => $this->request->get('id_module')
+                            'up_module' => $this->request->get('id_module'),
+                            'language' => $this->request->get('language')
                             ));
 
                         $modulePluginLink = new modulespluginslink();
@@ -330,6 +335,7 @@ class BackendModel extends GeneralModel
                         AND md.eid IS NULL
                         AND m_l.up_tree = :up_tree
                         AND m_l.up_module = :up_module
+                        AND m_l.language = :language
                         AND m_l.id = mp_l.up_link
                         AND mp_l.up_plugin = md.idd
                         AND md.plugin_name = :plugin_name
@@ -338,6 +344,7 @@ class BackendModel extends GeneralModel
                     $query->setParameters(array (
                         'up_tree' => $this->request->get('id'),
                         'up_module' => $this->request->get('id_module'),
+                        'language' => $this->request->get('language'),
                         'plugin_name' => $plugin->getValue('name'),
                         'plugin_type' => $plugin->getValue('type')
                     ));
@@ -403,7 +410,8 @@ class BackendModel extends GeneralModel
 
                         $modulelink = $this->em->getRepository('DialogsBundle:moduleslink')->findOneBy(array (
                             'up_tree' => $this->request->get('id'),
-                            'up_module' => $this->request->get('id_module')
+                            'up_module' => $this->request->get('id_module'),
+                            'language' => $this->request->get('language'),
                             ));
 
                         $modulePluginLink = new modulespluginslink();
@@ -433,12 +441,14 @@ class BackendModel extends GeneralModel
             WHERE md.status = 'active' 
             AND m_l.up_tree = :up_tree
             AND m_l.up_module = :up_module
+            AND m_l.language = :language
             AND m_l.id = mp_l.up_link
             AND mp_l.up_plugin = md.idd");
 
         $query->setParameters(array (
             'up_tree' => $this->request->get('id'),
-            'up_module' => $this->request->get('id_module')
+            'up_module' => $this->request->get('id_module'),
+            'language' => $this->request->get('language')
         ));
 
         $result = $query->getResult();

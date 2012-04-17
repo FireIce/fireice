@@ -604,10 +604,11 @@ function getNodeModules_callback(answer)
         
         return false;
     }          
-     
-    first_tab = answer.modules[0]['id'];
-    module_type = answer.modules[0]['module_type'];
-    first_language = answer.modules[0]['language'];
+    
+    var ans = answer.modules[0]['ru'];
+    first_tab = ans['id'];
+    module_type = ans['module_type'];
+    first_language = ans['language'];
     if (action == 'edit')
         answer.dialog_caption = 'Редактирование';
     else if (action == 'create')
