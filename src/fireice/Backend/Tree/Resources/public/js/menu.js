@@ -51,7 +51,7 @@ var id_module;
 var module_type;
 var create_module_id;
 var first_tab;
-var first_language;
+var language;
 var template, history_template;
 
 
@@ -604,11 +604,12 @@ function getNodeModules_callback(answer)
         
         return false;
     }          
-    
-    var ans = answer.modules[0]['ru'];
+     
+    var ans =  answer.modules[0]['ru'];
     first_tab = ans['id'];
     module_type = ans['module_type'];
-    first_language = ans['language'];
+    language = ans['language'];
+    
     if (action == 'edit')
         answer.dialog_caption = 'Редактирование';
     else if (action == 'create')
@@ -624,7 +625,7 @@ function getNodeModules_callback(answer)
         
         
         module_type = $(this).attr('module_type');
-        first_language = $(this).attr('language');
+        language = $(this).attr('language');
         $.history.load('action/' + getNodeAction(action) + '/id/' + id_action + '/module/' + $(this).attr('id_module')+'/language/'+$(this).attr('language')); 
     
     });   

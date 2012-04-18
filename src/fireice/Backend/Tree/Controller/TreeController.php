@@ -144,9 +144,9 @@ class TreeController extends Controller
     }
 
     public function nodeCreateAction()
-    {   $languages = $this->container->getParameter('languages');
+    { 
          if ($this->get('acl')->checkUserTreePermissions(false, $this->get('acl')->getValueMask('create'))) {
-            $answer = $this->getModel()->create($this->get('security.context'), $languages);
+            $answer = $this->getModel()->create($this->get('security.context'));
 
             $this->get('cache')->updateSiteTreeStructure();
             $this->get('cache')->updateSiteTreeAccessAll();

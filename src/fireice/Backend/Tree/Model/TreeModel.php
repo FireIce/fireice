@@ -18,6 +18,7 @@ Class TreeModel
     protected $em, $sess;
     protected $treeChilds = array ();
     protected $request;
+    protected $languages;
 
     public function __construct(EntityManager $em, $sess, $container)
     {
@@ -25,6 +26,7 @@ Class TreeModel
         $this->em = $em;
         $this->sess = $sess;
         $this->container = $container;
+        $this->languages = $this->container->getParameter('languages');
     }
 
     public function getNodeTitle($id)
@@ -91,10 +93,12 @@ Class TreeModel
         return $result2['value'];
     }
 
-    public function create($security, $languages)//*****
-    { 
+    public function create($security)//*****
+    {
+        $languages = $this->parameters;
+        print_r($languages);exit;
         $languageDefault = $languages['default'];
-        unset ( $languages['default']);
+        unset($languages['default']);
         $node = new modulesitetree();
         $node->setFinal('Y');
         $node->setUpParent($this->request->get('id'));
@@ -128,45 +132,50 @@ Class TreeModel
 
         $config = $this->getModuleConfig($module->getName());
 
+// Получаем список модулей
         $subModules = array ();
-
         foreach ($config['parameters']['modules'] as $val) {
-            $subModules=array();
-            $subModules[] = "'".$val['name']."'";
-
-            $query = $this->em->createQuery("
-            SELECT 
-                md.idd              
-            FROM 
-                DialogsBundle:modules md
-            WHERE md.final = 'Y'
-            AND md.status = 'active'
-            AND md.name IN(".implode(',', $subModules).")");
-
-            $module_id = $query->getSingleResult();
-            
-            if ('yes' == $val['multilanguage']) {
-
+		    $subModules[] = "'".$val['name']."'";
+		}
+		
+		// Берем из базы одним запросом данные для этих модулей
+        $query = $this->em->createQuery("
+                SELECT
+                    md.idd, md.name
+                FROM
+                    DialogsBundle:modules md
+                WHERE md.final = 'Y'
+                AND md.status = 'active'
+                AND md.name IN(".implode(',', $subModules).")");				
+		
+		// Формируем вспомогательный массив с данными модулей
+		$subModules = array();
+		foreach ($query->getResult() as $value) {
+		    $subModules[ $value['name'] ] = $value['idd'];
+		}
+		
+		// Теперь опять обходим конфиг 
+		// Все данные хранятся в $subModules['имя_модуля'] = значение_idd
+		foreach ($config['parameters']['modules'] as $value) {            
+            if ('yes' == $value['multilanguage']) {
                 foreach ($languages as $lang => $language) {
                     
                     $modulelink = new moduleslink();
                     $modulelink->setUpTree($node->getIdd());
-                    $modulelink->setUpModule($module_id['idd']);
+                    $modulelink->setUpModule($subModules[ $value['name'] ]);
                     $modulelink->setLanguage($lang);
-                    $this->em->persist($modulelink);
-                    
+                    $this->em->persist($modulelink);                    
                 }
             } else {
                 $modulelink = new moduleslink();
                 $modulelink->setUpTree($node->getIdd());
-                $modulelink->setUpModule($module_id['idd']);
+                $modulelink->setUpModule($subModules[ $value['name'] ]);
                 $modulelink->setLanguage($languageDefault);
                 $this->em->persist($modulelink);
-                
-
             }
         }
         $this->em->flush();
+		
         return $node->getIdd();
     }
 
@@ -1447,8 +1456,8 @@ Class TreeModel
 
             if ($access) {
                 $config = $this->getModuleConfig($val['name']);
-                
-                $modules[ $val['id']][$val['language']] = array (
+
+                $modules[$val['id']][$val['language']] = array (
                     'title' => $config['parameters']['title'],
                     'directory' => $val['name'],
                     'name' => $config['parameters']['name'],

@@ -232,7 +232,7 @@ function showOpenDialog(hash)
             params[tmp[i]] = tmp[i+1];
         }
     }
-    if  (params['language'] == undefined) params['language'] = first_language;  
+    if  (params['language'] == undefined) params['language'] = language;  
     if (params['action'] == 'node_create_1')
     {
         showSelectModule(params['id'], 'create_1');
@@ -248,17 +248,17 @@ function showOpenDialog(hash)
             if (params['module'] != undefined)
                 showTab(params['module'], params['language'], is_show_row);
             else
-                showTab(first_tab, first_language,  is_show_row);       
+                showTab(first_tab, language,  is_show_row);       
         
             if (params['edit_row'] != undefined)
-                editCreateRow(params['edit_row'], 'edit', first_language);
+                editCreateRow(params['edit_row'], 'edit', language);
         
             if (params['add_row'] == 'true')
-                editCreateRow(-1, 'add', first_language);  
+                editCreateRow(-1, 'add', language);  
         }
         else
         {
-            getHistory(params['module'], first_language);    
+            getHistory(params['module'], language);    
         }          
     }
     else if (params['action'] == 'node_edit')
@@ -272,13 +272,13 @@ function showOpenDialog(hash)
             if (params['module'] != undefined)
                 showTab(params['module'], params['language'], is_show_row);
             else
-                showTab(first_tab, first_language, is_show_row);       
+                showTab(first_tab, language, is_show_row);       
 
             if (params['edit_row'] != undefined)
-                editCreateRow(params['edit_row'], 'edit', first_language);
+                editCreateRow(params['edit_row'], 'edit', language);
         
             if (params['add_row'] == 'true')
-                editCreateRow(-1, 'add', first_language);     
+                editCreateRow(-1, 'add', language);     
         }
         else
         {
