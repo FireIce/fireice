@@ -18,7 +18,6 @@ Class TreeModel
     protected $em, $sess;
     protected $treeChilds = array ();
     protected $request;
-    protected $languages;
 
     public function __construct(EntityManager $em, $sess, $container)
     {
@@ -26,7 +25,6 @@ Class TreeModel
         $this->em = $em;
         $this->sess = $sess;
         $this->container = $container;
-        $this->languages = $this->container->getParameter('languages');
     }
 
     public function getNodeTitle($id)
@@ -95,8 +93,7 @@ Class TreeModel
 
     public function create($security)//*****
     {
-        $languages = $this->parameters;
-        print_r($languages);exit;
+        $languages = $this->container->getParameter('languages');
         $languageDefault = $languages['default'];
         unset($languages['default']);
         $node = new modulesitetree();
