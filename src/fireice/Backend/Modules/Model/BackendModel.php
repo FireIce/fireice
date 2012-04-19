@@ -204,7 +204,8 @@ class BackendModel extends GeneralModel
 
                     $modulelink = $this->em->getRepository('DialogsBundle:moduleslink')->findOneBy(array (
                         'up_tree' => $this->request->get('id'),
-                        'up_module' => $this->request->get('id_module')
+                        'up_module' => $this->request->get('id_module'),
+                        'language' => $this->request->get('language'),
                         ));
 
                     $modulePluginLink = new modulespluginslink();
@@ -627,6 +628,7 @@ class BackendModel extends GeneralModel
             AND md.status = 'active'
             AND md_l.up_tree = tr.idd
             AND md_l.up_module = md.idd
+            AND md_l.language = 'ru'
             AND tr.final = 'Y'
             AND tr.idd = :idd
             AND md.type = 'user'")->setParameter('idd', $data['id_node']);
@@ -646,7 +648,8 @@ class BackendModel extends GeneralModel
             SELECT 
                 md.idd as id_module,
                 md.name AS name,
-                md.table_name as entity
+                md.table_name as entity,
+                md_l.language as language
             FROM 
                 TreeBundle:modulesitetree tr, 
                 DialogsBundle:moduleslink md_l, 
@@ -655,11 +658,12 @@ class BackendModel extends GeneralModel
             AND md.status = 'active'
             AND md_l.up_tree = tr.idd
             AND md_l.up_module = md.idd
+            AND md_l.language = :language  
             AND (tr.status = 'active' OR tr.status = 'hidden')
             AND tr.final = 'Y'
             AND tr.idd = :idd
             AND md.type='user'
-            ORDER BY md.type")->setParameter('idd', $data['id_node']);
+            ORDER BY md.type")->setParameter('idd', $data['id_node'])->setParameter('language',"ru");
 
         $nodeModules = $query->getOneOrNullResult();
 
@@ -677,6 +681,7 @@ class BackendModel extends GeneralModel
 
             AND m_l.up_tree = :up_tree
             AND m_l.up_module = :up_module
+            AND m_l.language = :language
             AND m_l.id = mp_l.up_link
             AND mp_l.up_plugin = md.idd
 
@@ -686,6 +691,7 @@ class BackendModel extends GeneralModel
         $query->setParameters(array (
             'up_tree' => $data['id_node'],
             'up_module' => $nodeModules['id_module'],
+            'language' => $nodeModules['language'],
             'plugin_name' => $data['title']
         ));
 

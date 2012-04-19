@@ -145,7 +145,7 @@ function editCreateRowSubmit(row_id, act)
     data = data.slice(0, -1);
      
     $.ajax({
-        url: options.url + 'dialog_create_edit?act=edit&action=' + act + '&id=' + id_action + '&id_module=' + id_module + '&id_row=' + row_id,
+        url: options.url + 'dialog_create_edit?act=edit&action=' + act + '&id=' + id_action + '&id_module=' + id_module + '&id_row=' + row_id+'&language=' + language,
         data: data,
         type: 'post',
         async: true,
@@ -176,7 +176,7 @@ function deleteRow(id_row)
     if (confirm('Вы уверены?'))
     {           
         $.ajax({
-            url: options.url + 'dialog_create_edit?act=delete_row&id=' + id_action + '&id_module=' + id_module + '&id_row=' + id_row,
+            url: options.url + 'dialog_create_edit?act=delete_row&id=' + id_action + '&id_module=' + id_module + '&id_row=' + id_row+'&language=' + language,
             data: '',
             type: 'post',
             async: true,
@@ -186,7 +186,7 @@ function deleteRow(id_row)
                 
                 if (answer == 'ok') {   
                     showMessage('Удалено!', '#38bc50');        
-                    showTab(id_module);
+                    showTab(id_module,language);
                 } else if (answer == 'no_rights') {                    
                     showMessage('Нет прав!', '#ff0000');
                 } else {
@@ -210,7 +210,7 @@ function updateOrders()
     data = data.slice(0, -1);
     
     $.ajax({
-        url: options.url + 'update_orders?id=' + id_action + '&id_module=' + id_module,
+        url: options.url + 'update_orders?id=' + id_action + '&id_module=' + id_module+'&language=' + language,
         data: data,
         type: 'post',
         async: true,
@@ -220,7 +220,7 @@ function updateOrders()
                 
             if (answer == 'ok') {   
                 showMessage('Сохранено!', '#38bc50');        
-                showTab(id_module);        
+                showTab(id_module,language);        
             } else {
                 showMessage('Ошибка!', '#ff0000');
             } 

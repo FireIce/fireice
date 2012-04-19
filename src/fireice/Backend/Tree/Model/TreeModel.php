@@ -132,10 +132,10 @@ Class TreeModel
 // Получаем список модулей
         $subModules = array ();
         foreach ($config['parameters']['modules'] as $val) {
-		    $subModules[] = "'".$val['name']."'";
-		}
-		
-		// Берем из базы одним запросом данные для этих модулей
+            $subModules[] = "'".$val['name']."'";
+        }
+
+        // Берем из базы одним запросом данные для этих модулей
         $query = $this->em->createQuery("
                 SELECT
                     md.idd, md.name
@@ -143,36 +143,35 @@ Class TreeModel
                     DialogsBundle:modules md
                 WHERE md.final = 'Y'
                 AND md.status = 'active'
-                AND md.name IN(".implode(',', $subModules).")");				
-		
-		// Формируем вспомогательный массив с данными модулей
-		$subModules = array();
-		foreach ($query->getResult() as $value) {
-		    $subModules[ $value['name'] ] = $value['idd'];
-		}
-		
-		// Теперь опять обходим конфиг 
-		// Все данные хранятся в $subModules['имя_модуля'] = значение_idd
-		foreach ($config['parameters']['modules'] as $value) {            
+                AND md.name IN(".implode(',', $subModules).")");
+
+        // Формируем вспомогательный массив с данными модулей
+        $subModules = array ();
+        foreach ($query->getResult() as $value) {
+            $subModules[$value['name']] = $value['idd'];
+        }
+        // Теперь опять обходим конфиг 
+        // Все данные хранятся в $subModules['имя_модуля'] = значение_idd
+        foreach ($config['parameters']['modules'] as $value) {
             if ('yes' == $value['multilanguage']) {
                 foreach ($languages as $lang => $language) {
-                    
+
                     $modulelink = new moduleslink();
                     $modulelink->setUpTree($node->getIdd());
-                    $modulelink->setUpModule($subModules[ $value['name'] ]);
+                    $modulelink->setUpModule($subModules[$value['name']]);
                     $modulelink->setLanguage($lang);
-                    $this->em->persist($modulelink);                    
+                    $this->em->persist($modulelink);
                 }
             } else {
                 $modulelink = new moduleslink();
                 $modulelink->setUpTree($node->getIdd());
-                $modulelink->setUpModule($subModules[ $value['name'] ]);
+                $modulelink->setUpModule($subModules[$value['name']]);
                 $modulelink->setLanguage($languageDefault);
                 $this->em->persist($modulelink);
             }
         }
         $this->em->flush();
-		
+
         return $node->getIdd();
     }
 

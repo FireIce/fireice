@@ -32,7 +32,7 @@ function pluginSelectbox(data)
                 }
                
                 $.ajax({
-                    url: options.url + 'ajax_load?plugin=' + target[key] + '&' + parametres + 'id=' + id_action + '&id_module=' + id_module,
+                    url: options.url + 'ajax_load?plugin=' + target[key] + '&' + parametres + 'id=' + id_action + '&id_module=' + id_module+'&language=' + language,
                     data: '',
                     async: false,
                     dataType : "json",   
