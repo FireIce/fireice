@@ -628,10 +628,12 @@ class BackendModel extends GeneralModel
             AND md.status = 'active'
             AND md_l.up_tree = tr.idd
             AND md_l.up_module = md.idd
-            AND md_l.language = 'ru'
+            AND md_l.language = :language
             AND tr.final = 'Y'
             AND tr.idd = :idd
-            AND md.type = 'user'")->setParameter('idd', $data['id_node']);
+            AND md.type = 'user'")
+            ->setParameter('idd', $data['id_node'])
+            ->setParameter('language', $data['language']);
 
         $result = $query->getSingleResult();
 
@@ -663,7 +665,7 @@ class BackendModel extends GeneralModel
             AND tr.final = 'Y'
             AND tr.idd = :idd
             AND md.type='user'
-            ORDER BY md.type")->setParameter('idd', $data['id_node'])->setParameter('language',"ru");
+            ORDER BY md.type")->setParameter('idd', $data['id_node'])->setParameter('language',$data['language']);
 
         $nodeModules = $query->getOneOrNullResult();
 
