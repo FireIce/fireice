@@ -42,7 +42,6 @@ class BackendController extends Controller
 
         $config = 'config'.ucfirst($this->get('request')->get('plugin'));
         $params = $this->get('request')->get('params');
-        $params['language'] = $this->get('request')->get('language');
         $config = $entity->$config($params);
 
         $method = 'ajaxLoad'.ucfirst($config['data']['type']);

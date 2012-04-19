@@ -28,11 +28,11 @@ function pluginSelectbox(data)
                 var parametres = '';
                 for (var key3 in params[key])
                 {
-                    parametres += 'params[' + key3 + ']=' + $('#dialog_id .inner .data select[name=' + params[key][key3] + ']').val() + '&';                                        
+                    parametres += 'params[' + key3 + ']=' + $('#dialog_id .inner .data select[name=' + params[key][key3] + ']').val() + '&params[language]='+language+'&';                                        
                 }
                
                 $.ajax({
-                    url: options.url + 'ajax_load?plugin=' + target[key] + '&' + parametres + 'id=' + id_action + '&id_module=' + id_module+'&language=' + language,
+                    url: options.url + 'ajax_load?plugin=' + target[key] + '&' + parametres + 'id=' + id_action + '&id_module=' + id_module,
                     data: '',
                     async: false,
                     dataType : "json",   
