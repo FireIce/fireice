@@ -640,7 +640,7 @@ function showTab(id_mod, lang, is_show_row )
     
         $('#dialog_id .tab').removeClass('current');
         $('#dialog_id .form .tab').each(function(){
-            if ($(this).attr('id_module') == id_mod)
+            if ($(this).attr('id_module') == id_mod && $(this).attr('language') == lang)
             {
                 module_type = $(this).attr('module_type');
                 $(this).addClass('current');
