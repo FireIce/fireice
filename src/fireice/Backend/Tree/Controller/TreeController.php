@@ -456,7 +456,9 @@ class TreeController extends Controller
         $modules = $this->getModel()->getNodeModules($this->get('request')->get('id'), $this->get('acl'));
 
         if ($modules !== array ()) {
-            $moduleAct = '\\project\\Modules\\'.$modules[$this->get('request')->get('id_module')][$this->get('request')->get('language')]['directory'].'\\Controller\\BackendController';
+            $language = $this->get('request')->get('params');
+            $language = $language['language'];
+            $moduleAct = '\\project\\Modules\\'.$modules[$this->get('request')->get('id_module')][$language]['directory'].'\\Controller\\BackendController';
             $moduleAct = new $moduleAct();
             $moduleAct->setContainer($this->container);
 

@@ -5,22 +5,26 @@ namespace fireice\Backend\Tree\Services;
 use Assetic\Cache\FilesystemCache;
 use Symfony\Component\Security\Acl\Permission\MaskBuilder;
 use fireice\Backend\Dialogs\Entity\module;
+use Symfony\Component\Yaml\Yaml;
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class Cache
 {
     private $em;
     private $acl;
     private $FilesystemCache;
+    private $dirModules;
+    private $dirCache;
     private $tmp;
-    private $project_name;
 
-    public function __construct($em, $acl, $project_name, $cache_dir)
+    public function __construct($em, $acl, $dirCache, $dirModules)
     {
-        $this->FilesystemCache = new FilesystemCache($cache_dir);
-
+        $this->FilesystemCache = new FilesystemCache($dirCache);
+        $this->dirModules = $dirModules;
+        $this->dirCache = $dirCache;
         $this->em = $em;
         $this->acl = $acl;
-        $this->project_name = $project_name;
     }
 
     public function exists($key)
@@ -78,7 +82,7 @@ class Cache
         }
     }
 
-    public function updateSiteTreeAccessUser($user=false)
+    public function updateSiteTreeAccessUser($user = false)
     {
         if ($user === false) {
             $user = $this->acl->current_user;
@@ -126,7 +130,7 @@ class Cache
         }
     }
 
-    public function compileSiteTreeAccess($user=false)
+    public function compileSiteTreeAccess($user = false)
     {
         $query = $this->em->createQuery("
             SELECT 
@@ -234,7 +238,7 @@ class Cache
         $plugins_values = array ();
 
         foreach ($node_types as $key => $type) {
-            $module = '\\'.$this->project_name.'\\Modules\\'.$type['bundle'].'\\Entity\\'.$key;
+            $module = '\\project\\Modules\\'.$type['bundle'].'\\Entity\\'.$key;
             $module = new $module();
 
             $config = $module->getConfig();
@@ -308,7 +312,7 @@ class Cache
         foreach ($nodes as $key => $val) {
             $childs = $this->getChilds($key);
 
-            $hierarchy[$key] = $childs !==array() ? $childs : null;
+            $hierarchy[$key] = $childs !== array () ? $childs : null;
         }
 
         return array (
@@ -341,6 +345,22 @@ class Cache
 
             return $return;
         } else return array ();
+    }
+
+    public function getModuleConfig($name) //Функция чтения файла config для каждого модуля
+    {//$name - Наименование Модуля
+        $module = 'module_'.$name;
+        $configFile = $this->dirModules.$name.'/Resources/config/config.yml';
+        $cacheFile = $this->dirCache.'/'.$module;
+
+        if ($this->exists($module) && filemtime($configFile) < filemtime($cacheFile)) {
+            // Файл кеша более свежий, поэтому выдаем его
+            return $this->load($module);
+        } else {
+            $config = Yaml::parse($configFile);
+            $this->save($module, $config);
+            return $config;
+        }
     }
 
 }

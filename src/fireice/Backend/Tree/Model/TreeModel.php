@@ -127,7 +127,7 @@ Class TreeModel
 
         $module = $query->getSingleResult();
 
-        $config = $this->getModuleConfig($module->getName());
+        $config = $this->container->get('cache')->getModuleConfig($module->getName());
 
 // Получаем список модулей
         $subModules = array ();
@@ -615,7 +615,7 @@ Class TreeModel
         $nodeModules = array ();
 
         foreach ($query->getResult() as $val) {
-            $config = $this->getModuleConfig($val['name']);
+            $config = $this->container->get('cache')->getConfig($val['name']);
 
             $nodeModules[] = array (
                 'name' => $config['parameters']['name']
@@ -640,7 +640,7 @@ Class TreeModel
             $returnModules[$key] = array ();
 
             foreach ($user_modules as $user_module) {
-                $config = $this->getModuleConfig($user_module['name']);
+                $config = $this->container->get('cache')->getModuleConfig($user_module['name']);
 
                 if (!isset($nameTitle[$config['parameters']['name']])) {
                     $nameTitle[$config['parameters']['name']] = array (
@@ -1451,7 +1451,7 @@ Class TreeModel
             }
 
             if ($access) {
-                $config = $this->getModuleConfig($val['name']);
+                $config = $this->container->get('cache')->getModuleConfig($val['name']);
 
                 $modules[$val['id']][$val['language']] = array (
                     'title' => $config['parameters']['title'],
@@ -1580,7 +1580,7 @@ Class TreeModel
         $query->getResult();
     }
 
-    private function getModuleConfig($name)
+    static function getModuleConfig($name)
     {
         return Yaml::parse($this->container->getParameter('project_modules_directory').'/'.$name.'/Resources/config/config.yml');
     }

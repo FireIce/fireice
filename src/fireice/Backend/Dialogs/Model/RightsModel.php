@@ -4,7 +4,7 @@ namespace fireice\Backend\Dialogs\Model;
 
 use Symfony\Component\Security\Acl\Permission\MaskBuilder;
 use Doctrine\ORM\EntityManager;
-use Symfony\Component\Yaml\Yaml;
+//use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
 use fireice\Backend\Dialogs\Entity\module;
 use fireice\Backend\Dialogs\Entity\aclnodesrights;
@@ -52,7 +52,7 @@ class RightsModel
 
         $result = $query->getResult();
 
-        if ($result === array()) return false;
+        if ($result === array ()) return false;
 
         $result = $result[0];
 
@@ -71,8 +71,8 @@ class RightsModel
             AND stm.plugin_name = 'fireice_node_title'
             AND stm.final = 'Y'
             AND stm.status = 'active'");
-        
-        $query->setParameters(array(
+
+        $query->setParameters(array (
             'up_tree' => $id,
             'up_module' => $result['id']
         ));
@@ -115,7 +115,7 @@ class RightsModel
         $modules = array ();
 
         foreach ($query->getResult() as $key => $val) {
-            $config = Yaml::parse($this->container->getParameter('project_modules_directory').'//'.$val['name'].'//Resources//config//config.yml');
+            $config = $this->container->get('cache')->getModuleConfig($val['name']);
 
             $modules[] = array (
                 'title' => $config['parameters']['title'],
@@ -161,8 +161,8 @@ class RightsModel
             AND md_l.up_module = :up_module
             AND acl.up_modules_link = md_l.id
             AND acl.up_user IN (".implode(',', $users).")");
-        
-        $query->setParameters(array(
+
+        $query->setParameters(array (
             'up_tree' => $this->request->get('id_node'),
             'up_module' => $this->request->get('id_module')
         ));
@@ -250,8 +250,8 @@ class RightsModel
             AND md.idd = :idd
             AND md_l.up_tree = :up_tree
             AND md_l.up_module = :up_module");
-        
-        $query->setParameters(array(
+
+        $query->setParameters(array (
             'idd' => $this->request->get('id_module'),
             'up_tree' => $this->request->get('id_node'),
             'up_module' => $this->request->get('id_module')
@@ -259,7 +259,7 @@ class RightsModel
 
         $module = $query->getResult();
 
-        if ($module === array()) {
+        if ($module === array ()) {
             return 'error';
         }
 
@@ -292,8 +292,8 @@ class RightsModel
             AND md_l.up_module = :up_module
             AND acl.up_modules_link = md_l.id
             AND acl.up_user = :up_user");
-        
-        $query->setParameters(array(
+
+        $query->setParameters(array (
             'up_tree' => $this->request->get('id_node'),
             'up_module' => $this->request->get('id_module'),
             'up_user' => $this->request->get('id_user')
@@ -326,7 +326,7 @@ class RightsModel
         foreach ($groupRights as $right) {
             $intRight = $this->acl->getValueMask($right['name']);
 
-            if ($notrightsResult !== array()) $notRights = intval($notrightsResult[0]['not_rights']);
+            if ($notrightsResult !== array ()) $notRights = intval($notrightsResult[0]['not_rights']);
             else $notRights = 0;
 
             if (($intRight & (~$notRights)) === $intRight) {
@@ -367,8 +367,8 @@ class RightsModel
                     DialogsBundle:moduleslink md_l
                 WHERE md_l.up_tree = :up_tree
                 AND md_l.up_module = :up_module)");
-        
-        $query->setParameters(array(
+
+        $query->setParameters(array (
             'up_user' => $this->request->get('id_user'),
             'up_tree' => $this->request->get('id_node'),
             'up_module' => $this->request->get('id_module')

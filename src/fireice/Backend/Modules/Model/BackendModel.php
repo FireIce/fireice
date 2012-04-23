@@ -5,7 +5,8 @@ namespace fireice\Backend\Modules\Model;
 use fireice\Backend\Tree\Entity\history;
 use fireice\Backend\Dialogs\Entity\module;
 use fireice\Backend\Dialogs\Entity\modulespluginslink;
-use Symfony\Component\Yaml\Yaml;
+
+//use Symfony\Component\Yaml\Yaml;
 
 class BackendModel extends GeneralModel
 {
@@ -637,7 +638,7 @@ class BackendModel extends GeneralModel
 
         $result = $query->getSingleResult();
 
-        $config = Yaml::parse($this->container->getParameter('project_modules_directory').'//'.$result['name'].'//Resources//config//config.yml');
+        $config = $this->container->get('cache')->getModuleConfig($result['name']);
 
         if ($config['parameters']['type'] !== 'list') {
             return array (0 => array (
@@ -665,7 +666,7 @@ class BackendModel extends GeneralModel
             AND tr.final = 'Y'
             AND tr.idd = :idd
             AND md.type='user'
-            ORDER BY md.type")->setParameter('idd', $data['id_node'])->setParameter('language',$data['language']);
+            ORDER BY md.type")->setParameter('idd', $data['id_node'])->setParameter('language', $data['language']);
 
         $nodeModules = $query->getOneOrNullResult();
 

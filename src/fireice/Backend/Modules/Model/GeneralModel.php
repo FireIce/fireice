@@ -3,7 +3,7 @@
 namespace fireice\Backend\Modules\Model;
 
 use Doctrine\ORM\EntityManager;
-use Symfony\Component\Yaml\Yaml;
+//use Symfony\Component\Yaml\Yaml;
 use fireice\Backend\Dialogs\Entity\module;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -33,7 +33,7 @@ class GeneralModel
         if (!is_dir($this->container->getParameter('project_modules_directory').'/'.$parts[0])) {
             throw new \InvalidArgumentException('Specified empty module directory.');
         } else {
-            $config = Yaml::parse($this->container->getParameter('project_modules_directory').'/'.$parts[0].'/Resources/config/config.yml');
+            $config = $this->container->get('cache')->getModuleConfig($parts[0]);
             return $config['parameters']['name'];
         }
     }
@@ -85,9 +85,8 @@ class GeneralModel
                 $this->addPlugin($val);
             }
 
-            return true === empty($this->plugins) ? null:$this->plugins;
-        } else
-            return $this->plugins;
+            return true === empty($this->plugins) ? null : $this->plugins;
+        } else return $this->plugins;
     }
 
     protected function sort($array, $reindex = true)
@@ -101,17 +100,14 @@ class GeneralModel
             $config = $module->getConfig();
             $plugins = $this->getPlugins();
 
-            if (!isset($config[$config_sort['sortBy']]))
-                return array_values($array);
+            if (!isset($config[$config_sort['sortBy']])) return array_values($array);
 
             $tmp = $plugins[$config[$config_sort['sortBy']]['name']];
 
-            if ($config_sort['desc'] === true)
-                $tmp->desc = true;
-            else
-                $tmp->desc = false;
+            if ($config_sort['desc'] === true) $tmp->desc = true;
+            else $tmp->desc = false;
 
-            usort($array, array($tmp, 'cmp'));
+            usort($array, array ($tmp, 'cmp'));
 
             return $array;
         } else {
@@ -123,14 +119,14 @@ class GeneralModel
 
                     $tmp = $plugins['fireice_order'];
 
-                    usort($array, array($tmp, 'cmp'));
+                    usort($array, array ($tmp, 'cmp'));
 
                     return $array;
                 }
             }
         }
 
-        return ($reindex) ? array_values($array):$array;
+        return ($reindex) ? array_values($array) : $array;
     }
-    
+
 }
