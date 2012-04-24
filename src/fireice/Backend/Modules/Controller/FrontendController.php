@@ -9,11 +9,13 @@ class FrontendController extends Controller
     protected $model = null;
     protected $idNode;
     protected $idModule;
+    protected $language;
 
-    public function __construct($idNode, $idModule)
+    public function __construct($idNode, $language, $idModule)
     {
         $this->idNode = $idNode;
         $this->idModule = $idModule;
+        $this->language = $language;
     }
 
     public function getModel()
@@ -27,7 +29,7 @@ class FrontendController extends Controller
 
     public function load($params=array ())
     {
-        return $this->getModel()->getFrontendData($this->idNode, $this->idModule, $params);
+        return $this->getModel()->getFrontendData($this->idNode, $this->idModule, $this->language, $params);
     }
 
     public function frontend($params, $data=array())

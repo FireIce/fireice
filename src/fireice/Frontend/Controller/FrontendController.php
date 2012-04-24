@@ -39,9 +39,10 @@ class FrontendController extends Controller
         $path = $this->get('request')->getPathInfo();
         $path = trim($path, '/');
         $path = explode('/', $path);
-
+        $language = 'ru';
         if ($path === array ('')) {
-            return $this->showPage(1, '');
+             $language = 'ru';
+            return $this->showPage(1, $language, '');
         }
 
         if ($path !== array ()) {
@@ -49,7 +50,7 @@ class FrontendController extends Controller
                 if ($i == 0) $childs = $frontendModel->getChilds(1);
                 else $childs = $frontendModel->getChilds($path[$i - 1]);
 
-                $in_childs = $frontendModel->inChilds($path[$i], $childs);
+                $in_childs = $frontendModel->inChilds($path[$i], $childs, $language);
 
                 if ($in_childs === false) {
                     // Если остаток соответствует регулярному выражению модуля предыдущего узла,
@@ -61,7 +62,7 @@ class FrontendController extends Controller
                     $tree = new TreeController();
                     $tree->setContainer($this->container);
 
-                    if ($tree->getNodeModule($path[$i - 1])->checkEndOf($ostatok)) return $this->showPage($path[$i - 1], $ostatok);
+                    if ($tree->getNodeModule($path[$i - 1],$language)->checkEndOf($ostatok)) return $this->showPage($path[$i - 1], $language, $ostatok);
 
                     // Страницы не существует...
                     return $this->get404Page();
@@ -74,14 +75,14 @@ class FrontendController extends Controller
                 }
             }
 
-            return $this->showPage($path[$i - 1], '');
+            return $this->showPage($path[$i - 1], $language, '');
         }
 
         // Страницы не существует...
         return $this->get404Page();
     }
 
-    public function showPage($id_node, $params = '')
+    public function showPage($id_node, $language, $params = '')
     {
         $tree = new TreeController;
         $tree->setContainer($this->container);
@@ -89,11 +90,11 @@ class FrontendController extends Controller
         $frontendModel = $this->getModel();
 
         if ($frontendModel->checkAccess($id_node)) {
-            $nodeModules = $frontendModel->getNodeUsersModules($id_node);
+            $nodeModules = $frontendModel->getNodeUsersModules($id_node, $language);
 
             foreach ($nodeModules as $key => $val) {
 
-                $frontend = $tree->getNodeModule($id_node, $key)->frontend($params);
+                $frontend = $tree->getNodeModule($id_node, $language, $key)->frontend($params);
 
                 if ($frontend->isRedirect()) return $frontend;
 
@@ -108,7 +109,7 @@ class FrontendController extends Controller
             'sub' => $frontendModel->getMenu($id_node),
         );
 
-        $navigation = $frontendModel->getNavigation($id_node);
+        $navigation = $frontendModel->getNavigation($id_node, $language);
 
         $currentPage = $navigation[count($navigation) - 1];
 

@@ -45,15 +45,15 @@ class FrontendModel
         return $this->server_is_busy;
     }
 
-    public function getNodeInfo($node_id)
+    public function getNodeInfo($node_id ,$language)
     {
         $node = $this->sitetree['nodes'][$node_id];
 
         return array (
             'id' => $node_id,
             'parent' => $node['up_parent'],
-            'name' => isset($node['plugins']['fireice_node_name']['value']) ? $node['plugins']['fireice_node_name']['value'] : $node_id,
-            'title' => isset($node['plugins']['fireice_node_title']['value']) ? $node['plugins']['fireice_node_title']['value'] : '[Узел без названия]',
+            'name' => isset($node[$language]['plugins']['fireice_node_name']['value']) ? $node[$language]['plugins']['fireice_node_name']['value'] : $node_id,
+            'title' => isset($node[$language]['plugins']['fireice_node_title']['value']) ? $node[$language]['plugins']['fireice_node_title']['value'] : '[Узел без названия]',
             'path' => $node['url']['name']
         );
     }
@@ -69,20 +69,20 @@ class FrontendModel
         return $ret;
     }
 
-    public function getMenu($node_id)
+    public function getMenu($node_id, $language)
     {
         $data = array ();
 
         $childs = $this->getChilds($node_id);
 
         foreach ($childs as $node) {
-            $data[$node] = $this->getNodeInfo($node);
+            $data[$node] = $this->getNodeInfo($node, $language);
         }
 
         return $data;
     }
 
-    public function inChilds($node, $childs)
+    public function inChilds($node, $childs, $language)
     {
         $isInt = preg_match("|^[\d]+$|", $node) === 1;
 
@@ -92,7 +92,7 @@ class FrontendModel
         }
         else {
             foreach ($childs as $v) {
-                $info = $this->getNodeInfo($v);
+                $info = $this->getNodeInfo($v, $language);
 
                 if ($node === $info['name']) return $v;
             }
@@ -101,24 +101,24 @@ class FrontendModel
         }
     }
 
-    public function getNodeModules($id)
+    public function getNodeModules($id, $language)
     {
-        return $this->sitetree['nodes'][$id]['sitetree_module'] + $this->sitetree['nodes'][$id]['user_modules'];
+        return $this->sitetree['nodes'][$id]['sitetree_module'] + $this->sitetree['nodes'][$id]['language'][$language]['user_modules'];
     }
 
-    public function getNodeUsersModules($id)
+    public function getNodeUsersModules($id, $language)
     {
-        return $this->sitetree['nodes'][$id]['user_modules'];
+        return $this->sitetree['nodes'][$id]['language'][$language]['user_modules'];
     }
 
-    public function getNavigation($id)
+    public function getNavigation($id, $language)
     {
-        $node = $this->getNodeInfo($id);
+        $node = $this->getNodeInfo($id, $language);
 
         $return = array ($node);
 
         if ($id != '1') {
-            $return = array_merge($this->getNavigation($node['parent']), $return);
+            $return = array_merge($this->getNavigation($node['parent'],$language), $return);
         }
 
         return $return;

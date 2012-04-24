@@ -189,7 +189,8 @@ class Cache
                 md.name AS bundle,
                 md.idd AS module_id,
                 md.type,
-                tr.status
+                tr.status,
+                md_l.language AS language
             FROM 
                 TreeBundle:modulesitetree tr, 
                 DialogsBundle:moduleslink md_l, 
@@ -208,7 +209,6 @@ class Cache
             if (!isset($nodes[$val['node_id']])) $nodes[$val['node_id']] = array (
                     'up_parent' => $val['up_parent'],
                     'sitetree_module' => array (),
-                    'user_modules' => array (),
                     'status' => $val['status']
                 );
 
@@ -216,11 +216,14 @@ class Cache
                 $nodes[$val['node_id']]['sitetree_module'][$val['module_id']] = $val['bundle'];
             }
             if ($val['type'] == 'user') {
-                $nodes[$val['node_id']]['user_modules'][$val['module_id']] = $val['bundle'];
+                if (!isset($nodes[$val['node_id']]['language'][$val['language']])) {
+                    $nodes[$val['node_id']]['language'][$val['language']] = array();
+                }
+                $nodes[$val['node_id']]['language'][$val['language']]['user_modules'][$val['module_id']] = $val['bundle'];
                 unset($result[$key]);
             }
         }
-
+//print_r($nodes);
         $this->tmp = $nodes;
 
         $node_types = array ();
@@ -253,6 +256,7 @@ class Cache
                 $query = $this->em->createQuery("
                     SELECT 
                         m_l.up_tree AS node_id,
+                        m_l.language AS language,
                         md.plugin_type, 
                         md.plugin_name,
                         plg
@@ -282,9 +286,9 @@ class Cache
         }
 
         foreach ($plugins_values as $value) {
-            if (!isset($nodes[$value['node_id']]['plugins'])) $nodes[$value['node_id']]['plugins'] = array ();
-
-            $nodes[$value['node_id']]['plugins'][$value['plugin_name']] = array (
+            if (!isset($nodes[$value['node_id']][$value['language']]['plugins'])) $nodes[$value['node_id']][$value['language']]['plugins'] = array ();
+            $lang = $value['language'];
+            $nodes[$value['node_id']][$value['language']]['plugins'][$value['plugin_name']] = array (
                 'type' => $value['plugin_type'],
                 'name' => $value['plugin_name'],
                 'value' => $value[0]->getValue()
@@ -297,7 +301,7 @@ class Cache
             $name_path = array ();
 
             foreach ($path as $v) {
-                if (isset($nodes[$v]['plugins']['fireice_node_name']['value'])) $name_path[] = $nodes[$v]['plugins']['fireice_node_name']['value'];
+                if (isset($nodes[$v][$lang]['plugins']['fireice_node_name']['value'])) $name_path[] = $nodes[$v][$lang]['plugins']['fireice_node_name']['value'];
                 else $name_path[] = $key;
             }
 

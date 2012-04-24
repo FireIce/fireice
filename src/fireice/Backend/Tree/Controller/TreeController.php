@@ -430,14 +430,14 @@ class TreeController extends Controller
         return $response;
     }
 
-    public function getNodeModule($idNode, $idModule = false)
+    public function getNodeModule($idNode, $language, $idModule = false)
     {
         $this->sitetree = $this->container->get('cache')->getSiteTreeStructure();
 
         if (false !== $idModule) {
-            $module = $this->sitetree['nodes'][$idNode]['user_modules'][$idModule];
+            $module = $this->sitetree['nodes'][$idNode]['language'][$language]['user_modules'][$idModule];
         } else {
-            foreach ($this->sitetree['nodes'][$idNode]['user_modules'] as $key => $value) {
+            foreach ($this->sitetree['nodes'][$idNode]['language'][$language]['user_modules'] as $key => $value) {
                 $module = $value;
                 $idModule = $key;
                 break;
@@ -445,7 +445,7 @@ class TreeController extends Controller
         }
 
         $controller = '\\project\\Modules\\'.$module.'\\Controller\\FrontendController';
-        $controller = new $controller($idNode, $idModule);
+        $controller = new $controller($idNode, $language, $idModule);
         $controller->setContainer($this->container);
 
         return $controller;

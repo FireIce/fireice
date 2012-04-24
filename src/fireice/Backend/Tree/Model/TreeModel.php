@@ -1580,9 +1580,14 @@ Class TreeModel
         $query->getResult();
     }
 
-    static function getModuleConfig($name)
+    //Функция проверки языков. Добавляет необходимые записи в modules_link
+    //Возвращает массив языков
+    public function updateNodeLink($id)
     {
-        return Yaml::parse($this->container->getParameter('project_modules_directory').'/'.$name.'/Resources/config/config.yml');
+        //1. Узнаем какой модуль привязан к узлу.
+        
+        
     }
-
-}
+        
+        
+    }

@@ -5,7 +5,7 @@ namespace fireice\Backend\Modules\Model;
 class FrontendModel extends GeneralModel
 {
 
-    public function getFrontendData($sitetreeId, $moduleId, $params = array (),$language='ru')
+    public function getFrontendData($sitetreeId, $moduleId, $language, $params = array ())
     {
         $values = array ();
 
