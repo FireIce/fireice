@@ -155,11 +155,11 @@ Class TreeModel
         foreach ($config['parameters']['modules'] as $value) {
             if ('yes' == $value['multilanguage']) {
                 foreach ($languages as $lang => $language) {
-
                     $modulelink = new moduleslink();
                     $modulelink->setUpTree($node->getIdd());
                     $modulelink->setUpModule($subModules[$value['name']]);
                     $modulelink->setLanguage($lang);
+                    if ($module->getName() == $value['name']) $modulelink->setIsmain(1);
                     $this->em->persist($modulelink);
                 }
             } else {
@@ -167,6 +167,7 @@ Class TreeModel
                 $modulelink->setUpTree($node->getIdd());
                 $modulelink->setUpModule($subModules[$value['name']]);
                 $modulelink->setLanguage($languageDefault);
+                if ($module->getName() == $value['name']) $modulelink->setIsmain(1);
                 $this->em->persist($modulelink);
             }
         }
@@ -310,7 +311,7 @@ Class TreeModel
     public function getChildren($id)
     {
         $return = array ();
-
+        $languages = $this->container->getParameter('languages');
         if ($id == 1) {
             $query = $this->em->createQuery("
                 SELECT 
@@ -326,10 +327,12 @@ Class TreeModel
                 AND md.status = 'active'
                 AND md_l.up_tree = tr.idd
                 AND md_l.up_module = md.idd
+                AND md_l.language = :language
                 AND tr.status = 'active'
                 AND tr.final = 'Y'
                 AND md.type='sitetree_node'
                 AND tr.idd = 1");
+            $query->setParameter('language', $languages['default']);
 
             $result1 = $query->getSingleResult();
 
@@ -346,12 +349,14 @@ Class TreeModel
                 AND m_l.up_tree = 1
                 AND m_l.up_module = :up_module
                 AND m_l.id = mp_l.up_link
+                AND m_l.language = :language
                 AND mp_l.up_plugin = md.idd
-
+                               
                 AND md.final = 'Y'
                 AND md.plugin_id = plg.id
                 AND md.plugin_name = 'fireice_node_title'
-                AND md.plugin_type = 'text'")->setParameter('up_module', $result1['id']);
+                AND md.plugin_type = 'text'")->setParameter('up_module', $result1['id'])->setParameter('language', $languages['default']);
+            ;
 
             $result2 = $query->getSingleResult();
 
@@ -431,13 +436,14 @@ Class TreeModel
             
                     AND m_l.up_tree IN (".implode(',', $type['ids']).")
                     AND m_l.up_module = :up_module
+                    AND m_l.language = :language
                     AND m_l.id = mp_l.up_link
                     AND mp_l.up_plugin = md.idd
 
                     AND md.final = 'Y'
                     AND md.plugin_id = plg.id
                     AND md.plugin_name = 'fireice_node_title'
-                    AND md.plugin_type = 'text'")->setParameter('up_module', $type['id']);
+                    AND md.plugin_type = 'text'")->setParameter('up_module', $type['id'])->setParameter('language', $languages['default']);
 
                 foreach ($query->getResult() as $val) {
                     $childsNode[$val['up_tree']]['name'] = $val['title'];
@@ -463,6 +469,7 @@ Class TreeModel
                 AND md.status = 'active'
                 AND md_l.up_tree = tr.idd
                 AND md_l.up_module = md.idd
+                AND md_l.language = :language
                 AND (tr.status = 'active' OR tr.status = 'hidden')
                 AND tr.final = 'Y'
                 AND md.type='sitetree_node'
@@ -474,7 +481,7 @@ Class TreeModel
                     AND (tr2.status = 'active' OR tr2.status = 'hidden')
                 ) 
                 GROUP BY tr.up_parent");
-
+            $query->setParameter('language', $languages['default']);
             $children = $query->getResult();
 
             $tmp = array ();
@@ -615,7 +622,7 @@ Class TreeModel
         $nodeModules = array ();
 
         foreach ($query->getResult() as $val) {
-            $config = $this->container->get('cache')->getConfig($val['name']);
+            $config = $this->container->get('cache')->getModuleConfig($val['name']);
 
             $nodeModules[] = array (
                 'name' => $config['parameters']['name']
@@ -1415,6 +1422,12 @@ Class TreeModel
     // Возвращает массив модулей, которые привязаны к узлу id
     public function getNodeModules($id, $acl, $action = 'edit')
     {
+        //Языки потребуются для отсева модулей с удаленными языками
+        $languages = $this->container->getParameter('languages');
+        //список модудей потребуется для отсева удаленных модулей
+        //найдем наименование модуля на основе которого пострен узел
+        //прочтем конфиг
+        //сформируем массив модулей
         $query = $this->em->createQuery("
             SELECT 
                 md.idd AS id,
@@ -1450,7 +1463,7 @@ Class TreeModel
                 }
             }
 
-            if ($access) {
+            if ($access && array_key_exists($val['language'], $languages)) {
                 $config = $this->container->get('cache')->getModuleConfig($val['name']);
 
                 $modules[$val['id']][$val['language']] = array (
@@ -1582,12 +1595,147 @@ Class TreeModel
 
     //Функция проверки языков. Добавляет необходимые записи в modules_link
     //Возвращает массив языков
-    public function updateNodeLink($id)
+    public function updateNodeLink($idNode)
     {
-        //1. Узнаем какой модуль привязан к узлу.
-        
-        
+        //1. Вытягиваем список языков
+        $languages = $this->container->getParameter('languages');
+        $languageDefault = $languages['default'];
+        unset($languages['default']);
+        //2. Узаем на основе какого модуля создан узел
+        $query = $this->em->createQuery("
+            SELECT 
+                md.name AS name
+            FROM 
+                TreeBundle:modulesitetree tr, 
+                DialogsBundle:moduleslink md_l, 
+                DialogsBundle:modules md
+            WHERE md.final = 'Y'
+            AND md.status = 'active'
+            AND md_l.up_tree = tr.idd
+            AND md_l.up_module = md.idd
+            AND (tr.status = 'active' OR tr.status = 'hidden')
+            AND tr.final = 'Y'
+            AND tr.idd = :idd
+            AND md_l.is_main = 1
+            ORDER BY md.type DESC")->setParameter('idd', $idNode);
+        $modules = $query->getResult();
+        $moduleName = $modules[0]['name']; //Имя модуля
+        //3. Прочтем конфиг этого модуля
+        $config = $this->container->get('cache')->getModuleConfig($moduleName);
+        // Получаем список модулей
+        $subModules = array ();
+        foreach ($config['parameters']['modules'] as $val) {
+            $subModules[] = "'".$val['name']."'";
+        }
+
+        // Берем из базы одним запросом данные для этих модулей
+        $query = $this->em->createQuery("
+                SELECT
+                    md.idd, md.name
+                FROM
+                    DialogsBundle:modules md
+                WHERE md.final = 'Y'
+                AND md.status = 'active'
+                AND md.name IN(".implode(',', $subModules).")");
+
+        // Формируем вспомогательный массив с данными модулей
+        $subModules = array ();
+        foreach ($query->getResult() as $value) {
+            $subModules[$value['name']] = $value['idd'];
+        }
+
+        // Теперь опять обходим конфиг 
+        // Все данные хранятся в $subModules['имя_модуля'] = значение_idd
+        foreach ($config['parameters']['modules'] as $value) {
+            //Проверяем есть ли такой модуль в узле. Если нет, то добавляем
+            $query = $this->em->createQuery("
+                        SELECT md_l 
+                        FROM DialogsBundle:moduleslink md_l
+                        WHERE
+                            md_l.up_tree = :up_tree
+                            AND md_l.up_module = :up_module
+                            AND md_l.language = :language
+                        ");
+            $query->setParameter('up_tree', $idNode);
+            $query->setParameter('up_module', $subModules[$value['name']]);
+            if ('yes' == $value['multilanguage']) {
+                foreach ($languages as $lang => $language) {
+                    $query->setParameter('language', $lang);
+                    if (array () === $query->getResult()) {
+                        $modulelink = new moduleslink();
+                        $modulelink->setUpTree($idNode);
+                        $modulelink->setUpModule($subModules[$value['name']]);
+                        $modulelink->setLanguage($lang);
+                        if ($moduleName == $value['name']) $modulelink->setIsmain(1);
+                        $this->em->persist($modulelink);
+                    }
+                }
+            } else {
+                $query->setParameter('language', $languageDefault);
+                if (array () === $query->getResult()) {
+                    $modulelink = new moduleslink();
+                    $modulelink->setUpTree($idNode);
+                    $modulelink->setUpModule($subModules[$value['name']]);
+                    $modulelink->setLanguage($languageDefault);
+                    if ($moduleName == $value['name']) $modulelink->setIsmain(1);
+                    $this->em->persist($modulelink);
+                }
+            }
+
+
+            /*             * ****************************
+              //2. Узнаем какие модули привязаны к узлу.
+              $query = $this->em->createQuery("
+              SELECT
+              md.idd AS idd,
+              md.name AS name,
+              md.type AS type,
+              md_l.language as language
+              FROM
+              TreeBundle:modulesitetree tr,
+              DialogsBundle:moduleslink md_l,
+              DialogsBundle:modules md
+              WHERE md.final = 'Y'
+              AND md.status = 'active'
+              AND md_l.up_tree = tr.idd
+              AND md_l.up_module = md.idd
+              AND (tr.status = 'active' OR tr.status = 'hidden')
+              AND tr.final = 'Y'
+              AND tr.idd = :idd
+              ORDER BY md.type DESC")->setParameter('idd', $idNode);
+
+              $modules = array ();
+
+              foreach ($query->getResult() as $key => $val) {
+              //$config = $this->container->get('cache')->getModuleConfig($val['name']);
+              $modules[$val['idd']] = 1;
+              }
+              foreach ($modules as $idd => $modules) {
+              foreach ($languages as $lang => $language) {
+              $query = $this->em->createQuery("
+              SELECT md_l
+              FROM DialogsBundle:moduleslink md_l
+              WHERE
+              md_l.up_tree =:id
+              AND md_l.up_module = :idd
+              AND md_l.language = :language");
+              $query->setParameters(array (
+              'id' => $idNode,
+              'idd' => $idd,
+              'language' => $lang,
+              ));
+              if (0 == count($query->getResult())) {
+              $modulelink = new moduleslink();
+              $modulelink->setUpTree($idNode);
+              $modulelink->setUpModule($idd);
+              $modulelink->setLanguage($lang);
+              $this->em->persist($modulelink);
+              }
+              }
+              $this->em->flush();
+              } */
+        }
+        $this->em->flush();
     }
-        
-        
-    }
+
+}

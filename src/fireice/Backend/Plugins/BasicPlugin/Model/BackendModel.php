@@ -45,7 +45,6 @@ class BackendModel
             'up_module' => $module_id,
             'language' => $language,
             'plugin_type' => $this->controller->getValue('type'),
-            
         ));
 
         return $query->getScalarResult();
@@ -68,7 +67,7 @@ class BackendModel
     protected function getChoices($entity, $plugin_name, array $options = array ())
     {
         $metod = 'config'.ucfirst($plugin_name);
-
+        $languages = $this->container->getParameter('languages');
         // Если нет метода задающего источник, то возвращаем false
         if (!method_exists($entity, $metod)) return false;
 
@@ -90,12 +89,14 @@ class BackendModel
                 WHERE m_l.up_tree = :up_tree
                 AND m_l.up_module = :up_module
                 AND m_l.up_module = mds.idd
+                AND m_l.language = :language
                 AND mds.final = 'Y'
                 AND mds.status = 'active'");
 
             $query->setParameters(array (
                 'up_tree' => $config['data']['id_node'],
-                'up_module' => $config['data']['id_module']
+                'up_module' => $config['data']['id_module'],
+                'language' => $languages['default'],
             ));
 
             $result = $query->getOneOrNullResult();

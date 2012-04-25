@@ -189,7 +189,7 @@ class TreeController extends Controller
 
 
         if ($request->get('act') == 'show') {
-
+            $this->getModel()->updateNodeLink($request->get('id'));
             $modules = $this->getModel()->getNodeModules($request->get('id'), $acl);
 
             if (isset($modules[$request->get('id_module')][$request->get('language')])) {
@@ -435,9 +435,9 @@ class TreeController extends Controller
         $this->sitetree = $this->container->get('cache')->getSiteTreeStructure();
 
         if (false !== $idModule) {
-            $module = $this->sitetree['nodes'][$idNode]['language'][$language]['user_modules'][$idModule];
+            $module = $this->sitetree['nodes'][$idNode]['user_modules'][$language][$idModule];
         } else {
-            foreach ($this->sitetree['nodes'][$idNode]['language'][$language]['user_modules'] as $key => $value) {
+            foreach ($this->sitetree['nodes'][$idNode]['user_modules'][$language] as $key => $value) {
                 $module = $value;
                 $idModule = $key;
                 break;

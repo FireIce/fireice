@@ -209,17 +209,16 @@ class Cache
             if (!isset($nodes[$val['node_id']])) $nodes[$val['node_id']] = array (
                     'up_parent' => $val['up_parent'],
                     'sitetree_module' => array (),
+                    'user_modules' => array (),
                     'status' => $val['status']
                 );
 
             if ($val['type'] == 'sitetree_node') {
-                $nodes[$val['node_id']]['sitetree_module'][$val['module_id']] = $val['bundle'];
+                $nodes[$val['node_id']]['sitetree_module'][$val['language']][$val['module_id']] = $val['bundle'];
             }
             if ($val['type'] == 'user') {
-                if (!isset($nodes[$val['node_id']]['language'][$val['language']])) {
-                    $nodes[$val['node_id']]['language'][$val['language']] = array();
-                }
-                $nodes[$val['node_id']]['language'][$val['language']]['user_modules'][$val['module_id']] = $val['bundle'];
+                if (!isset($nodes[$val['node_id']])) $nodes[$val['node_id']] = array ();
+                $nodes[$val['node_id']]['user_modules'][$val['language']][$val['module_id']] = $val['bundle'];
                 unset($result[$key]);
             }
         }
@@ -286,13 +285,15 @@ class Cache
         }
 
         foreach ($plugins_values as $value) {
-            if (!isset($nodes[$value['node_id']][$value['language']]['plugins'])) $nodes[$value['node_id']][$value['language']]['plugins'] = array ();
-            $lang = $value['language'];
-            $nodes[$value['node_id']][$value['language']]['plugins'][$value['plugin_name']] = array (
+            if (!isset($nodes[$value['node_id']]['plugins'][$value['language']])) $nodes[$value['node_id']]['plugins'][$value['language']] = array ();
+            $nodes[$value['node_id']]['plugins'][$value['language']][$value['plugin_name']] = array (
                 'type' => $value['plugin_type'],
                 'name' => $value['plugin_name'],
                 'value' => $value[0]->getValue()
             );
+            if ('fireice_node_name' == $value['plugin_name']) {
+                $nodes[$value['node_id']]['path'] = $value[0]->getValue();
+            }
         }
 
         foreach ($nodes as $key => &$node) {
@@ -301,7 +302,7 @@ class Cache
             $name_path = array ();
 
             foreach ($path as $v) {
-                if (isset($nodes[$v][$lang]['plugins']['fireice_node_name']['value'])) $name_path[] = $nodes[$v][$lang]['plugins']['fireice_node_name']['value'];
+                if (isset($nodes[$v]['path'])) $name_path[] = $nodes[$v]['path'];
                 else $name_path[] = $key;
             }
 
@@ -318,7 +319,7 @@ class Cache
 
             $hierarchy[$key] = $childs !== array () ? $childs : null;
         }
-
+//print_r($nodes);exit;
         return array (
             'nodes' => $nodes,
             'hierarchy' => $hierarchy

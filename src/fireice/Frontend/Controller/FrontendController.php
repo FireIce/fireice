@@ -39,9 +39,9 @@ class FrontendController extends Controller
         $path = $this->get('request')->getPathInfo();
         $path = trim($path, '/');
         $path = explode('/', $path);
-        $language = 'ru';
+        $language = 'en';
         if ($path === array ('')) {
-             $language = 'ru';
+            $language = 'en';
             return $this->showPage(1, $language, '');
         }
 
@@ -62,7 +62,7 @@ class FrontendController extends Controller
                     $tree = new TreeController();
                     $tree->setContainer($this->container);
 
-                    if ($tree->getNodeModule($path[$i - 1],$language)->checkEndOf($ostatok)) return $this->showPage($path[$i - 1], $language, $ostatok);
+                    if ($tree->getNodeModule($path[$i - 1], $language)->checkEndOf($ostatok)) return $this->showPage($path[$i - 1], $language, $ostatok);
 
                     // Страницы не существует...
                     return $this->get404Page();

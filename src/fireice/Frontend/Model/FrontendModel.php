@@ -45,15 +45,15 @@ class FrontendModel
         return $this->server_is_busy;
     }
 
-    public function getNodeInfo($node_id ,$language)
+    public function getNodeInfo($node_id, $language)
     {
         $node = $this->sitetree['nodes'][$node_id];
 
         return array (
             'id' => $node_id,
             'parent' => $node['up_parent'],
-            'name' => isset($node[$language]['plugins']['fireice_node_name']['value']) ? $node[$language]['plugins']['fireice_node_name']['value'] : $node_id,
-            'title' => isset($node[$language]['plugins']['fireice_node_title']['value']) ? $node[$language]['plugins']['fireice_node_title']['value'] : '[Узел без названия]',
+            'name' => isset($node['plugins'][$language]['fireice_node_name']['value']) ? $node['plugins'][$language]['fireice_node_name']['value'] : $node_id,
+            'title' => isset($node['plugins'][$language]['fireice_node_title']['value']) ? $node['plugins'][$language]['fireice_node_title']['value'] : '[Узел без названия]',
             'path' => $node['url']['name']
         );
     }
@@ -103,12 +103,12 @@ class FrontendModel
 
     public function getNodeModules($id, $language)
     {
-        return $this->sitetree['nodes'][$id]['sitetree_module'] + $this->sitetree['nodes'][$id]['language'][$language]['user_modules'];
+        return $this->sitetree['nodes'][$id]['sitetree_module'][$language] + $this->sitetree['nodes'][$id]['user_modules'][$language];
     }
 
     public function getNodeUsersModules($id, $language)
     {
-        return $this->sitetree['nodes'][$id]['language'][$language]['user_modules'];
+        return $this->sitetree['nodes'][$id]['user_modules'][$language];
     }
 
     public function getNavigation($id, $language)
@@ -118,7 +118,7 @@ class FrontendModel
         $return = array ($node);
 
         if ($id != '1') {
-            $return = array_merge($this->getNavigation($node['parent'],$language), $return);
+            $return = array_merge($this->getNavigation($node['parent'], $language), $return);
         }
 
         return $return;

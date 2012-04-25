@@ -30,6 +30,10 @@ class moduleslink
      * @ORM\Column(type="string", length=5) 
      */
     protected $language;
+    /**
+     * @ORM\Column(type="is_main", type="integer", nullable="TRUE") 
+     */
+    protected $is_main;
 
     public function setId($id)
     {
@@ -69,6 +73,16 @@ class moduleslink
     public function getLanguage()
     {
         return $this->language;
+    }
+
+    public function setIsmain($is_main)
+    {
+        $this->is_main = $is_main;
+    }
+
+    public function getIsmain()
+    {
+        return $this->is_main;
     }
 
 }

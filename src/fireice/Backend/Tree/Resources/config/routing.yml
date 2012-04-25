@@ -5,7 +5,7 @@ nodes_show:
 node_create:
     pattern: /backoffice/node_create
     defaults: { _controller: TreeBundle:Tree:nodeCreate } 
-    
+
 hide_node:
     pattern: /backoffice/hide_node/{id}
     defaults: { _controller: TreeBundle:Tree:hideNode } 
