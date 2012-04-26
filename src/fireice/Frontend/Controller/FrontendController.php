@@ -18,7 +18,8 @@ class FrontendController extends Controller
             $this->model = new FrontendModel(
                     $this->get('doctrine.orm.entity_manager'),
                     $this->get('acl'),
-                    $this->get('cache')
+                    $this->get('cache'),
+                    $this->container
             );
         }
 
@@ -42,30 +43,33 @@ class FrontendController extends Controller
         $path = explode('/', $path);
         $languages = $this->container->getParameter('languages');
         $languageDefault = $languages['default']; //Присвоили по умолчанию
-        
-        //берем хост и проверяем есть ли такой хост в конфиге
-        $host = $this->get('request')->getHost();
-        $languages = $languages['list'];
-        foreach ($languages as $lang => $language) {
-            $aHosts = $language['host'];
-            if (in_array($host, $aHosts)) {
-                $languageDefault = $lang; //присвоили тот на котором прописан Хост
+        if ('yes' == $this->container->getParameter('multilanguage')) {
+            //берем хост и проверяем есть ли такой хост в конфиге
+            $host = $this->get('request')->getHost();
+            $languages = $languages['list'];
+            foreach ($languages as $lang => $language) {
+                $aHosts = $language['host'];
+                if (in_array($host, $aHosts)) {
+                    $languageDefault = $lang; //присвоили тот на котором прописан Хост
+                }
             }
         }
-
         if ($path === array ('')) {
             return $this->showPage(1, $languageDefault, '');
         }
-        $languageSelect = $path[0];
+        if ('yes' == $this->container->getParameter('multilanguage')) {
+            $languageSelect = $path[0];
 
-        //Проверим есть ли такой язык в списке
-        if (array_key_exists($languageSelect, $languages)) {
-            //Да это язык
-            array_shift($path);
-        } else { //Нет, не язык.
-            return $this->redirect($languageDefault.$this->get('request')->getPathInfo(), 301);
+            //Проверим есть ли такой язык в списке
+            if (array_key_exists($languageSelect, $languages)) {
+                //Да это язык
+                array_shift($path);
+            } else { //Нет, не язык.
+                return $this->redirect($languageDefault.$this->get('request')->getPathInfo(), 301);
+            }
+        } else {
+            $languageSelect = $languageDefault;
         }
-
 
 
 

@@ -12,14 +12,17 @@ class FrontendModel
     private $server_is_busy = false;
     protected $sitetree;
     protected $access;
+    protected $container;
 
-    public function __construct(EntityManager $em, $acl, $cache)
+    public function __construct(EntityManager $em, $acl, $cache, $container)
     {
         $this->em = $em;
         $this->acl = $acl;
+        $this->container = $container;
 
         $this->sitetree = $cache->getSiteTreeStructure();
         $this->access = $cache->getSiteTreeAccess();
+
 
         if ($this->sitetree === false || $this->access === false) {
             $this->server_is_busy = true;
@@ -48,14 +51,17 @@ class FrontendModel
     public function getNodeInfo($node_id, $language)
     {
         $node = $this->sitetree['nodes'][$node_id];
-
-        return array (
+        $arr = array (
             'id' => $node_id,
             'parent' => $node['up_parent'],
             'name' => isset($node['plugins'][$language]['fireice_node_name']['value']) ? $node['plugins'][$language]['fireice_node_name']['value'] : $node_id,
-            'title' => isset($node['plugins'][$language]['fireice_node_title']['value']) ? $node['plugins'][$language]['fireice_node_title']['value'] : '[Узел без названия]',
-            'path' => $language.'/'. $node['url']['name']
-        );
+            'title' => isset($node['plugins'][$language]['fireice_node_title']['value']) ? $node['plugins'][$language]['fireice_node_title']['value'] : '[Узел без названия]',);
+        if ('yes' === $this->container->getParameter('multilanguage')) {
+            $arr['path'] = $language.'/'.$node['url']['name'];
+        } else {
+            $arr['path'] = $node['url']['name'];
+        }
+        return $arr;
     }
 
     public function getChilds($node_ident)
