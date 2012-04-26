@@ -31,7 +31,7 @@ class moduleslink
      */
     protected $language;
     /**
-     * @ORM\Column(type="integer", nullable="TRUE") 
+     * @ORM\Column(type="boolean", nullable="TRUE") 
      */
     protected $is_main;
 
