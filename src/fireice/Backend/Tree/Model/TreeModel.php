@@ -91,11 +91,12 @@ Class TreeModel
         return $result2['value'];
     }
 
-    public function create($security)//*****
+    public function create($security)
     {
         $languages = $this->container->getParameter('languages');
-        $languageDefault = $languages['default'];
+        $languageAll = $languages['for_all_type_languagest'];
         unset($languages['default']);
+        unset($languages['for_all_type_languagest']);
         $node = new modulesitetree();
         $node->setFinal('Y');
         $node->setUpParent($this->request->get('id'));
@@ -159,15 +160,15 @@ Class TreeModel
                     $modulelink->setUpTree($node->getIdd());
                     $modulelink->setUpModule($subModules[$value['name']]);
                     $modulelink->setLanguage($lang);
-                    if ($module->getName() == $value['name']) $modulelink->setIsmain(1);
+                    if ($module->getName() == $value['name']) $modulelink->setIsMain(1);
                     $this->em->persist($modulelink);
                 }
             } else {
                 $modulelink = new moduleslink();
                 $modulelink->setUpTree($node->getIdd());
                 $modulelink->setUpModule($subModules[$value['name']]);
-                $modulelink->setLanguage($languageDefault);
-                if ($module->getName() == $value['name']) $modulelink->setIsmain(1);
+                $modulelink->setLanguage($languageAll);
+                if ($module->getName() == $value['name']) $modulelink->setIsMain(1);
                 $this->em->persist($modulelink);
             }
         }
@@ -707,17 +708,31 @@ Class TreeModel
             }
         }
 
-        // Считаем пересечение (потом можно переделать)
+        // Считаем пересечение (потом можно переделать) //Переделал
         $count = count($returnModules);
 
         if ($count === 1) {
             $result = $returnModules[0];
         } elseif ($count === 2) {
             $result = array_intersect($returnModules[0], $returnModules[1]);
-        } elseif ($count === 3) {
-            $result = array_intersect($returnModules[0], $returnModules[1], $returnModules[2]);
+        } else {
+            $result = array_intersect($returnModules[0], $returnModules[1]);
+            for ($i = 2; $i < $count; $i++) {
+                $result = array_intersect($result, $returnModules[$i]);
+            }
         }
-
+        /*
+          if ($count === 1) {
+          $result = $returnModules[0];
+          } elseif ($count === 2) {
+          $result = array_intersect($returnModules[0], $returnModules[1]);
+          } elseif ($count === 3) {
+          $result = array_intersect($returnModules[0], $returnModules[1], $returnModules[2]);
+          } elseif ($count === 4) {
+          $result = array_intersect($returnModules[0], $returnModules[1], $returnModules[2], $returnModules[3]);
+          } elseif ($count === 5) {
+          $result = array_intersect($returnModules[0], $returnModules[1], $returnModules[2], $returnModules[3], $returnModules[4]);
+          } */
         $return = array ();
 
         foreach ($result as $val) {
@@ -822,7 +837,7 @@ Class TreeModel
             } else return 'no_send';
         }
 
-        // Отправляем письмо тому, кто отправлял на утверждение        
+// Отправляем письмо тому, кто отправлял на утверждение        
         $historyRecord = $this->em->getRepository('TreeBundle:history')->findOneBy(array ('id' => $old_cid));
 
         $currentUser = $security->getToken()->getUser();
@@ -835,7 +850,7 @@ Class TreeModel
         return 'ok';
     }
 
-    // Подтвердить на уровне главного редактора
+// Подтвердить на уровне главного редактора
     public function proveMainEditor($security) //*****
     {
         $query = $this->em->createQuery("
@@ -936,7 +951,7 @@ Class TreeModel
             } else return 'no_send';
         }
 
-        // Отправляем письмо тому редактору, кто отправлял на утверждение        
+// Отправляем письмо тому редактору, кто отправлял на утверждение        
         $historyRecord = $this->em->getRepository('TreeBundle:history')->findOneBy(array ('id' => $old_cid));
 
         $currentUser = $security->getToken()->getUser();
@@ -949,7 +964,7 @@ Class TreeModel
         return 'ok';
     }
 
-    // Отправить на подтверждение редактору   
+// Отправить на подтверждение редактору   
     public function sendToProveEditor($security, $acl) //*****
     {
         $query = $this->em->createQuery("
@@ -1039,7 +1054,7 @@ Class TreeModel
             } else return 'no_save';
         }
 
-        // Отправляем письма всем редакторам
+// Отправляем письма всем редакторам
         $tmp = $this->em->getRepository('DialogsBundle:groups')->findAll();
         foreach ($tmp as $group) {
             $groups[$group->getId()] = $group;
@@ -1068,7 +1083,7 @@ Class TreeModel
         return 'ok';
     }
 
-    // Отправить на подтверждение главному редактору
+// Отправить на подтверждение главному редактору
     public function sendToProveMainEditor($security, $acl) //*****
     {
         $query = $this->em->createQuery("
@@ -1158,7 +1173,7 @@ Class TreeModel
             } else return 'no_save';
         }
 
-        // Отправляем письма всем главным редакторам
+// Отправляем письма всем главным редакторам
         $tmp = $this->em->getRepository('DialogsBundle:groups')->findAll();
         foreach ($tmp as $group) {
             $groups[$group->getId()] = $group;
@@ -1187,7 +1202,7 @@ Class TreeModel
         return 'ok';
     }
 
-    // Вернуть на доработку писателю (рядовому журналисту)
+// Вернуть на доработку писателю (рядовому журналисту)
     public function returnWriter($security) //*****
     {
         $query = $this->em->createQuery("
@@ -1280,7 +1295,7 @@ Class TreeModel
             } else return 'no_send';
         }
 
-        // Отправляем письмо тому, кто отправлял на утверждение        
+// Отправляем письмо тому, кто отправлял на утверждение        
         $historyRecord = $this->em->getRepository('TreeBundle:history')->findOneBy(array ('id' => $old_cid));
 
         $currentUser = $security->getToken()->getUser();
@@ -1296,7 +1311,7 @@ Class TreeModel
         return 'ok';
     }
 
-    // Вернуть на доработку редактору
+// Вернуть на доработку редактору
     public function returnEditor($security) //*****
     {
         $query = $this->em->createQuery("
@@ -1389,7 +1404,7 @@ Class TreeModel
             } else return 'no_send';
         }
 
-        // Отправляем письмо тому, кто отправлял на утверждение        
+// Отправляем письмо тому, кто отправлял на утверждение        
         $historyRecord = $this->em->getRepository('TreeBundle:history')->findOneBy(array ('id' => $old_cid));
 
         $currentUser = $security->getToken()->getUser();
@@ -1405,7 +1420,7 @@ Class TreeModel
         return 'ok';
     }
 
-    // Отправляет сообщение
+// Отправляет сообщение
     public function sendMessage($send_from, $send_for, $subject, $message)
     {
         $messages = new messages();
@@ -1419,15 +1434,38 @@ Class TreeModel
         $this->em->flush();
     }
 
-    // Возвращает массив модулей, которые привязаны к узлу id
+// Возвращает массив модулей, которые привязаны к узлу id
     public function getNodeModules($id, $acl, $action = 'edit')
     {
-        //Языки потребуются для отсева модулей с удаленными языками
+
+//Языки потребуются для отсева модулей с удаленными языками
         $languages = $this->container->getParameter('languages');
-        //список модудей потребуется для отсева удаленных модулей
-        //найдем наименование модуля на основе которого пострен узел
-        //прочтем конфиг
-        //сформируем массив модулей
+
+//список модудей потребуется для отсева удаленных модулей
+//найдем наименование модуля на основе которого пострен узел
+        $query = $this->em->createQuery("
+            SELECT 
+                md.name AS name
+            FROM 
+                TreeBundle:modulesitetree tr, 
+                DialogsBundle:moduleslink md_l, 
+                DialogsBundle:modules md
+            WHERE md.final = 'Y'
+            AND md.status = 'active'
+            AND md_l.up_tree = tr.idd
+            AND md_l.up_module = md.idd
+            AND md_l.is_main = 1
+            AND (tr.status = 'active' OR tr.status = 'hidden')
+            AND tr.final = 'Y'
+            AND tr.idd = :idd
+            ORDER BY md.type DESC")->setParameter('idd', $id);
+        $moduleMain = $query->getResult();
+        $moduleMain = $moduleMain[0]['name'];
+
+//прочтем конфиг
+        $configMain = $this->container->get('cache')->getModuleConfig($moduleMain);
+
+//сформируем массив модулей
         $query = $this->em->createQuery("
             SELECT 
                 md.idd AS id,
@@ -1466,21 +1504,26 @@ Class TreeModel
             if ($access && array_key_exists($val['language'], $languages)) {
                 $config = $this->container->get('cache')->getModuleConfig($val['name']);
 
-                $modules[$val['id']][$val['language']] = array (
-                    'title' => $config['parameters']['title'],
-                    'directory' => $val['name'],
-                    'name' => $config['parameters']['name'],
-                    'id' => $val['id'],
-                    'count' => $config['parameters']['count'],
-                    'count-per-parent' => $config['parameters']['count-per-parent'],
-                    'parent' => $config['parameters']['parent'],
-                    'module_type' => $config['parameters']['type'],
-                    'css_tab' => $config['parameters']['css_tab'],
-                    'language' => $val['language'],
-                );
+                $isModule = false;
+                foreach ($configMain['parameters']['modules'] as $mod) {
+                    if ($mod['name'] == $val['name']) $isModule = true;
+                }
+                if ($isModule) {
+                    $modules[$val['id']][$val['language']] = array (
+                        'title' => $config['parameters']['title'],
+                        'directory' => $val['name'],
+                        'name' => $config['parameters']['name'],
+                        'id' => $val['id'],
+                        'count' => $config['parameters']['count'],
+                        'count-per-parent' => $config['parameters']['count-per-parent'],
+                        'parent' => $config['parameters']['parent'],
+                        'module_type' => $config['parameters']['type'],
+                        'css_tab' => $config['parameters']['css_tab'],
+                        'language' => $val['language'],
+                    );
+                }
             }
         }
-
         return $modules;
     }
 
@@ -1593,15 +1636,16 @@ Class TreeModel
         $query->getResult();
     }
 
-    //Функция проверки языков. Добавляет необходимые записи в modules_link
-    //Возвращает массив языков
+//Функция проверки языков. Добавляет необходимые записи в modules_link
+//Возвращает массив языков
     public function updateNodeLink($idNode)
     {
-        //1. Вытягиваем список языков
+// Вытягиваем список языков
         $languages = $this->container->getParameter('languages');
-        $languageDefault = $languages['default'];
+        $languageAll = $languages['for_all_type_languagest'];
         unset($languages['default']);
-        //2. Узаем на основе какого модуля создан узел
+        unset($languages['for_all_type_languagest']);
+// Узаем на основе какого модуля создан узел
         $query = $this->em->createQuery("
             SELECT 
                 md.name AS name
@@ -1620,15 +1664,16 @@ Class TreeModel
             ORDER BY md.type DESC")->setParameter('idd', $idNode);
         $modules = $query->getResult();
         $moduleName = $modules[0]['name']; //Имя модуля
-        //3. Прочтем конфиг этого модуля
+// Прочтем конфиг этого модуля
         $config = $this->container->get('cache')->getModuleConfig($moduleName);
-        // Получаем список модулей
+
+// Получаем список модулей
         $subModules = array ();
         foreach ($config['parameters']['modules'] as $val) {
             $subModules[] = "'".$val['name']."'";
         }
 
-        // Берем из базы одним запросом данные для этих модулей
+// Берем из базы одним запросом данные для этих модулей
         $query = $this->em->createQuery("
                 SELECT
                     md.idd, md.name
@@ -1638,46 +1683,59 @@ Class TreeModel
                 AND md.status = 'active'
                 AND md.name IN(".implode(',', $subModules).")");
 
-        // Формируем вспомогательный массив с данными модулей
+// Формируем вспомогательный массив с данными модулей
         $subModules = array ();
         foreach ($query->getResult() as $value) {
             $subModules[$value['name']] = $value['idd'];
         }
 
-        // Теперь опять обходим конфиг 
-        // Все данные хранятся в $subModules['имя_модуля'] = значение_idd
+//Вытяним все записи узла в массив
+        $sDQL = "
+            SELECT md_l 
+            FROM DialogsBundle:moduleslink md_l
+            WHERE md_l.up_tree = :up_tree";
+        $query = $this->em->createQuery($sDQL);
+        $query->setParameter('up_tree', $idNode);
+        $aNode = $query->getResult();
+
+// Теперь опять обходим конфиг 
+// Все данные хранятся в $subModules['имя_модуля'] = значение_idd
+
         foreach ($config['parameters']['modules'] as $value) {
+
             //Проверяем есть ли такой модуль в узле. Если нет, то добавляем
-            $query = $this->em->createQuery("
-                        SELECT md_l 
-                        FROM DialogsBundle:moduleslink md_l
-                        WHERE
-                            md_l.up_tree = :up_tree
-                            AND md_l.up_module = :up_module
-                            AND md_l.language = :language
-                        ");
-            $query->setParameter('up_tree', $idNode);
-            $query->setParameter('up_module', $subModules[$value['name']]);
+
             if ('yes' == $value['multilanguage']) {
                 foreach ($languages as $lang => $language) {
-                    $query->setParameter('language', $lang);
-                    if (array () === $query->getResult()) {
+                    $isLink = false;
+                    foreach ($aNode as $moduleslink) {
+                        if ($moduleslink->getLanguage() == $lang && $moduleslink->getUpModule() == $subModules[$value['name']]) {
+                            $isLink = true;
+                        }
+                    }
+
+                    if (false === $isLink) {
                         $modulelink = new moduleslink();
                         $modulelink->setUpTree($idNode);
                         $modulelink->setUpModule($subModules[$value['name']]);
                         $modulelink->setLanguage($lang);
-                        if ($moduleName == $value['name']) $modulelink->setIsmain(1);
+                        if ($moduleName == $value['name']) $modulelink->setIsMain(1);
                         $this->em->persist($modulelink);
                     }
                 }
             } else {
-                $query->setParameter('language', $languageDefault);
-                if (array () === $query->getResult()) {
+                $isLink = false;
+                foreach ($aNode as $moduleslink) {
+                    if ($moduleslink->getLanguage() == $lang && $moduleslink->getUpModule() == $subModules[$value['name']]) {
+                        $isLink = true;
+                    }
+                }
+                if (false === $isLink) {
                     $modulelink = new moduleslink();
                     $modulelink->setUpTree($idNode);
                     $modulelink->setUpModule($subModules[$value['name']]);
-                    $modulelink->setLanguage($languageDefault);
-                    if ($moduleName == $value['name']) $modulelink->setIsmain(1);
+                    $modulelink->setLanguage($languageAll);
+                    if ($moduleName == $value['name']) $modulelink->setIsMain(1);
                     $this->em->persist($modulelink);
                 }
             }

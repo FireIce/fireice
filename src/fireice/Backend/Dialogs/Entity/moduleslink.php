@@ -31,7 +31,7 @@ class moduleslink
      */
     protected $language;
     /**
-     * @ORM\Column(type="is_main", type="integer", nullable="TRUE") 
+     * @ORM\Column(type="integer", nullable="TRUE") 
      */
     protected $is_main;
 
@@ -75,12 +75,12 @@ class moduleslink
         return $this->language;
     }
 
-    public function setIsmain($is_main)
+    public function setIsMain($is_main)
     {
         $this->is_main = $is_main;
     }
 
-    public function getIsmain()
+    public function getIsMain()
     {
         return $this->is_main;
     }

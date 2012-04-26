@@ -161,6 +161,8 @@ class TreeController extends Controller
 
     public function getNodeModulesAction()
     {
+        $request = $this->get('request');
+        $this->getModel()->updateNodeLink($request->get('id'));
         $modules = $this->getModel()->getNodeModules($this->get('request')->get('id'), $this->get('acl'));
 
         if ($modules === array ()) {
@@ -189,7 +191,7 @@ class TreeController extends Controller
 
 
         if ($request->get('act') == 'show') {
-            $this->getModel()->updateNodeLink($request->get('id'));
+            
             $modules = $this->getModel()->getNodeModules($request->get('id'), $acl);
 
             if (isset($modules[$request->get('id_module')][$request->get('language')])) {
@@ -452,7 +454,7 @@ class TreeController extends Controller
     }
 
     public function ajaxLoadAction()
-    {
+    {//Возможно вставить updateNodeLink()
         $modules = $this->getModel()->getNodeModules($this->get('request')->get('id'), $this->get('acl'));
 
         if ($modules !== array ()) {
