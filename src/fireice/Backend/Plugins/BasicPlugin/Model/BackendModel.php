@@ -68,6 +68,9 @@ class BackendModel
     {
         $metod = 'config'.ucfirst($plugin_name);
         $languages = $this->container->getParameter('languages');
+        $languagesDefault = $languages['default'];
+        $languages = $languages['list'];
+        
         // Если нет метода задающего источник, то возвращаем false
         if (!method_exists($entity, $metod)) return false;
 
@@ -96,7 +99,7 @@ class BackendModel
             $query->setParameters(array (
                 'up_tree' => $config['data']['id_node'],
                 'up_module' => $config['data']['id_module'],
-                'language' => $languages['default'],
+                'language' => $languagesDefault,
             ));
 
             $result = $query->getOneOrNullResult();

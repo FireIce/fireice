@@ -94,9 +94,9 @@ Class TreeModel
     public function create($security)
     {
         $languages = $this->container->getParameter('languages');
+        $languages = $languages['list'];
         $languageAll = $languages['for_all_type_languagest'];
-        unset($languages['default']);
-        unset($languages['for_all_type_languagest']);
+
         $node = new modulesitetree();
         $node->setFinal('Y');
         $node->setUpParent($this->request->get('id'));
@@ -313,6 +313,8 @@ Class TreeModel
     {
         $return = array ();
         $languages = $this->container->getParameter('languages');
+        $languageDefault = $languages['default'];
+
         if ($id == 1) {
             $query = $this->em->createQuery("
                 SELECT 
@@ -333,7 +335,7 @@ Class TreeModel
                 AND tr.final = 'Y'
                 AND md.type='sitetree_node'
                 AND tr.idd = 1");
-            $query->setParameter('language', $languages['default']);
+            $query->setParameter('language', $languageDefault);
 
             $result1 = $query->getSingleResult();
 
@@ -356,7 +358,7 @@ Class TreeModel
                 AND md.final = 'Y'
                 AND md.plugin_id = plg.id
                 AND md.plugin_name = 'fireice_node_title'
-                AND md.plugin_type = 'text'")->setParameter('up_module', $result1['id'])->setParameter('language', $languages['default']);
+                AND md.plugin_type = 'text'")->setParameter('up_module', $result1['id'])->setParameter('language', $languageDefault);
             ;
 
             $result2 = $query->getSingleResult();
@@ -444,7 +446,7 @@ Class TreeModel
                     AND md.final = 'Y'
                     AND md.plugin_id = plg.id
                     AND md.plugin_name = 'fireice_node_title'
-                    AND md.plugin_type = 'text'")->setParameter('up_module', $type['id'])->setParameter('language', $languages['default']);
+                    AND md.plugin_type = 'text'")->setParameter('up_module', $type['id'])->setParameter('language', $languageDefault);
 
                 foreach ($query->getResult() as $val) {
                     $childsNode[$val['up_tree']]['name'] = $val['title'];
@@ -482,7 +484,7 @@ Class TreeModel
                     AND (tr2.status = 'active' OR tr2.status = 'hidden')
                 ) 
                 GROUP BY tr.up_parent");
-            $query->setParameter('language', $languages['default']);
+            $query->setParameter('language', $languageDefault);
             $children = $query->getResult();
 
             $tmp = array ();
@@ -1440,7 +1442,8 @@ Class TreeModel
 
         //Языки потребуются для отсева модулей с удаленными языками
         $languages = $this->container->getParameter('languages');
-
+        $languages = $languages['list'];
+        
         //список модудей потребуется для отсева удаленных модулей
         //найдем наименование модуля на основе которого пострен узел
         $query = $this->em->createQuery("
@@ -1642,8 +1645,8 @@ Class TreeModel
         // Вытягиваем список языков
         $languages = $this->container->getParameter('languages');
         $languageAll = $languages['for_all_type_languagest'];
-        unset($languages['default']);
-        unset($languages['for_all_type_languagest']);
+        $languages = $languages['list'];
+        
 
         // Узаем на основе какого модуля создан узел
         $query = $this->em->createQuery("
@@ -1690,11 +1693,10 @@ Class TreeModel
         }
 
         //Вытяним все записи узла в массив
-        $sDQL = "
+        $query = $this->em->createQuery("
             SELECT md_l 
             FROM DialogsBundle:moduleslink md_l
-            WHERE md_l.up_tree = :up_tree";
-        $query = $this->em->createQuery($sDQL);
+            WHERE md_l.up_tree = :up_tree");
         $query->setParameter('up_tree', $idNode);
         $aNode = $query->getResult();
 

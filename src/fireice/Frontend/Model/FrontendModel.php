@@ -54,7 +54,7 @@ class FrontendModel
             'parent' => $node['up_parent'],
             'name' => isset($node['plugins'][$language]['fireice_node_name']['value']) ? $node['plugins'][$language]['fireice_node_name']['value'] : $node_id,
             'title' => isset($node['plugins'][$language]['fireice_node_title']['value']) ? $node['plugins'][$language]['fireice_node_title']['value'] : '[Узел без названия]',
-            'path' => $node['url']['name']
+            'path' => $language.'/'. $node['url']['name']
         );
     }
 

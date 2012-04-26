@@ -39,10 +39,19 @@ class FrontendController extends Controller
         $path = $this->get('request')->getPathInfo();
         $path = trim($path, '/');
         $path = explode('/', $path);
-        $language = 'en';
+        $languages = $this->container->getParameter('languages');
+        $languageDefault = $languages['default'];
+        $languages = $languages['list'];
+
         if ($path === array ('')) {
-            $language = 'en';
-            return $this->showPage(1, $language, '');
+            return $this->showPage(1, $languageDefault, '');
+        }
+        $languageSelect = $path[0];
+        unset($path[0]);
+        $tmp = $path;
+        $path = array ();
+        foreach ($tmp as $val) {
+            $path[] = $val;
         }
 
         if ($path !== array ()) {
@@ -50,7 +59,7 @@ class FrontendController extends Controller
                 if ($i == 0) $childs = $frontendModel->getChilds(1);
                 else $childs = $frontendModel->getChilds($path[$i - 1]);
 
-                $in_childs = $frontendModel->inChilds($path[$i], $childs, $language);
+                $in_childs = $frontendModel->inChilds($path[$i], $childs, $languageSelect);
 
                 if ($in_childs === false) {
                     // Если остаток соответствует регулярному выражению модуля предыдущего узла,
@@ -62,7 +71,7 @@ class FrontendController extends Controller
                     $tree = new TreeController();
                     $tree->setContainer($this->container);
 
-                    if ($tree->getNodeModule($path[$i - 1], $language)->checkEndOf($ostatok)) return $this->showPage($path[$i - 1], $language, $ostatok);
+                    if ($tree->getNodeModule($path[$i - 1], $languageSelect)->checkEndOf($ostatok)) return $this->showPage($path[$i - 1], $language, $ostatok);
 
                     // Страницы не существует...
                     return $this->get404Page();
@@ -74,12 +83,14 @@ class FrontendController extends Controller
                     $path[$i] = $in_childs;
                 }
             }
-
-            return $this->showPage($path[$i - 1], $language, '');
+            
+            return $this->showPage($path[$i - 1], $languageSelect, '');
         }
-
-        // Страницы не существует...
-        return $this->get404Page();
+        
+        //Открыть главную страницу
+        return $this->showPage(1, $languageSelect, '');
+        /*/* Страницы не существует...
+        return $this->get404Page();*/
     }
 
     public function showPage($id_node, $language, $params = '')
