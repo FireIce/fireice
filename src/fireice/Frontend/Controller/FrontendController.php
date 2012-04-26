@@ -36,23 +36,38 @@ class FrontendController extends Controller
             return $response;
         }
 
+
         $path = $this->get('request')->getPathInfo();
         $path = trim($path, '/');
         $path = explode('/', $path);
         $languages = $this->container->getParameter('languages');
-        $languageDefault = $languages['default'];
+        $languageDefault = $languages['default']; //Присвоили по умолчанию
+        
+        //берем хост и проверяем есть ли такой хост в конфиге
+        $host = $this->get('request')->getHost();
         $languages = $languages['list'];
+        foreach ($languages as $lang => $language) {
+            $aHosts = $language['host'];
+            if (in_array($host, $aHosts)) {
+                $languageDefault = $lang; //присвоили тот на котором прописан Хост
+            }
+        }
 
         if ($path === array ('')) {
             return $this->showPage(1, $languageDefault, '');
         }
         $languageSelect = $path[0];
-        unset($path[0]);
-        $tmp = $path;
-        $path = array ();
-        foreach ($tmp as $val) {
-            $path[] = $val;
+
+        //Проверим есть ли такой язык в списке
+        if (array_key_exists($languageSelect, $languages)) {
+            //Да это язык
+            array_shift($path);
+        } else { //Нет, не язык.
+            return $this->redirect($languageDefault.$this->get('request')->getPathInfo(), 301);
         }
+
+
+
 
         if ($path !== array ()) {
             for ($i = 0; $i < count($path); $i++) {
@@ -83,14 +98,14 @@ class FrontendController extends Controller
                     $path[$i] = $in_childs;
                 }
             }
-            
+
             return $this->showPage($path[$i - 1], $languageSelect, '');
         }
-        
+
         //Открыть главную страницу
         return $this->showPage(1, $languageSelect, '');
-        /*/* Страницы не существует...
-        return $this->get404Page();*/
+        /* /* Страницы не существует...
+          return $this->get404Page(); */
     }
 
     public function showPage($id_node, $language, $params = '')

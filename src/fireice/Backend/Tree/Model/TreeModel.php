@@ -93,10 +93,6 @@ Class TreeModel
 
     public function create($security)
     {
-        $languages = $this->container->getParameter('languages');
-        $languages = $languages['list'];
-        $languageAll = $languages['for_all_type_languagest'];
-
         $node = new modulesitetree();
         $node->setFinal('Y');
         $node->setUpParent($this->request->get('id'));
@@ -148,6 +144,11 @@ Class TreeModel
 
         // Формируем вспомогательный массив с данными модулей
         $subModules = array ();
+
+        $languages = $this->container->getParameter('languages');
+        $languages = $languages['list'];
+        $languageAll = $languages['for_all_type_languagest'];
+
         foreach ($query->getResult() as $value) {
             $subModules[$value['name']] = $value['idd'];
         }
@@ -1440,10 +1441,6 @@ Class TreeModel
     public function getNodeModules($id, $acl, $action = 'edit')
     {
 
-        //Языки потребуются для отсева модулей с удаленными языками
-        $languages = $this->container->getParameter('languages');
-        $languages = $languages['list'];
-        
         //список модудей потребуется для отсева удаленных модулей
         //найдем наименование модуля на основе которого пострен узел
         $query = $this->em->createQuery("
@@ -1489,6 +1486,10 @@ Class TreeModel
             ORDER BY md.type DESC")->setParameter('idd', $id);
 
         $modules = array ();
+
+        //Языки потребуются для отсева модулей с удаленными языками
+        $languages = $this->container->getParameter('languages');
+        $languages = $languages['list'];
 
         foreach ($query->getResult() as $key => $val) {
             $access = false;
@@ -1642,11 +1643,6 @@ Class TreeModel
     //Функция проверки языков. Добавляет необходимые записи в modules_link
     public function updateNodeLink($idNode)
     {
-        // Вытягиваем список языков
-        $languages = $this->container->getParameter('languages');
-        $languageAll = $languages['for_all_type_languagest'];
-        $languages = $languages['list'];
-        
 
         // Узаем на основе какого модуля создан узел
         $query = $this->em->createQuery("
@@ -1700,6 +1696,11 @@ Class TreeModel
         $query->setParameter('up_tree', $idNode);
         $aNode = $query->getResult();
 
+        // Вытягиваем список языков
+        $languages = $this->container->getParameter('languages');
+        $languageAll = $languages['for_all_type_languagest'];
+        $languages = $languages['list'];
+        
         // Теперь опять обходим конфиг 
         // Все данные хранятся в $subModules['имя_модуля'] = значение_idd
 
