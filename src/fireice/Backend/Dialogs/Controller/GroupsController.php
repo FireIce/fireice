@@ -293,7 +293,7 @@ class GroupsController extends Controller
 
             // Определили какой модуль дерева должен быть привязан к узлу Главной страницы
             $config = $this->container->get('cache')->getModuleConfig('Mainpage');
-            $nodeModule = $config['parameters']['modules']['sitetree'];
+            $nodeModule = $config['parameters']['modules']['sitetree']['name'];
 
             // Создадим записи в таблице 
             // Сущность модуля
@@ -343,20 +343,26 @@ class GroupsController extends Controller
             $em->flush();
 
             // Создаём записи в таблице modules_link
+            $languages = $this->container->getParameter('languages');
+            $languageDefault = $languages['default']; 
             foreach ($config['parameters']['modules'] as $value) {
                 $module = $em->getRepository('DialogsBundle:modules')->findOneBy(array (
-                    'name' => $value
+                    'name' => $value['name']
                     ));
 
                 $moduleslink = new moduleslink();
                 $moduleslink->setUpTree(1);
                 $moduleslink->setUpModule($module->getId());
+                $moduleslink->setLanguage($languageDefault);
+                if ('Mainpage' == $value['name']) {
+                    $moduleslink->setIsMain(1);
+                }
                 $em->persist($moduleslink);
                 $em->flush();
 
-                if (stripos($value, 'FireiceNode') !== false) {
+                if (stripos($value['name'], 'FireiceNode') !== false) {
 
-                    $records = $em->getRepository('Module'.$value.'Bundle:module'.strtolower($value))->findAll();
+                    $records = $em->getRepository('Module'.$value['name'].'Bundle:module'.strtolower($value['name']))->findAll();
 
                     foreach ($records as $val) {
                         $modulespluginslink = new modulespluginslink();

@@ -110,7 +110,7 @@ class FrontendController extends Controller
 
         //Открыть главную страницу, если только язык в урле
         if ($isLang) return $this->showPage(1, $languageSelect, '');
-        /* /* Страницы не существует... */
+        // Страницы не существует... 
         return $this->get404Page();
     }
 
