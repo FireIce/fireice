@@ -352,8 +352,8 @@ class Cache
         } else return array ();
     }
 
-    public function getModuleConfig($name) //Функция чтения файла config для каждого модуля
-    {//$name - Наименование Модуля
+    public function getModuleConfig($name) // Функция чтения файла config для каждого модуля
+    {// $name - Наименование Модуля
         $module = 'module_'.$name;
         $configFile = $this->dirModules.$name.'/Resources/config/config.yml';
         $cacheFile = $this->dirCache.'/'.$module;

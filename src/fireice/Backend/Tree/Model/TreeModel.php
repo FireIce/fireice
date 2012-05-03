@@ -146,8 +146,9 @@ Class TreeModel
         $subModules = array ();
 
         $languages = $this->container->getParameter('languages');
-        $languages = $languages['list'];
         $languageAll = $languages['for_all_type_languagest'];
+        $languages = $languages['list'];
+        
 
         foreach ($query->getResult() as $value) {
             $subModules[$value['name']] = $value['idd'];
@@ -1441,8 +1442,8 @@ Class TreeModel
     public function getNodeModules($id, $acl, $action = 'edit')
     {
 
-        //список модудей потребуется для отсева удаленных модулей
-        //найдем наименование модуля на основе которого пострен узел
+        // Список модудей потребуется для отсева удаленных модулей
+        // Найдем наименование модуля на основе которого пострен узел
         $query = $this->em->createQuery("
             SELECT 
                 md.idd AS id,
@@ -1470,12 +1471,12 @@ Class TreeModel
                 break;
             }
         }
-        //Прочтем конфиг
+        // Прочтем конфиг
         $configMain = $this->container->get('cache')->getModuleConfig($moduleMain);
 
         $modules = array ();
 
-        //Языки потребуются для отсева модулей с удаленными языками
+        // Языки потребуются для отсева модулей с удаленными языками
         $languages = $this->container->getParameter('languages');
         $languages = $languages['list'];
 
@@ -1628,7 +1629,7 @@ Class TreeModel
         $query->getResult();
     }
 
-    //Функция проверки языков. Добавляет необходимые записи в modules_link
+    // Функция проверки языков. Добавляет необходимые записи в modules_link
     public function updateNodeLink($idNode)
     {
 
@@ -1676,14 +1677,18 @@ Class TreeModel
             $subModules[$value['name']] = $value['idd'];
         }
 
-        //Вытяним все записи узла в массив
+        // Вытяним все записи узла в массив
         $query = $this->em->createQuery("
             SELECT md_l 
             FROM DialogsBundle:moduleslink md_l
             WHERE md_l.up_tree = :up_tree");
         $query->setParameter('up_tree', $idNode);
         $aNode = $query->getResult();
+        $nodesModules = array ();
         foreach ($aNode as $moduleslink) {
+            if (!isset($nodesModules[$moduleslink->getUpModule()])) {
+                $nodesModules[$moduleslink->getUpModule()] = array ();
+            }
             $nodesModules[$moduleslink->getUpModule()][$moduleslink->getLanguage()] = true;
         }
 
@@ -1697,7 +1702,7 @@ Class TreeModel
 
         foreach ($config['parameters']['modules'] as $value) {
 
-            //Проверяем есть ли такой модуль в узле. Если нет, то добавляем
+            // Проверяем есть ли такой модуль в узле. Если нет, то добавляем
 
             if ('yes' == $value['multilanguage']) {
                 foreach ($languages as $lang => $language) {

@@ -62,12 +62,12 @@ class FrontendController extends Controller
         if ('yes' == $this->container->getParameter('multilanguage')) {
             $languageSelect = $path[0];
 
-            //Проверим есть ли такой язык в списке
+            // Проверим есть ли такой язык в списке
             if (array_key_exists($languageSelect, $languages)) {
-                //Да это язык
+                // Да это язык
                 $isLang = true;
                 array_shift($path);
-            } else { //Нет, не язык.
+            } else { // Нет, не язык.
                 return $this->redirect($languageDefault.$this->get('request')->getPathInfo(), 301);
             }
         } else {
@@ -109,7 +109,7 @@ class FrontendController extends Controller
             return $this->showPage($path[$i - 1], $languageSelect, '');
         }
 
-        //Открыть главную страницу, если только язык в урле
+        // Открыть главную страницу, если только язык в урле
         if ($isLang) return $this->showPage(1, $languageSelect, '');
         // Страницы не существует... 
         return $this->get404Page();
