@@ -51,6 +51,7 @@ class FrontendController extends Controller
                 $aHosts = $language['host'];
                 if (in_array($host, $aHosts)) {
                     $languageDefault = $lang; //присвоили тот на котором прописан Хост
+                    break;
                 }
             }
         }

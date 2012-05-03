@@ -1445,33 +1445,11 @@ Class TreeModel
         //найдем наименование модуля на основе которого пострен узел
         $query = $this->em->createQuery("
             SELECT 
-                md.name AS name
-            FROM 
-                TreeBundle:modulesitetree tr, 
-                DialogsBundle:moduleslink md_l, 
-                DialogsBundle:modules md
-            WHERE md.final = 'Y'
-            AND md.status = 'active'
-            AND md_l.up_tree = tr.idd
-            AND md_l.up_module = md.idd
-            AND md_l.is_main = 1
-            AND (tr.status = 'active' OR tr.status = 'hidden')
-            AND tr.final = 'Y'
-            AND tr.idd = :idd
-            ORDER BY md.type DESC")->setParameter('idd', $id);
-        $moduleMain = $query->getResult();
-        $moduleMain = $moduleMain[0]['name'];
-
-        //прочтем конфиг
-        $configMain = $this->container->get('cache')->getModuleConfig($moduleMain);
-
-        //сформируем массив модулей
-        $query = $this->em->createQuery("
-            SELECT 
                 md.idd AS id,
                 md.name AS name,
                 md.type AS type,
-                md_l.language as language
+                md_l.language as language,
+                md_l.is_main as is_main
             FROM 
                 TreeBundle:modulesitetree tr, 
                 DialogsBundle:moduleslink md_l, 
@@ -1484,6 +1462,16 @@ Class TreeModel
             AND tr.final = 'Y'
             AND tr.idd = :idd
             ORDER BY md.type DESC")->setParameter('idd', $id);
+        $AllModules = $query->getResult();
+
+        foreach ($AllModules as $module) {
+            if ('1' === $module['is_main']) {
+                $moduleMain = $module['name'];
+                break;
+            }
+        }
+        //Прочтем конфиг
+        $configMain = $this->container->get('cache')->getModuleConfig($moduleMain);
 
         $modules = array ();
 
@@ -1491,7 +1479,7 @@ Class TreeModel
         $languages = $this->container->getParameter('languages');
         $languages = $languages['list'];
 
-        foreach ($query->getResult() as $key => $val) {
+        foreach ($AllModules as $key => $val) {
             $access = false;
 
             if ($val['type'] == 'sitetree_node') {
@@ -1695,12 +1683,15 @@ Class TreeModel
             WHERE md_l.up_tree = :up_tree");
         $query->setParameter('up_tree', $idNode);
         $aNode = $query->getResult();
+        foreach ($aNode as $moduleslink) {
+            $nodesModules[$moduleslink->getUpModule()][$moduleslink->getLanguage()] = true;
+        }
 
         // Вытягиваем список языков
         $languages = $this->container->getParameter('languages');
         $languageAll = $languages['for_all_type_languagest'];
         $languages = $languages['list'];
-        
+
         // Теперь опять обходим конфиг 
         // Все данные хранятся в $subModules['имя_модуля'] = значение_idd
 
@@ -1710,14 +1701,7 @@ Class TreeModel
 
             if ('yes' == $value['multilanguage']) {
                 foreach ($languages as $lang => $language) {
-                    $isLink = false;
-                    foreach ($aNode as $moduleslink) {
-                        if ($moduleslink->getLanguage() == $lang && $moduleslink->getUpModule() == $subModules[$value['name']]) {
-                            $isLink = true;
-                        }
-                    }
-
-                    if (false === $isLink) {
+                    if (!isset($nodesModules[$subModules[$value['name']]][$lang])) {
                         $modulelink = new moduleslink();
                         $modulelink->setUpTree($idNode);
                         $modulelink->setUpModule($subModules[$value['name']]);
@@ -1727,13 +1711,7 @@ Class TreeModel
                     }
                 }
             } else {
-                $isLink = false;
-                foreach ($aNode as $moduleslink) {
-                    if ($moduleslink->getLanguage() == $lang && $moduleslink->getUpModule() == $subModules[$value['name']]) {
-                        $isLink = true;
-                    }
-                }
-                if (false === $isLink) {
+                if (!isset($nodesModules[$subModules[$value['name']]][$languageAll])) {
                     $modulelink = new moduleslink();
                     $modulelink->setUpTree($idNode);
                     $modulelink->setUpModule($subModules[$value['name']]);
