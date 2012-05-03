@@ -93,7 +93,7 @@ class FrontendController extends Controller
                     $tree = new TreeController();
                     $tree->setContainer($this->container);
 
-                    if ($tree->getNodeModule($path[$i - 1], $languageSelect)->checkEndOf($ostatok)) return $this->showPage($path[$i - 1], $language, $ostatok);
+                    if ($tree->getNodeModule($path[$i - 1], $languageSelect)->checkEndOf($ostatok)) return $this->showPage($path[$i - 1], $languageSelect, $ostatok);
 
                     // Страницы не существует...
                     return $this->get404Page();
