@@ -17,14 +17,16 @@ class Cache
     private $dirModules;
     private $dirCache;
     private $tmp;
+    private $languages;
 
-    public function __construct($em, $acl, $dirCache, $dirModules)
+    public function __construct($em, $acl, $dirCache, $dirModules, $languages)
     {
         $this->FilesystemCache = new FilesystemCache($dirCache);
         $this->dirModules = $dirModules;
         $this->dirCache = $dirCache;
         $this->em = $em;
         $this->acl = $acl;
+        $this->languages = $languages;
     }
 
     public function exists($key)
@@ -190,7 +192,8 @@ class Cache
                 md.idd AS module_id,
                 md.type,
                 tr.status,
-                md_l.language AS language
+                md_l.language AS language,
+                md_l.is_main AS is_main
             FROM 
                 TreeBundle:modulesitetree tr, 
                 DialogsBundle:moduleslink md_l, 
@@ -214,11 +217,11 @@ class Cache
                 );
 
             if ($val['type'] == 'sitetree_node') {
-                $nodes[$val['node_id']]['sitetree_module'][$val['language']][$val['module_id']] = $val['bundle'];
+                $nodes[$val['node_id']]['sitetree_module'][$val['language']][$val['module_id']] = array ('name' => $val['bundle'], 'multi' => false);
             }
             if ($val['type'] == 'user') {
                 if (!isset($nodes[$val['node_id']])) $nodes[$val['node_id']] = array ();
-                $nodes[$val['node_id']]['user_modules'][$val['language']][$val['module_id']] = $val['bundle'];
+                $nodes[$val['node_id']]['user_modules'][$val['module_id']] = array ('name' => $val['bundle'], 'multi' => false);
                 unset($result[$key]);
             }
         }
@@ -283,7 +286,7 @@ class Cache
                 $plugins_values = array_merge($query->getResult(), $plugins_values);
             }
         }
-
+        $aPlagins = array ();
         foreach ($plugins_values as $value) {
             if (!isset($nodes[$value['node_id']]['plugins'][$value['language']])) $nodes[$value['node_id']]['plugins'][$value['language']] = array ();
             $nodes[$value['node_id']]['plugins'][$value['language']][$value['plugin_name']] = array (
@@ -291,6 +294,13 @@ class Cache
                 'name' => $value['plugin_name'],
                 'value' => $value[0]->getValue()
             );
+            if (!isset($aPlagins[$value['plugin_name']])) {
+                $aPlagins[$value['plugin_name']] = array (
+                    'type' => $value['plugin_type'],
+                    'name' => $value['plugin_name'],
+                    'value' => false);
+            }
+
             if ('fireice_node_name' == $value['plugin_name']) {
                 $nodes[$value['node_id']]['path'] = $value[0]->getValue();
             }
@@ -311,6 +321,80 @@ class Cache
                 'name' => implode('/', $name_path)
             );
         }
+
+        //Вытяним список языков 
+        $languages = $this->languages;
+        $languageDefault = $languages['default'];
+        $languageAll = $languages['for_all_type_languagest'];
+        $languages = $languages['list'];
+
+        // Исключим лишнее
+        // Пройдемся по узлам. Прочтем у каждого Конфиг
+        foreach ($nodes as $idNode => &$node) {
+            // Найдем модуль на основе которого построен узел
+            $query = $this->em->createQuery('
+                SELECT md.name as name
+                FROM 
+                    DialogsBundle:moduleslink md_l, 
+                    DialogsBundle:modules md
+                WHERE
+                    md_l.up_tree= :idNode
+                    AND md_l.is_main = TRUE
+                    AND md_l.up_module = md.idd');
+            $query->setParameter('idNode', $idNode);
+            $name = $query->getResult();
+            $moduleMain = $name[0]['name']; //Это он.
+            $config = $this->getModuleConfig($moduleMain);
+            $modules = $config['parameters']['modules'];
+            /* $aUserModules = array ();
+              foreach ($config['parameters']['modules'] as $key => $module) {
+              if ('sitetree' != $key) {
+              $aUserModules[$key] = $module;
+              }
+              } */
+
+            foreach ($modules as $key => $module) {
+                if ($key == 'sitetree') {
+                    if ($module['multilanguage'] == 'yes') {
+                        unset($node['sitetree_module'][$languageAll]);
+                        unset($node['plugins'][$languageAll]);
+                    } else {
+                        $tmp = array ();
+                        $tmp = $node['sitetree_module'][$languageAll];
+                        unset($node['sitetree_module']);
+                        $node['sitetree_module'] = array ();
+                        $node['sitetree_module'][$languageAll] = $tmp;
+
+                        $tmp = array ();
+                        $tmp = $node['plugins'][$languageAll];
+                        unset($node['plugins']);
+                        $node['plugins'] = array ();
+                        $node['plugins'][$languageAll] = $tmp;
+                    }
+                } else {
+                    if ($module['multilanguage'] == 'yes') {
+                        foreach ($node['user_modules'] as $id => $mod) {
+                            if ($mod['name'] == $module['name']) {
+                                $node['user_modules'][$id]['multi'] = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Проверка плгинов для всех языков
+        foreach ($nodes as $key => $val) {
+            foreach ($languages as $lang => $language) {
+                if (!isset($val['plugins'][$lang])) {
+                    $nodes[$key]['plugins'][$lang] = $aPlagins;
+                }
+            }
+            if (!isset($val['plugins'][$languageAll])) {
+                $nodes[$key]['plugins'][$languageAll] = $aPlagins;
+            }
+        }
+
 
         $hierarchy = array ();
 
