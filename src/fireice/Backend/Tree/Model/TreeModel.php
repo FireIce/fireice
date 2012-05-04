@@ -148,7 +148,7 @@ Class TreeModel
         $languages = $this->container->getParameter('languages');
         $languageAll = $languages['for_all_type_languagest'];
         $languages = $languages['list'];
-        
+
 
         foreach ($query->getResult() as $value) {
             $subModules[$value['name']] = $value['idd'];
@@ -1462,7 +1462,7 @@ Class TreeModel
             AND (tr.status = 'active' OR tr.status = 'hidden')
             AND tr.final = 'Y'
             AND tr.idd = :idd
-            ORDER BY md.type DESC")->setParameter('idd', $id);
+            ORDER BY md.type DESC, md_l.language ASC")->setParameter('idd', $id);
         $AllModules = $query->getResult();
 
         foreach ($AllModules as $module) {
@@ -1478,6 +1478,7 @@ Class TreeModel
 
         // Языки потребуются для отсева модулей с удаленными языками
         $languages = $this->container->getParameter('languages');
+        $languagesAll = $languages['for_all_type_languagest'];
         $languages = $languages['list'];
 
         foreach ($AllModules as $key => $val) {
@@ -1494,14 +1495,21 @@ Class TreeModel
                 }
             }
 
-            if ($access && array_key_exists($val['language'], $languages)) {
+            if ($access && (array_key_exists($val['language'], $languages) || $languagesAll == $val['language'])) {
                 $config = $this->container->get('cache')->getModuleConfig($val['name']);
 
                 $isModule = false;
+                $isMulti = false;
                 foreach ($configMain['parameters']['modules'] as $mod) {
-                    if ($mod['name'] == $val['name']) $isModule = true;
+                    if ($mod['name'] == $val['name']) {
+                        if ('yes' == $mod['multilanguage']) {
+                            $isMulti = true;
+                        }
+                        $isModule = true;
+                        break;
+                    }
                 }
-                if ($isModule) {
+                if ($isModule && (($isMulti == true && $val['language'] != $languagesAll)|| ($isMulti==false && $val['language'] == $languagesAll))) {
                     $modules[$val['id']][$val['language']] = array (
                         'title' => $config['parameters']['title'],
                         'directory' => $val['name'],

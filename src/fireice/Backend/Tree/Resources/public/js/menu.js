@@ -603,9 +603,13 @@ function getNodeModules_callback(answer)
         $.history.load('');
         
         return false;
-    }          
-     
-    var ans =  answer.modules[0]['ru'];
+    } 
+    var slang;
+    for (l in answer.modules[0]){
+        slang=l;
+        break;
+    }
+    var ans =  answer.modules[0][slang];
     first_tab = ans['id'];
     module_type = ans['module_type'];
     language = ans['language'];

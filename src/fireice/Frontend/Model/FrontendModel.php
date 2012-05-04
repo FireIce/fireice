@@ -108,12 +108,12 @@ class FrontendModel
     }
 
     public function getNodeModules($id, $language)
-    {
+    { 
         return $this->sitetree['nodes'][$id]['sitetree_module'][$language] + $this->sitetree['nodes'][$id]['user_modules'][$language];
     }
 
     public function getNodeUsersModules($id, $language)
-    {
+    { 
         return $this->sitetree['nodes'][$id]['user_modules'][$language];
     }
 
