@@ -191,15 +191,18 @@ class TreeController extends Controller
 
 
         if ($request->get('act') == 'show') {
-            
+
             $modules = $this->getModel()->getNodeModules($request->get('id'), $acl);
 
             if (isset($modules[$request->get('id_module')][$request->get('language')])) {
                 $moduleAct = '\\project\\Modules\\'.$modules[$request->get('id_module')][$request->get('language')]['directory'].'\\Controller\\BackendController';
                 $moduleAct = new $moduleAct();
                 $moduleAct->setContainer($this->container);
-
-                $fields = $moduleAct->getData($request->get('id'), $request->get('id_module'), $request->get('language')); //??? Добавить язык из реквеста
+                if ('FireiceNodeDefault' == $modules[$request->get('id_module')][$request->get('language')]['directory']) {
+                    $fields = $moduleAct->getData($request->get('id'), $request->get('id_module'), $request->get('language'));
+                } else {
+                    $fields = $moduleAct->getData($request->get('id'), $request->get('id_module'), $request->get('language'));
+                } //??? Добавить язык из реквеста
             } else $fields = 'no_rights';
         } elseif ($request->get('act') == 'edit') {
 
@@ -437,17 +440,23 @@ class TreeController extends Controller
         $this->sitetree = $this->container->get('cache')->getSiteTreeStructure();
 
         if (false !== $idModule) {
-            $module = $this->sitetree['nodes'][$idNode]['user_modules'][$language][$idModule];
+            $module = $this->sitetree['nodes'][$idNode]['user_modules'][$idModule];
         } else {
-            foreach ($this->sitetree['nodes'][$idNode]['user_modules'][$language] as $key => $value) {
+            foreach ($this->sitetree['nodes'][$idNode]['user_modules'] as $key => $value) {
                 $module = $value;
                 $idModule = $key;
                 break;
             }
         }
+        $languages = $this->container->getParameter('languages');
+        $languageAll = $languages['for_all_type_languagest'];
+        $controller = '\\project\\Modules\\'.$module['name'].'\\Controller\\FrontendController';
+        if ($module['multi'] == true) {
+            $controller = new $controller($idNode, $language, $idModule);
+        } else {
+            $controller = new $controller($idNode, $languageAll, $idModule);
+        }
 
-        $controller = '\\project\\Modules\\'.$module.'\\Controller\\FrontendController';
-        $controller = new $controller($idNode, $language, $idModule);
         $controller->setContainer($this->container);
 
         return $controller;

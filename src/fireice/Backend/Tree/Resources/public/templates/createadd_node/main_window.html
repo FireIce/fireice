@@ -8,7 +8,7 @@
 
         {{each modules}}
         {{each $value}}
-        <div id_module="${$value.id}" module_type="${$value.module_type}" language="${$value.language}" class="tab {{if $index == 0}}current{{/if}} ${$value.css_tab}">${$value.title} * (${$value.language})</div>
+        <div id_module="${$value.id}" module_type="${$value.module_type}" language="${$value.language}" class="tab {{if $index == 0}}current{{/if}} ${$value.css_tab}">${$value.title} {{if $value.writeLang != ''}}[${$value.writeLang}]{{/if}}  </div>
         {{/each}}
         {{/each}}
         <div class="clear"></div>

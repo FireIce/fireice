@@ -344,16 +344,22 @@ class GroupsController extends Controller
 
             // Создаём записи в таблице modules_link
             $languages = $this->container->getParameter('languages');
-            $languageDefault = $languages['default']; 
+            $languageDefault = $languages['default'];
+            $languageAll = $languages['for_all_type_languagest'];
+
             foreach ($config['parameters']['modules'] as $value) {
                 $module = $em->getRepository('DialogsBundle:modules')->findOneBy(array (
-                    'name' => $value['name']
+                    'name' => $value['name'],
                     ));
 
                 $moduleslink = new moduleslink();
                 $moduleslink->setUpTree(1);
                 $moduleslink->setUpModule($module->getId());
-                $moduleslink->setLanguage($languageDefault);
+                if ('yes' == $value['multilanguage']) {
+                    $moduleslink->setLanguage($languageDefault);
+                } else {
+                    $moduleslink->setLanguage($languageAll);
+                }
                 if ('Mainpage' == $value['name']) {
                     $moduleslink->setIsMain(1);
                 }

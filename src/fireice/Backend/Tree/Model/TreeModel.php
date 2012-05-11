@@ -315,8 +315,8 @@ Class TreeModel
     {
         $return = array ();
         $languages = $this->container->getParameter('languages');
-        $languageDefault = $languages['default'];
-
+        //$languageDefault = $languages['default'];
+        $languageAll = $languages['for_all_type_languagest'];
         if ($id == 1) {
             $query = $this->em->createQuery("
                 SELECT 
@@ -337,7 +337,7 @@ Class TreeModel
                 AND tr.final = 'Y'
                 AND md.type='sitetree_node'
                 AND tr.idd = 1");
-            $query->setParameter('language', $languageDefault);
+            $query->setParameter('language', $languageAll);
 
             $result1 = $query->getSingleResult();
 
@@ -360,7 +360,7 @@ Class TreeModel
                 AND md.final = 'Y'
                 AND md.plugin_id = plg.id
                 AND md.plugin_name = 'fireice_node_title'
-                AND md.plugin_type = 'text'")->setParameter('up_module', $result1['id'])->setParameter('language', $languageDefault);
+                AND md.plugin_type = 'text'")->setParameter('up_module', $result1['id'])->setParameter('language', $languageAll);
             ;
 
             $result2 = $query->getSingleResult();
@@ -448,7 +448,7 @@ Class TreeModel
                     AND md.final = 'Y'
                     AND md.plugin_id = plg.id
                     AND md.plugin_name = 'fireice_node_title'
-                    AND md.plugin_type = 'text'")->setParameter('up_module', $type['id'])->setParameter('language', $languageDefault);
+                    AND md.plugin_type = 'text'")->setParameter('up_module', $type['id'])->setParameter('language', $languageAll);
 
                 foreach ($query->getResult() as $val) {
                     $childsNode[$val['up_tree']]['name'] = $val['title'];
@@ -486,7 +486,7 @@ Class TreeModel
                     AND (tr2.status = 'active' OR tr2.status = 'hidden')
                 ) 
                 GROUP BY tr.up_parent");
-            $query->setParameter('language', $languageDefault);
+            $query->setParameter('language', $languageAll);
             $children = $query->getResult();
 
             $tmp = array ();
@@ -1479,7 +1479,11 @@ Class TreeModel
         // Языки потребуются для отсева модулей с удаленными языками
         $languages = $this->container->getParameter('languages');
         $languagesAll = $languages['for_all_type_languagest'];
+        $languageDefault = $languages['default'];
         $languages = $languages['list'];
+        if ('yes' != $this->container->getParameter('multilanguage')) {
+            $languages = array ($languageDefault => $languages[$languageDefault]);
+        }
 
         foreach ($AllModules as $key => $val) {
             $access = false;
@@ -1509,7 +1513,12 @@ Class TreeModel
                         break;
                     }
                 }
-                if ($isModule && (($isMulti == true && $val['language'] != $languagesAll)|| ($isMulti==false && $val['language'] == $languagesAll))) {
+                if ($isModule && (($isMulti == true && $val['language'] != $languagesAll) || ($isMulti == false && $val['language'] == $languagesAll))) {
+                    if ($val['language'] == $languagesAll) {
+                        $writeLang = '';
+                    } else {
+                        $writeLang = $languages[$val['language']]['name'];
+                    }
                     $modules[$val['id']][$val['language']] = array (
                         'title' => $config['parameters']['title'],
                         'directory' => $val['name'],
@@ -1521,6 +1530,7 @@ Class TreeModel
                         'module_type' => $config['parameters']['type'],
                         'css_tab' => $config['parameters']['css_tab'],
                         'language' => $val['language'],
+                        'writeLang' => $writeLang,
                     );
                 }
             }
@@ -1703,8 +1713,11 @@ Class TreeModel
         // Вытягиваем список языков
         $languages = $this->container->getParameter('languages');
         $languageAll = $languages['for_all_type_languagest'];
+        $languageDefault = $languages['default'];
         $languages = $languages['list'];
-
+        if ('yes' != $this->container->getParameter('multilanguage')) {
+            $languages = array ($languageDefault => $languages[$languageDefault]);
+        }
         // Теперь опять обходим конфиг 
         // Все данные хранятся в $subModules['имя_модуля'] = значение_idd
 
@@ -1721,20 +1734,20 @@ Class TreeModel
                         $modulelink->setLanguage($lang);
                         if ($moduleName == $value['name']) $modulelink->setIsMain(1);
                         $this->em->persist($modulelink);
+                    } else {
+                        if (!isset($nodesModules[$subModules[$value['name']]][$languageAll])) {
+                            $modulelink = new moduleslink();
+                            $modulelink->setUpTree($idNode);
+                            $modulelink->setUpModule($subModules[$value['name']]);
+                            $modulelink->setLanguage($languageAll);
+                            if ($moduleName == $value['name']) $modulelink->setIsMain(1);
+                            $this->em->persist($modulelink);
+                        }
                     }
                 }
-            } else {
-                if (!isset($nodesModules[$subModules[$value['name']]][$languageAll])) {
-                    $modulelink = new moduleslink();
-                    $modulelink->setUpTree($idNode);
-                    $modulelink->setUpModule($subModules[$value['name']]);
-                    $modulelink->setLanguage($languageAll);
-                    if ($moduleName == $value['name']) $modulelink->setIsMain(1);
-                    $this->em->persist($modulelink);
-                }
+                $this->em->flush();
             }
         }
-        $this->em->flush();
     }
 
 }

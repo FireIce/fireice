@@ -13,6 +13,7 @@ class FrontendModel
     protected $sitetree;
     protected $access;
     protected $container;
+    protected $languageAll;
 
     public function __construct(EntityManager $em, $acl, $cache, $container)
     {
@@ -41,6 +42,8 @@ class FrontendModel
                 );
             }
         }
+        $languages = $this->container->getParameter('languages');
+        $this->languageAll = $languages['for_all_type_languagest'];
     }
 
     public function checkServerBusy()
@@ -51,11 +54,40 @@ class FrontendModel
     public function getNodeInfo($node_id, $language)
     {
         $node = $this->sitetree['nodes'][$node_id];
+        if (isset($node['plugins'][$this->languageAll]['fireice_node_name']['value'])) {
+            $name = $node['plugins'][$this->languageAll]['fireice_node_name']['value'];
+        } elseif (isset($node['plugins'][$language]['fireice_node_name']['value'])) {
+            $name = $node['plugins'][$language]['fireice_node_name']['value'];
+        } else {
+            $name = $node_id;
+        }
+
+        if (isset($node['plugins'][$this->languageAll]['fireice_node_title_lang_'.$language]['value'])) {
+            $title = $node['plugins'][$this->languageAll]['fireice_node_title_lang_'.$language]['value'];
+            if ('' == $title) {
+                $title = $node['plugins'][$this->languageAll]['fireice_node_title']['value'];
+            }
+        } else {
+            $title = '[Узел без названия]';
+        }
+
+
+        if (isset($node['plugins'][$this->languageAll]['fireice_node_title_lang_'.$language]['value'])) {
+            $title = $node['plugins'][$this->languageAll]['fireice_node_title_lang_'.$language]['value'];
+            if ('' == $title) {
+                $title = $node['plugins'][$this->languageAll]['fireice_node_title']['value'];
+            }
+        } else {
+            $title = '[Узел без названия]';
+        }
+
+
+
         $arr = array (
             'id' => $node_id,
             'parent' => $node['up_parent'],
-            'name' => isset($node['plugins'][$language]['fireice_node_name']['value']) ? $node['plugins'][$language]['fireice_node_name']['value'] : $node_id,
-            'title' => isset($node['plugins'][$language]['fireice_node_title']['value']) ? $node['plugins'][$language]['fireice_node_title']['value'] : '[Узел без названия]',);
+            'name' => $name,
+            'title' => $title);
         if ('yes' === $this->container->getParameter('multilanguage')) {
             $arr['path'] = $language.'/'.$node['url']['name'];
         } else {
@@ -108,13 +140,16 @@ class FrontendModel
     }
 
     public function getNodeModules($id, $language)
-    { 
-        return $this->sitetree['nodes'][$id]['sitetree_module'][$language] + $this->sitetree['nodes'][$id]['user_modules'][$language];
+    {
+        if (isset($this->sitetree['nodes'][$id]['sitetree_module'][$this->languageAll])) {
+            return $this->sitetree['nodes'][$id]['sitetree_module'][$this->languageAll] + $this->sitetree['nodes'][$id]['user_modules'];
+        }
+        return $this->sitetree['nodes'][$id]['sitetree_module'][$language] + $this->sitetree['nodes'][$id]['user_modules'];
     }
 
     public function getNodeUsersModules($id, $language)
-    { 
-        return $this->sitetree['nodes'][$id]['user_modules'][$language];
+    {
+        return $this->sitetree['nodes'][$id]['user_modules'];
     }
 
     public function getNavigation($id, $language)

@@ -485,7 +485,9 @@ class BackendModel extends GeneralModel
         }
         // --- Получаем значения плагинов по группам      
         // +++ Получаем массив вида [cid] => array(пользователь, действие, дата)
-        $query = $this->em->createQuery("
+        // Так как $cids - может оказаться пустым добавим
+        if (array () !== $cids) {
+            $query = $this->em->createQuery("
             SELECT 
                 ht.id,
                 ht.up_user,
@@ -495,7 +497,10 @@ class BackendModel extends GeneralModel
                 TreeBundle:history ht
             WHERE ht.id IN (".implode(',', $cids).")");
 
-        $resultCides = $query->getResult();
+            $resultCides = $query->getResult();
+        } else {
+            $resultCides = array ();
+        }
 
         $cids = array ();
         $users = array ();
@@ -507,7 +512,8 @@ class BackendModel extends GeneralModel
         }
         // --- Получаем массив вида [cid] => array(пользователь, действие, дата)    
         // +++ Получаем массив соответсвия ид юзера - имя юзера
-        $query = $this->em->createQuery("
+        if (array () !== $users) {
+            $query = $this->em->createQuery("
             SELECT 
                 us.id,
                 us.login
@@ -515,7 +521,11 @@ class BackendModel extends GeneralModel
                 DialogsBundle:users us
             WHERE us.id IN (".implode(',', $users).")");
 
-        $result_users = $query->getResult();
+            $result_users = $query->getResult();
+        } else {
+            $result_users = array ();
+        }
+
 
         $users = array ();
 

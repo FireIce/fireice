@@ -77,12 +77,25 @@ class GeneralModel
     // Считывание плагинов из конфига и их добавление
     public function getPlugins()
     {
+        $languages = $this->container->getParameter('languages');
+        $languagesAll = $languages['for_all_type_languagest'];
+        $languages = $languages['list'];
         if (true === empty($this->plugins)) {
 
             $config = $this->getModuleEntity()->getConfig();
 
             foreach ($config as $val) {
-                $this->addPlugin($val);
+                if (isset($val['multi']) && true == $val['multi']) {
+                    $name = $val['name'];
+                    $title = $val['title'];
+                    foreach ($languages as $lang => $language) {
+                        $val['name'] = $name.'_'.$lang;
+                        $val['title'] = $title.'('.$lang.')';
+                        $this->addPlugin($val);
+                    }
+                } else {
+                    $this->addPlugin($val);
+                }
             }
 
             return true === empty($this->plugins) ? null : $this->plugins;

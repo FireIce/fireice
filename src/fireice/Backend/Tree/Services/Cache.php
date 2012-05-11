@@ -328,48 +328,47 @@ class Cache
         $languageAll = $languages['for_all_type_languagest'];
         $languages = $languages['list'];
 
-        // Исключим лишнее
-        // Пройдемся по узлам. Прочтем у каждого Конфиг
-        foreach ($nodes as $idNode => &$node) {
-            // Найдем модуль на основе которого построен узел
-            $query = $this->em->createQuery('
-                SELECT md.name as name
+        $query = $this->em->createQuery('
+                SELECT md_l.up_tree as id, md.name as name
                 FROM 
                     DialogsBundle:moduleslink md_l, 
                     DialogsBundle:modules md
                 WHERE
-                    md_l.up_tree= :idNode
-                    AND md_l.is_main = TRUE
+                    md_l.is_main = TRUE
                     AND md_l.up_module = md.idd');
-            $query->setParameter('idNode', $idNode);
-            $name = $query->getResult();
-            $moduleMain = $name[0]['name']; //Это он.
+        $mains = $query->getResult();
+        $moduleMains = array ();
+        foreach ($mains as $main) {
+            if (!isset($moduleMains[$main['id']])) $moduleMains[$main['id']] = $main['name'];
+        }
+
+        // Исключим лишнее
+        // Пройдемся по узлам. Прочтем у каждого Конфиг
+
+        foreach ($nodes as $idNode => &$node) {
+            // Найдем модуль на основе которого построен узел
+            $moduleMain = $moduleMains[$idNode];//$name[0]['name']; //Это он.
             $config = $this->getModuleConfig($moduleMain);
             $modules = $config['parameters']['modules'];
-            /* $aUserModules = array ();
-              foreach ($config['parameters']['modules'] as $key => $module) {
-              if ('sitetree' != $key) {
-              $aUserModules[$key] = $module;
-              }
-              } */
 
             foreach ($modules as $key => $module) {
                 if ($key == 'sitetree') {
-                    if ($module['multilanguage'] == 'yes') {
-                        unset($node['sitetree_module'][$languageAll]);
-                        unset($node['plugins'][$languageAll]);
-                    } else {
-                        $tmp = array ();
-                        $tmp = $node['sitetree_module'][$languageAll];
-                        unset($node['sitetree_module']);
-                        $node['sitetree_module'] = array ();
-                        $node['sitetree_module'][$languageAll] = $tmp;
+                    $aTmpPlugins = array ();
+                    if (isset($node['plugins'][$languageAll])) {
+                        $aTmpPlugins = $node['plugins'][$languageAll];
+                    }
+                    $aTmpSitetree = array ();
+                    if (isset($node['sitetree_module'][$languageAll])) {
+                        $aTmpSitetree = $node['sitetree_module'][$languageAll];
+                    }
+                    unset($node['sitetree_module'][$languageAll]);
+                    unset($node['plugins'][$languageAll]);
 
-                        $tmp = array ();
-                        $tmp = $node['plugins'][$languageAll];
-                        unset($node['plugins']);
-                        $node['plugins'] = array ();
-                        $node['plugins'][$languageAll] = $tmp;
+                    if ($module['multilanguage'] != 'yes') { // Пока всегда, так как Настройки не могут быть мультиязычными
+                        $node['sitetree_module'][$languageAll] = array ();
+                        $node['sitetree_module'][$languageAll] = $aTmpSitetree;
+                        $node['plugins'][$languageAll] = array ();
+                        $node['plugins'][$languageAll] = $aTmpPlugins;
                     }
                 } else {
                     if ($module['multilanguage'] == 'yes') {
@@ -382,19 +381,6 @@ class Cache
                 }
             }
         }
-
-        // Проверка плгинов для всех языков
-        foreach ($nodes as $key => $val) {
-            foreach ($languages as $lang => $language) {
-                if (!isset($val['plugins'][$lang])) {
-                    $nodes[$key]['plugins'][$lang] = $aPlagins;
-                }
-            }
-            if (!isset($val['plugins'][$languageAll])) {
-                $nodes[$key]['plugins'][$languageAll] = $aPlagins;
-            }
-        }
-
 
         $hierarchy = array ();
 
