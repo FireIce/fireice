@@ -69,7 +69,7 @@ function defPosition(event)
     } 
     else 
     {
-    // Do nothing
+        // Do nothing
     }
     return {
         x:x, 
@@ -342,7 +342,14 @@ function ckeditorInstancesDestroy()
         for (var key in CKEDITOR.instances)
         {
             var tmp = CKEDITOR.instances[key];
-            tmp.destroy();         
+            if (typeof(tmp) != undefined && tmp != null)
+           // { try{
+                    tmp.destroy(true);
+            //}
+             //   catch (e) {
+                   // tmp.destroy(true);
+              //  }
+           // }
         }   
     }
 }

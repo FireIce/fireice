@@ -70,7 +70,7 @@ class BackendModel
         $languages = $this->container->getParameter('languages');
         $languagesDefault = $languages['default'];
         $languages = $languages['list'];
-        
+
         // Если нет метода задающего источник, то возвращаем false
         if (!method_exists($entity, $metod)) return false;
 

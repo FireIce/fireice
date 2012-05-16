@@ -605,6 +605,11 @@ Class TreeModel
     // Возвращает массив модулей которые можно привязать к потомку данного узла
     public function getModules($node_id)
     {
+        $languages = $this->container->getParameter('languages');
+        //$languagesAll = $languages['for_all_type_languagest'];
+        $languageDefault = $languages['default'];
+        //$languages = $languages['list'];
+
         $returnModules = array ();
 
         $query = $this->em->createQuery("
@@ -675,6 +680,7 @@ Class TreeModel
                             AND md.status = 'active'
                             AND md_l.up_tree = tr.idd
                             AND md_l.up_module = md.idd
+                            AND md_l.language = '$languageDefault'
                             AND (tr.status = 'active' OR tr.status = 'hidden')
                             AND tr.final = 'Y'
                             AND md.idd = :idd")->setParameter('idd', $user_module['id']);
@@ -693,6 +699,7 @@ Class TreeModel
                             AND md.status = 'active'
                             AND md_l.up_tree = tr.idd
                             AND md_l.up_module = md.idd
+                            AND md_l.language = '$languageDefault'
                             AND (tr.status = 'active' OR tr.status = 'hidden')
                             AND tr.final = 'Y'
                             AND tr.up_parent = :up_parent

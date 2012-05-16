@@ -96,11 +96,11 @@ class FrontendController extends Controller
                     if ($tree->getNodeModule($path[$i - 1], $languageSelect)->checkEndOf($ostatok)) return $this->showPage($path[$i - 1], $languageSelect, $ostatok);
 
                     // Страницы не существует...
-                    return $this->get404Page();
+                    return $this->get404Page($languageSelect);
                 }
                 else if (!$frontendModel->checkAccess($in_childs)) {
                     // Страницы не существует...
-                    return $this->get404Page();
+                    return $this->get404Page($languageSelect);
                 } else {
                     $path[$i] = $in_childs;
                 }
@@ -112,7 +112,7 @@ class FrontendController extends Controller
         // Открыть главную страницу, если только язык в урле
         if ($isLang) return $this->showPage(1, $languageSelect, '');
         // Страницы не существует... 
-        return $this->get404Page();
+        return $this->get404Page($languageSelect);
     }
 
     public function showPage($id_node, $language, $params = '')
@@ -156,12 +156,22 @@ class FrontendController extends Controller
         return new Response($this->transformationHtml($content));
     }
 
-    public function get404Page()
+    public function get404Page($language = null)
     {
-        $response = new Response('', 404);
-        $response->headers->set('Content-Type', 'text/html');
+        if (null == $language) {
+            $languages = $this->container->getParameter('languages');
+            $languageSelected = $languages['default']; //Присвоили по умолчанию
+        } else {
+            $languageSelected = $language;
+        }
+        return $this->render('FrontendBundle:Frontend:404.html.twig', array (
+                'language' => $languageSelected,
+            ));
 
-        return $response;
+        /*      $response = new Response('Собственная 404', 404);
+          $response->headers->set('Content-Type', 'text/html');
+
+          return $response; */
     }
 
     protected function transformationHtml($html)
