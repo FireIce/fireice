@@ -39,11 +39,11 @@ function showListInner(data)
     $( list_temp ).tmpl( arr ).appendTo( '#dialog_id .inner' );      
 
     $('#dialog_id .inner .edit_button').click(function(){
-        $.history.load('action/' + getNodeAction(action) + '/id/' + id_action + '/module/' + id_module + '/edit_row/' + $(this).attr('row_id')+'/language/'+language);
+        $.history.load('action/' + getNodeAction(action) + '/id/' + id_action + '/module/' + id_module + '/edit_row/' + $(this).attr('row_id'));
     });
     
     $('#dialog_id .inner .add_button').click(function(){
-        $.history.load('action/' + getNodeAction(action) + '/id/' + id_action + '/module/' + id_module + '/add_row/true'+'/language/'+language);
+        $.history.load('action/' + getNodeAction(action) + '/id/' + id_action + '/module/' + id_module + '/add_row/true');
     });   
     
     $('#dialog_id .inner .delete_button').click(function(){

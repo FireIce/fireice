@@ -68,7 +68,13 @@ class FrontendController extends Controller
                 $isLang = true;
                 array_shift($path);
             } else { // Нет, не язык.
-                return $this->redirect($languageDefault.$this->get('request')->getPathInfo(), 301);
+                $lnCp = count($path);
+                $lsPath = '';
+                for ($i = 1; $i < $lnCp; $i++) {
+                    $lsPath = $lsPath.'../';
+                }
+                $lsPath = $lsPath.$languageDefault.$this->get('request')->getPathInfo();
+                return $this->redirect($lsPath, 301);
             }
         } else {
             $languageSelect = $languageDefault;
@@ -164,9 +170,12 @@ class FrontendController extends Controller
         } else {
             $languageSelected = $language;
         }
+        $response = new Response('Собственная 404', 404);
         return $this->render('FrontendBundle:Frontend:404.html.twig', array (
                 'language' => $languageSelected,
-            ));
+                ), $response);
+
+
 
         /*      $response = new Response('Собственная 404', 404);
           $response->headers->set('Content-Type', 'text/html');

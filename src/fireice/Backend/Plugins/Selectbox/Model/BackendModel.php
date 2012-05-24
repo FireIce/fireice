@@ -74,7 +74,7 @@ class BackendModel extends \fireice\Backend\Plugins\BasicPlugin\Model\BackendMod
         }
 
         // Если нет записей в БД, нужно всё равно вернуть записи с label
-        if ($return === array () && $rows !== false) {
+        if ($return === array () /* && $rows !== false */) {
             foreach ($entity->getConfig() as $plugin) {
                 $сhoices = $this->getChoices($entity, $plugin['name']);
 

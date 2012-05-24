@@ -182,6 +182,11 @@ class TreeController extends Controller
         return $response;
     }
 
+    public function getNodeModuleCommentsAction($id)
+    {
+        $this->getModel()->updateNodeLink($id);
+    }
+
     public function dialogCreateEditAction()
     {
         $em = $this->get('doctrine.orm.entity_manager');

@@ -66,7 +66,7 @@ function showItemInner(data)
         $('#dialog_id .history_button').click(function(){ 
         
        
-            $.history.load('action/' + getNodeAction(action) + '/id/' + id_action + '/module/' + id_module + '/history/true'); 
+            $.history.load('action/' + getNodeAction(action) + '/id/' + id_action + '/module/' + id_module + '/history/true' + '/language/' + language); 
         });
         $('#dialog_id .submit_button').click(function(){
             editSubmit();
@@ -150,14 +150,27 @@ function getHistory(id_mod, language)
     id_module = id_mod;
     
     ckeditorInstancesDestroy();
+    
   
-    $('#dialog_id .tab').removeClass('current');
-    $('#dialog_id .form .tab').each(function(){
+    
+  
+    //$('#dialog_id .tab').removeClass('current');
+    /*$('#dialog_id .form .tab').each(function(){
         if ($(this).attr('id_module') == id_mod)
         {
+        //$(this).addClass('current');
+        }
+    });   */ 
+    
+    // Выделение
+    $('#dialog_id .tab').removeClass('current');
+    $('#dialog_id .form .tab').each(function(){
+        if ($(this).attr('id_module') == id_module && $(this).attr('language') == language)
+        {
+            module_type = $(this).attr('module_type');
             $(this).addClass('current');
         }
-    });      
+    });
     
     var template = getTemplate(options.assets + '/tree/templates/createadd_node/item_inner.html');      
     $('#dialog_id .inner').html(template);
@@ -190,6 +203,7 @@ function getHistory(id_mod, language)
         dataType : "json",   
         cache: false,                             
         success: function (answer, textStatus) { 
+
                 
             getHistory_callback(answer);
         }
@@ -197,11 +211,15 @@ function getHistory(id_mod, language)
 }
 function getHistory_callback(answer)
 { 
+
     var template = '<script type="text/x-jquery-tmpl">' + getTemplate(options.assets + '/tree/templates/createadd_node/history_block.html') + '</script>';
     
     $('#dialog_id .history').html('');
     
     $(template).tmpl(answer).appendTo('#dialog_id .history');
+    
+   
+    
 }
 
 // Подтвердить на уровне редактора        

@@ -1542,7 +1542,19 @@ Class TreeModel
                 }
             }
         }
-        return $modules;
+
+        $aID = array ();
+        $return = array ();
+        foreach ($modules as $id => $mod) {
+            $aID[] = $id;
+        }
+        foreach ($aID as $id) {
+            foreach ($languages as $lang => $language) {
+                if (isset($modules[$id][$lang])) $return[$id][$lang] = $modules[$id][$lang];
+            }
+            if (isset($modules[$id][$languagesAll])) $return[$id][$languagesAll] = $modules[$id][$languagesAll];
+        }
+        return $return; //$modules;
     }
 
     public function getNewMessages($security)
@@ -1741,20 +1753,20 @@ Class TreeModel
                         $modulelink->setLanguage($lang);
                         if ($moduleName == $value['name']) $modulelink->setIsMain(1);
                         $this->em->persist($modulelink);
-                    } else {
-                        if (!isset($nodesModules[$subModules[$value['name']]][$languageAll])) {
-                            $modulelink = new moduleslink();
-                            $modulelink->setUpTree($idNode);
-                            $modulelink->setUpModule($subModules[$value['name']]);
-                            $modulelink->setLanguage($languageAll);
-                            if ($moduleName == $value['name']) $modulelink->setIsMain(1);
-                            $this->em->persist($modulelink);
-                        }
                     }
                 }
-                $this->em->flush();
+            } else {
+                if (!isset($nodesModules[$subModules[$value['name']]][$languageAll])) {
+                    $modulelink = new moduleslink();
+                    $modulelink->setUpTree($idNode);
+                    $modulelink->setUpModule($subModules[$value['name']]);
+                    $modulelink->setLanguage($languageAll);
+                    if ($moduleName == $value['name']) $modulelink->setIsMain(1);
+                    $this->em->persist($modulelink);
+                }
             }
         }
+        $this->em->flush();
     }
 
 }
